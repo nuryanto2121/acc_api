@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Acc.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Acc.Api.Controllers.AuthController.Login(Acc.Api.Models.AuthLogin)">
+            <summary>
+            ini adalah login
+            </summary>
+            <param name="Model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.AuthController.Logout(Acc.Api.Models.AuthLogin)">
+            <summary>
+            
+            </summary>
+            <param name="Model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.Delete(System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Dynamic API untuk Delete
+            </summary>
+            <param name="option_url">url utk dapat nama table/SP yg di exec</param>
+            <param name="line_no"></param>
+            <param name="id">ini id data yg ingin diGet</param>
+            <param name="lastupdatestamp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.GetById(System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+             Dynamic API untuk GetDataByID
+            </summary>
+            <param name="option_url">url utk dapat nama table/SP yg di exec</param>
+            <param name="line_no"></param>
+            <param name="id">ini id data yg ingin diGet</param>
+            <param name="lastupdatestamp">ini xmin data yg ingin diGet</param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.GetList(Acc.Api.Models.ParamList)">
+            <summary>
+            Dynamic API untuk GetList
+            </summary>
+            <param name="ModelList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.GetListLookup(Acc.Api.Models.ParamLookupList)">
+            <summary>
+            Dynamic API untuk GetListLookup
+            </summary>
+            <param name="ModelList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.Insert(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Dynamic API untuk Insert
+            </summary>
+            <param name="Model">paramter wajib : option_url dan line_no ,selebih'a parameter utk function</param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.DynamicAPIController.Update(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Dynamic API untuk Update
+            </summary>
+            <param name="Model">paramter wajib : option_url dan line_no ,selebih'a parameter utk function</param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.Dynamic.DynamicFunctionController.GetData(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            api untuk function yg didaftarkan di table function
+            </summary>
+            <param name="Jmodel">option_function_cd : required,module_cd : required, sisa'a parameter untuk functionnya</param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.FileUploadImport.FileController.UploadFile(Acc.Api.Models.UploadFile)">
+            <summary>
+            
+            </summary>
+            <param name="uploadFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.FileUploadImport.FileController.ExportFileList(System.String,System.String,System.String)">
+            <summary>
+            Generate File excel,pdf dan csv dari list
+            </summary>
+            <param name="N">FileName</param>
+            <param name="T">Type File : 1 = excel, 2 = pdf ,3 = csv</param>
+            <param name="K">Key(Token) dari list</param>
+            <returns></returns>
+            <response code="200">Returns the requested file</response>
+        </member>
+        <member name="M:Acc.Api.Controllers.FileUploadImport.FileController.GetTokenExport(Acc.Api.Models.ExportExcelJson)">
+            <summary>
+            untuk generate token baru berdasarkan row yg dipilih
+            </summary>
+            <param name="Jmodel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.SsMenuController.Delete(System.String,System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="option_url"></param>
+            <param name="line_no"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.SsMenuController.GetById(System.String,System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="option_url"></param>
+            <param name="line_no"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Controllers.SystemAdministrator.UserFavoriteController.Insert(Acc.Api.Models.SystemAdministrator.ParamMenuFav)">
+            <summary>
+            
+            </summary>
+            <param name="Model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Helper.Tools.DBConnection(System.String)">
+            <summary>
+            ini utk connection postgress
+            </summary>
+            <param name="ConnectionString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Helper.Tools.SqlConnection(System.String)">
+            <summary>
+            Ini utk Connecti SQL
+            </summary>
+            <param name="ConnectionString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Acc.Api.Helper.Tools.MySqlConnection(System.String)">
+            <summary>
+            Connection Mysql
+            </summary>
+            <param name="ConnectionString"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Acc.Api.Models.ParamList">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Acc.Api.Services.SwaggerFileOperationFilter.Apply(Swashbuckle.AspNetCore.Swagger.Operation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            
+            </summary>
+            <param name="operation"></param>
+            <param name="context"></param>
+        </member>
+    </members>
+</doc>
