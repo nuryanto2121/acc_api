@@ -61,7 +61,12 @@ namespace Acc.Api
                 AddJsonOptions(options => options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local);
 
             AppSettings settings = Configuration.GetSection("appSetting").Get<AppSettings>();
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.Configure<AppSettings>(Configuration.GetSection("appSetting"));
             services.AddSingleton(settings);
+            services.AddTransient<IEmailService, EmailService>();
+            //services.AddTransient<IEmailSender, EmailService>();
+            
             //services.AddTransient<IDynamicService, DynamicService>();
             services.AddTransient<IAuthService, AuthServices>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
