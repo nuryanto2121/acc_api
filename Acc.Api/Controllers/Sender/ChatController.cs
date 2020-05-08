@@ -93,6 +93,7 @@ namespace Acc.Api.Controllers.Sender
         /// </summary>
         /// <param name="id">id header chat</param>
         /// <param name="user_id">user_id dari yg menerima/login</param>
+        /// <param name="curr_page">default utk timer selalu 1, bila di scroll ke atas +1 </param>
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(Output), 200)]

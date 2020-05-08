@@ -77,7 +77,7 @@ namespace Acc.Api.DataAccess
             }
         }
 
-        public List<GetChat> GetAllChat(int HeaderId)
+        public List<GetChat> GetAllChat(int HeaderId,int curr_page)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
@@ -87,6 +87,7 @@ namespace Acc.Api.DataAccess
                     conn.Open();
                     DynamicParameters Parameters = new DynamicParameters();
                     Parameters.Add("p_header_id", HeaderId, dbType: DbType.Int32);
+                    Parameters.Add("p_page", curr_page, dbType: DbType.Int32);
                     _result = conn.Query<GetChat>("fss_chat_d_getallchat", Parameters, commandType: CommandType.StoredProcedure).ToList();
                 }
                 catch (Exception ex)

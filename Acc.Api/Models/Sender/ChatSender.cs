@@ -14,6 +14,7 @@ namespace Acc.Api.Models
         public string user_id_to { get; set; }
         public string doc_type { get; set; }
         public string doc_no { get; set; }
+        public int current_page { get; set; }
         public string user_input { get; set; }
     }
     public class ChatDetail

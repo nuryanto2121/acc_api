@@ -35,7 +35,7 @@ namespace Acc.Api.Services
                 {
                     int ChatId = Convert.ToInt32(HeaderId);
                     var dataHedaer = chatRepo.GetDataHeader(ChatId);
-                    var dataChat = chatRepo.GetAllChat(ChatId);
+                    var dataChat = chatRepo.GetAllChat(ChatId, Model.current_page);
                     dataChat.ForEach(delegate (GetChat dtChat)
                     {
                         dtChat.user_id_from = EncryptionLibrary.EncryptText(dtChat.user_id_from);
