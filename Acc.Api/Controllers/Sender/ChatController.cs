@@ -22,7 +22,7 @@ namespace Acc.Api.Controllers.Sender
         }
 
         /// <summary>
-        /// 
+        /// check pesan, ketika klik logo pesan.
         /// </summary>
         /// <param name="Model"> parameter yg dipake : {"portfolio_id":"","subportfolio_id":"","doc_type":"","doc_no":""}</param>
         /// <returns></returns>
@@ -44,7 +44,7 @@ namespace Acc.Api.Controllers.Sender
         }
 
         /// <summary>
-        /// 
+        /// bila check pesan data'a null maka save header
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
@@ -66,7 +66,7 @@ namespace Acc.Api.Controllers.Sender
         }
 
         /// <summary>
-        /// 
+        /// untuk kirim pesan
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
@@ -89,10 +89,10 @@ namespace Acc.Api.Controllers.Sender
 
 
         /// <summary>
-        /// 
+        /// untuk refresh pesan baru
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="user_id"></param>
+        /// <param name="id">id header chat</param>
+        /// <param name="user_id">user_id dari yg menerima/login</param>
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(Output), 200)]

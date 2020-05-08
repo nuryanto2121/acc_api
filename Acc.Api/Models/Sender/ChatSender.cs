@@ -10,7 +10,8 @@ namespace Acc.Api.Models
         public string portfolio_id { get; set; }
         public string subportfolio_id { get; set; }
         public string subject { get; set; }
-        public string user_ids { get; set; }
+        public string user_id_from { get; set; }
+        public string user_id_to { get; set; }
         public string doc_type { get; set; }
         public string doc_no { get; set; }
         public string user_input { get; set; }

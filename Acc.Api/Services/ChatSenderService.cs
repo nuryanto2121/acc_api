@@ -1,6 +1,7 @@
 ﻿using Acc.Api.DataAccess;
 using Acc.Api.Helper;
 using Acc.Api.Models;
+using EncryptLibrary.AES256Encryption;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Acc.Api.Services
         public Output GetAllChat(ChatSender Model)
         {
             Output _result = new Output();
+            Dictionary<string, object> ObjOutput = new Dictionary<string, object>();
             try
             {
                 //check chat header
@@ -32,7 +34,17 @@ namespace Acc.Api.Services
                 if (HeaderId != null)
                 {
                     int ChatId = Convert.ToInt32(HeaderId);
-                    _result.Data = chatRepo.GetAllChat(ChatId);
+                    var dataHedaer = chatRepo.GetDataHeader(ChatId);
+                    var dataChat = chatRepo.GetAllChat(ChatId);
+                    dataChat.ForEach(delegate (GetChat dtChat)
+                    {
+                        dtChat.user_id_from = EncryptionLibrary.EncryptText(dtChat.user_id_from);
+                    });
+                    ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
+                    ObjOutput.Add("user_to", EncryptionLibrary.EncryptText(dataHedaer.user_id_to));
+                    ObjOutput.Add("row_id", HeaderId);
+                    ObjOutput.Add("chat", dataChat);
+                    _result.Data = ObjOutput;
                 }
 
             }
@@ -45,16 +57,28 @@ namespace Acc.Api.Services
         public Output GetChat(int id, string user_id)
         {
             Output _result = new Output();
+            Dictionary<string, object> ObjOutput = new Dictionary<string, object>();
             try
             {
-                GetChat dt = new GetChat();
+                List<GetChat> dtList = new List<GetChat>();
                 user_id = fn.DecryptString(user_id);
 
-                dt = chatRepo.GetChat(id, user_id);
+                dtList = chatRepo.GetChat(id, user_id);
+                if (dtList.Count > 0)
+                {
+                    dtList.ForEach(delegate (GetChat dt)
+                    {
+                        chatRepo.UpdateStatusChat(dt);
+                        dt.user_id_from = EncryptionLibrary.EncryptText(dt.user_id_from);
+                    });
 
-                chatRepo.UpdateStatusChat(dt);
-
-                _result.Data = dt;
+                }
+                var dataHedaer = chatRepo.GetDataHeader(id);
+                ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
+                ObjOutput.Add("user_to", EncryptionLibrary.EncryptText(dataHedaer.user_id_to));
+                ObjOutput.Add("row_id", id);
+                ObjOutput.Add("chat", dtList);
+                _result.Data = ObjOutput;
             }
             catch (Exception ex)
             {
@@ -84,6 +108,8 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
+                string paramWhere = string.Format("ss_chat_h_id = {0}", Model.ss_chat_h_id);
+                //string user_id_to = fn.SelectScalar(Enum.SQL.Function.Aggregate.Max, "ss_chat_h", "user_id_to", paramWhere).ToString();
                 Model.user_id_to = fn.DecryptString(Model.user_id_to);
                 Model.user_id_from = fn.DecryptString(Model.user_id_from);
                 Model.user_input = fn.DecryptString(Model.user_input);
