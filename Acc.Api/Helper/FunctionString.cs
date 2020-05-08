@@ -993,7 +993,7 @@ namespace Acc.Api.Helper
                 }
             }
 
-            if (data.ToUpper().Contains("portfolio_id"))
+            if (data.ToLower().Contains("portfolio_id"))
             {
                 valStrEncrypt = this.getString(data, "portfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "portfolio_id='", "'") : valStrEncrypt;
@@ -1008,7 +1008,7 @@ namespace Acc.Api.Helper
                 valStrDecrypt = string.Empty;
             }
 
-            if (data.ToUpper().Contains("subportfolio_id"))
+            if (data.ToLower().Contains("subportfolio_id"))
             {
                 valStrEncrypt = this.getString(data, "subportfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "subportfolio_id='", "'") : valStrEncrypt;
