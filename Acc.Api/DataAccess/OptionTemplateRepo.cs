@@ -55,8 +55,7 @@ namespace Acc.Api.DataAccess
                     sQuery.AppendFormat("SELECT ");
                     sQuery.AppendFormat("subportfolio_id,Column_Field ");
                     sQuery.AppendFormat("FROM SS_Define_Column ");
-                    sQuery.AppendFormat("WHERE user_id ='{0}' AND subportfolio_id = '{1}' ", user_id, subportfolio_cd);
-                    sQuery.AppendFormat("AND option_url iLike '{0}' AND Line_No = '{1}' ", OptionSeq.ToUpper(), LineNo);
+                    sQuery.AppendFormat("WHERE option_url iLike '{0}' AND Line_No = '{1}' ", OptionSeq.ToUpper(), LineNo);
 
                     conn.Open();
                     dd = conn.Query<DefineColumn>(sQuery.ToString()).FirstOrDefault();

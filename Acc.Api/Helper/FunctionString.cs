@@ -460,6 +460,7 @@ namespace Acc.Api.Helper
                             }
                             else
                             {
+                                valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
                                 sp.Add("@" + validName, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
                             }
                         }
@@ -474,6 +475,7 @@ namespace Acc.Api.Helper
                         }
                         else
                         {
+                            valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
                             sp.Add("@" + validName, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
                         }
 
@@ -487,6 +489,7 @@ namespace Acc.Api.Helper
                         }
                         else
                         {
+                            valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
                             sp.Add("@" + validName, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
                         }
 
@@ -500,6 +503,7 @@ namespace Acc.Api.Helper
                         }
                         else
                         {
+                            valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
                             sp.Add("@" + validName, Convert.ToInt64(valData.ToString()), dbType: DbType.Int64);
                         }
 
@@ -592,7 +596,7 @@ namespace Acc.Api.Helper
             string dtSize = string.Empty;
             string fieldWhere = string.Empty;
             string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;
-            if(dfColumn != null)
+            if (dfColumn != null)
             {
                 if (dfColumn[0] == "no")
                 {
@@ -600,7 +604,7 @@ namespace Acc.Api.Helper
                     sSize = "S,";
                 }
             }
-            
+
 
             //dfColumn = List ? null : dfColumn;
             //string sWhere = string.Empty;
@@ -1048,7 +1052,7 @@ namespace Acc.Api.Helper
                     {
                         _result += string.Format("lower({0}::varchar) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
                     }
-                    
+
                 }
                 _result = !string.IsNullOrEmpty(_result) ? "( " + _result.Remove(_result.LastIndexOf("OR")) + " )" : _result;
             }

@@ -24,7 +24,7 @@ namespace Acc.Api.Controllers.Sender
         /// <summary>
         /// check pesan, ketika klik logo pesan.
         /// </summary>
-        /// <param name="Model"> parameter yg dipake : {"portfolio_id":"","subportfolio_id":"","doc_type":"","doc_no":""}</param>
+        /// <param name="Model"> parameter yg dipake : {"portfolio_id":"","subportfolio_id":"","doc_type":"","doc_no":"","current_page":1}</param>
         /// <returns></returns>
         [HttpPost("Check")]
         [ProducesResponseType(typeof(Output), 200)]
@@ -93,7 +93,6 @@ namespace Acc.Api.Controllers.Sender
         /// </summary>
         /// <param name="id">id header chat</param>
         /// <param name="user_id">user_id dari yg menerima/login</param>
-        /// <param name="curr_page">default utk timer selalu 1, bila di scroll ke atas +1 </param>
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(Output), 200)]
