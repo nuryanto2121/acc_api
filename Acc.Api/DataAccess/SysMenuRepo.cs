@@ -387,5 +387,53 @@ namespace Acc.Api.DataAccess
             }
             return result;
         }
+
+        public bool Delete(int key, int timestamp)
+        {
+            int result = 0;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = "DELETE FROM public.ss_menu WHERE ss_menu_id = @ss_menu_id and xmin::text::integer = @timestamp";
+                try
+                {
+                    conn.Open();
+                    result = conn.Execute(sqlQuery, new { ss_menu_id = key, timestamp = timestamp });
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return (result > 0);
+        }
+
+        public SsMenu GetById(int key, int timestamp)
+        {
+            SsMenu t = null;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string strQuery = "SELECT   ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id and xmin::text::integer = @timestamp";
+                try
+                {
+                    conn.Open();
+                    t = conn.Query<SsMenu>(strQuery, new { ss_menu_id = key, timestamp = timestamp }).SingleOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+            }
+
+            return t;
+        }
     }
 }

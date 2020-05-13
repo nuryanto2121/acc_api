@@ -34,6 +34,11 @@ namespace Acc.Api.Services
             return _result;
         }
 
+        public Output Delete(int Key, int Timestamp)
+        {
+            throw new NotImplementedException();
+        }
+
         public Output GetDataBy(int Key)
         {
             Output _result = new Output();
@@ -46,6 +51,11 @@ namespace Acc.Api.Services
                 throw ex;
             }
             return _result;
+        }
+
+        public Output GetDataBy(int Key, int Timestamp)
+        {
+            throw new NotImplementedException();
         }
 
         public Output GetDataList(string Parameter)
@@ -63,19 +73,9 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        public Output GetList(JObject JModel)
+        public DTResultListDyn<dynamic> GetList(ParamList JModel)
         {
             throw new NotImplementedException();
-            //Output _result = new Output();
-            //try
-            //{
-            //    _result.Data = moduleRepo.GetById(Key);
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
-            //return _result;
         }
 
         public Output Insert(SsModule Model)

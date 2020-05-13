@@ -11,9 +11,9 @@ namespace Acc.Api.Interface
     {
         Output Insert(T Model);
         Output Update(T Model);
-        Output Delete(K Key);
-        Output GetDataBy(K Key);
-        Output GetList(JObject JModel);
+        Output Delete(K Key,K Timestamp);
+        Output GetDataBy(K Key, K Timestamp);
+        DTResultListDyn<dynamic> GetList(ParamList JModel);
         Output GetDataList(string Parameter);
     }
 }

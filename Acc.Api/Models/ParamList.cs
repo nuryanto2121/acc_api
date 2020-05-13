@@ -11,9 +11,9 @@ namespace Acc.Api.Models
     /// </summary>
     public class ParamList
     {
-        [Required]
+        //[Required]
         public string option_url { get; set; }
-        [Required]
+        //[Required]
         public int line_no { get; set; }
         public string user_id { get; set; }
         public string portfolio_id { get; set; }

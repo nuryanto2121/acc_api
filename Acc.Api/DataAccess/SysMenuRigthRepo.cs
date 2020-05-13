@@ -250,5 +250,15 @@ namespace Acc.Api.DataAccess
             }
             return (result > 0);
         }
+
+        public bool Delete(int key, int timestamp)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SsMenuGroup GetById(int key, int timestamp)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

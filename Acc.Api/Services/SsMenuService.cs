@@ -21,7 +21,7 @@ namespace Acc.Api.Services
             fn = new FunctionString(Tools.ConnectionString(configuration));
         }
 
-        public Output Delete(int Key)
+        public Output Delete(int Key, int Timestamp)
         {
             Output _result = new Output();
             try
@@ -60,12 +60,12 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        public Output GetDataBy(int Key)
+        public Output GetDataBy(int Key, int Timestamp)
         {
             Output _result = new Output();
             try
             {
-                _result.Data = SsMenuRepo.GetById(Key);
+                _result.Data = SsMenuRepo.GetById(Key, Timestamp);
             }
             catch (Exception ex)
             {
@@ -74,7 +74,7 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        public Output GetList(JObject JModel)
+        public DTResultListDyn<dynamic> GetList(ParamList JModel)
         {
             throw new NotImplementedException();
         }

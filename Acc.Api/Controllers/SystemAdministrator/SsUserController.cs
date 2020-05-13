@@ -1,46 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
-namespace Acc.Api.Controllers
+namespace Acc.Api.Controllers.SystemAdministrator
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SsMenuController : ControllerBase//, IAPIController<SsMenu>
+    public class SsUserController : ControllerBase//, IAPIController<SsUser>
     {
-        private IConfiguration config;
-        private ICrudService<SsMenu, int> sysMenuService;
-        public SsMenuController(IConfiguration configuration)
+        private ICrudService<SsUser, int> SsUserService;
+        public SsUserController(IConfiguration configuration)
         {
-            config = configuration;
-            sysMenuService = new SsMenuService(configuration);
+            SsUserService = new SsUserService(configuration);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="option_url"></param>
-        /// <param name="line_no"></param>
         /// <param name="id"></param>
+        /// <param name="lastupdatestamp"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult Delete(string option_url, int line_no, [Required]int id)
+        public IActionResult Delete([Required] int id, [Required] int lastupdatestamp)
         {
             var output = new Output();
             try
             {
-                output = sysMenuService.Delete(id, 123);
+                SsUserService.Delete(id, lastupdatestamp);
             }
             catch (Exception ex)
             {
@@ -53,18 +49,17 @@ namespace Acc.Api.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="option_url"></param>
-        /// <param name="line_no"></param>
         /// <param name="id"></param>
+        /// <param name="lastupdatestamp"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetById(string option_url, int line_no, [Required]int id)
+        public IActionResult GetById([Required] int id, [Required] int lastupdatestamp)
         {
             var output = new Output();
             try
             {
-                output = sysMenuService.GetDataBy(id, 1);
+                output = SsUserService.GetDataBy(id, lastupdatestamp);
             }
             catch (Exception ex)
             {
@@ -74,65 +69,66 @@ namespace Acc.Api.Controllers
             return Ok(output);
         }
 
-
-
-        [HttpGet("datalist")]
-        [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetDataList(string initialwhere = "")
-        {
-            var output = new Output();
-            try
-            {
-
-
-                output = sysMenuService.GetDataList(initialwhere);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
-            }
-
-            return Ok(output);
-        }
-
-
-        [HttpPost]
-        [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult Insert([FromBody] SsMenu Model)
-        {
-            var output = new Output();
-            try
-            {
-                output = sysMenuService.Insert(Model);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
-            }
-            return Ok(output);
-        }
-
-        [HttpPut]
-        [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult Update([FromBody] SsMenu Model)
-        {
-            var output = new Output();
-            try
-            {
-                output = sysMenuService.Update(Model);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
-            }
-            return Ok(output);
-        }
-
-        [HttpPost("Shortcut")]
+        [HttpPost("GetList")]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetList([FromBody] ParamList ModelList)
         {
-            throw new NotImplementedException();
+            var output = new DTResultListDyn<dynamic>();
+            try
+            {
+                output = SsUserService.GetList(ModelList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult Insert([FromBody] SsUser Model)
+        {
+            var output = new Output();
+            try
+            {
+                SsUserService.Insert(Model);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult Update([FromBody] SsUser Model)
+        {
+            var output = new Output();
+            try
+            {
+                SsUserService.Update(Model);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
         }
     }
 }
