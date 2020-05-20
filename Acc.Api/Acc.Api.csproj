@@ -33,6 +33,11 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\GenerateFunctionPostgres\GenerateFunctionPostgres.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
     <Reference Include="EncryptLibrary">
       <HintPath>EncryptLib\EncryptLibrary.dll</HintPath>
     </Reference>

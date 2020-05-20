@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Acc.Api.Helper;
 using Acc.Api.Models;
 using Acc.Api.Services;
 using ClosedXML.Excel;
+using GenerateFunctionPostgres.ClassGenerateFunction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,11 +24,13 @@ namespace Acc.Api.Controllers.FileUploadImport
         private IHostingEnvironment _environment;
         private FunctionString fn;
         private FileService FileService;
+        private ProsessGenerateFunction ProsesGenerateFunction;
         public FileController(IConfiguration configuration, IHostingEnvironment environment)
         {
             _environment = environment;
             fn = new FunctionString(Tools.ConnectionString(configuration));
             FileService = new FileService(configuration, environment);
+            ProsesGenerateFunction = new ProsessGenerateFunction(Tools.ConnectionString(configuration));
 
         }
 
@@ -348,6 +349,46 @@ namespace Acc.Api.Controllers.FileUploadImport
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GenerateFileFunctionPostgresWithTable(string TableName)
+        {
+            var stream = new MemoryStream();
+            string fileNames = string.Empty;//string.Format("CRUD_{0}.sql", TableName);
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                {
+                    _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
+
+                string pathToSave = Path.Combine(_environment.WebRootPath, "FolderFunctionPostgres");
+
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+
+                fileNames = ProsesGenerateFunction.CreateFileFunction(TableName, pathToSave, _environment.WebRootPath);
+
+                string PathFile = Path.Combine(pathToSave, fileNames);
+                var workbookBytes = new byte[0];
+                System.IO.FileStream fs = new System.IO.FileStream(PathFile, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                fs.CopyTo(stream);
+                stream.Position = 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return File(stream, "application/octet-stream", fileNames);
         }
 
     }

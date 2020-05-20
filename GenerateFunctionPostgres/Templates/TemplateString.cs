@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace GenerateFunctionPostgres.Templates
+{
+    public class TemplateString
+    {
+        public static string MasterCrudPostgres()
+        {
+            return @"
+/*Insert*/
+CREATE OR REPLACE FUNCTION public.f{TableName}_i (
+{ParameterInsert}
+)
+RETURNS integer AS
+$body$
+declare v_count integer;
+begin
+
+  		INSERT INTO 
+  public.{TableName}
+    (
+{FieldInsert}
+    )
+  VALUES (
+{FieldInsertParameter}
+  );
+    
+    GET DIAGNOSTICS v_count = ROW_COUNT;
+    return v_count;
+end;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
+
+
+/*Update*/
+CREATE OR REPLACE FUNCTION public.f{TableName}_u (
+{ParameterUpdate}
+)
+RETURNS integer AS
+$body$
+declare v_count integer;
+begin	
+    
+         
+        UPDATE  public.{TableName} set
+{FieldUpdateParameter}	 
+        WHERE xmin::text::integer = p_lastupdatestamp
+        AND {TableName}_id = p_{TableName}_id;
+    
+    GET DIAGNOSTICS v_count = ROW_COUNT;
+    return v_count;
+end;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
+
+
+/*Delete*/
+CREATE OR REPLACE FUNCTION public.f{TableName}_d (
+     p_{TableName}_id integer,
+     p_lastupdatestamp integer
+)
+RETURNS integer AS
+$body$
+Declare v_COUNT integer;
+begin
+
+	DELETE FROM {TableName}
+    WHERE xmin::text::integer = p_lastupdatestamp   
+		and {TableName}_id = p_{TableName}_id;
+                   
+    GET DIAGNOSTICS v_COUNT = ROW_COUNT; 
+    
+  RETURN v_COUNT;
+end;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
+
+/*Select*/
+CREATE OR REPLACE FUNCTION public.f{TableName}_s (
+     p_{TableName}_id integer
+)
+RETURNS TABLE (
+{ReturnTable}
+) AS
+$body$
+DECLARE v_id INTEGER; 
+BEGIN 	
+      RETURN QUERY                
+{QueryTable};
+	 	  
+END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100 ROWS 1000;
+
+/*View*/
+create view v{TableName}
+AS
+{QueryTableView};
+
+
+";
+        }
+
+
+        
+    }
+}
