@@ -13,7 +13,9 @@ namespace Acc.Api.Models
         public string ss_subportfolio_id { get; set; }
         public int ss_user_id { get; set; }
         public string user_id { get; set; }
-        public int ss_group_id { get; set; }
+        public string ss_group_id { get; set; }
+        public int group_id { get; set; }
+        public string group_descs { get; set; }
         public string user_name { get; set; }
         public string password { get; set; }
         [RegularExpression(@"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", ErrorMessage = "Email is not valid.")]

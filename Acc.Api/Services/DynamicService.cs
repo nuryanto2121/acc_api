@@ -274,8 +274,7 @@ namespace Acc.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    OutputList.Error = true;
-                    OutputList.Message = ex.Message;
+                    throw ex;
                 }
                 finally
                 {

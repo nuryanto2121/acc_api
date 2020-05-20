@@ -77,7 +77,7 @@ namespace Acc.Api.DataAccess
             }
         }
 
-        public List<GetChat> GetAllChat(int HeaderId,int curr_page)
+        public List<GetChat> GetAllChat(int HeaderId, int curr_page)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
@@ -149,11 +149,39 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
-        public bool SendChat(ChatDetail Model)
+        public bool UpdateUserHeader(int Key, string UserIdTo)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                var _result = false;
+                bool _result = false;
+                try
+                {
+                    string sqlQuery = @"UPDATE public.ss_chat_h 
+                                    SET 
+                                      user_id_to = @user_id_to
+                                    WHERE 
+                                      ss_chat_h_id = @ss_chat_h_id
+                                    ; ";
+                    conn.Open();
+                    conn.Execute(sqlQuery, new { user_id_to = UserIdTo, ss_chat_h_id = Key });
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+                return _result;
+            }
+        }
+        public ChatID SendChat(ChatDetail Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                ChatID _result = new ChatID();
                 try
                 {
                     conn.Open();
@@ -164,7 +192,63 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_user_id_from", Model.user_id_from);
                     Parameters.Add("p_user_id_to", Model.user_id_to);
                     Parameters.Add("p_user_input", Model.user_input);
-                    var dd = conn.Query<dynamic>("fss_chat_d_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = conn.Query<ChatID>("fss_chat_d_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    //_result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool SendChatRead(ChatDetail Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_chat_d_id", Model.ss_chat_d_id, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id_from", Model.user_id_from);
+                    Parameters.Add("p_user_id_to", Model.user_id_to);
+                    Parameters.Add("p_is_read", false, dbType: DbType.Boolean);
+                    Parameters.Add("p_user_input", Model.user_input);
+                    var dd = conn.Query<dynamic>("fss_chat_d_read_id_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool UpdateStatusChatRead(int Key,string From,string To)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_chat_d_id", Key, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id_from", From);
+                    Parameters.Add("p_user_id_to", To);                    
+                    var dd = conn.Query<dynamic>("fss_chat_d_read_id_u_status", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = true;
                 }
                 catch (Exception ex)

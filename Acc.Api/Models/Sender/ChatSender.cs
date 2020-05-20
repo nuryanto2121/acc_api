@@ -38,4 +38,8 @@ namespace Acc.Api.Models
         public string user_id_from { get; set; }
         public string user_name { get; set; }
     }
+    public class ChatID
+    {
+        public int row_id { get; set; }
+    }
 }

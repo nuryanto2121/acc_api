@@ -8,7 +8,7 @@ namespace Acc.Api.Models
     public class SsMenuGroup
     {
         public int ss_menu_group_id { get; set; }
-        public int cm_portfolio_id { get; set; }
+        public int ss_portfolio_id { get; set; }
         public int ss_menu_id { get; set; }
         public int ss_group_id { get; set; }
         public bool add_status { get; set; }

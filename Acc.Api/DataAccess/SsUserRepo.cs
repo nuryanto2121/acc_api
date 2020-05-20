@@ -72,12 +72,8 @@ namespace Acc.Api.DataAccess
             SsUser t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = @"SELECT  ss_user_id,  				user_id,  		ss_group_id,  	user_name,  	email,  
-                                  user_level,  				expired_date,  	is_inactive,  	job_title,  	hand_phone,  
-                                  last_change_password,  	default_language,  user_input,  user_edit,  	portfolio_id,  
-                                  subportfolio_id,  		time_input,  		time_edit,  file_name,  	path_file ,
-                                    address,                notes, password
-                        FROM public.ss_user  WHERE ss_user_id = @ss_user_id and xmin::text::integer = @lastupdatestamp";
+                string strQuery = @"SELECT  *
+                        FROM public.vss_user_by  WHERE ss_user_id = @ss_user_id and lastupdatestamp = @lastupdatestamp";
                 try
                 {
                     conn.Open();
@@ -126,7 +122,7 @@ namespace Acc.Api.DataAccess
                                         address,                notes
                                 )
                                 VALUES (
-                                      @user_id,                                      @ss_group_id,
+                                      @user_id,                                      @group_id,
                                       @user_name,                                      @password,
                                       @email,                                      @user_level,
                                       @expired_date,                                      @is_inactive,
@@ -210,7 +206,7 @@ namespace Acc.Api.DataAccess
                 string sqlQuery = @"UPDATE public.ss_user 
                                     SET 
                                       user_id = @user_id,
-                                      ss_group_id = @ss_group_id,
+                                      ss_group_id = @group_id,
                                       user_name = @user_name,
                                       password = @password,
                                       email = @email,

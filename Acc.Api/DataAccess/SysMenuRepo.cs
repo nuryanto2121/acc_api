@@ -307,6 +307,56 @@ namespace Acc.Api.DataAccess
             }
             return _result;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="portfolio_id"></param>
+        /// <param name="group_id"></param>
+        /// <returns></returns>
+        public object GetMenuJson(int? portfolio_id, int? group_id)
+        {
+            object _result = new object();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    if (group_id == 0)
+                    {
+                        Parameters.Add("p_ss_group_id", null, dbType: DbType.Int32);
+                    }
+                    else
+                    {
+                        Parameters.Add("p_ss_group_id", group_id, dbType: DbType.Int32);
+                    }
+                    if (portfolio_id == 0)
+                    {
+                        Parameters.Add("p_ss_portfolio_id", null, dbType: DbType.Int32);
+                    }
+                    else
+                    {
+                        Parameters.Add("p_ss_portfolio_id", portfolio_id, dbType: DbType.Int32);
+                    }
+                    
+                    
+                    var dd = conn.Query<dynamic>("get_menu_json_group", Parameters, commandType: CommandType.StoredProcedure);
+                    //var dd = conn.Query<dynamic>("get_menu_json", Parameters, commandType: CommandType.StoredProcedure);
+                    _result = dd;
+                    //result = conn.Execute(sqlQuery, new { ss_menu_id = key });
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return _result;
+        }
         public bool SaveTemp(SsMenuTemp domain)
         {
             bool result = false;
@@ -416,11 +466,11 @@ namespace Acc.Api.DataAccess
             SsMenu t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = "SELECT   ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id and xmin::text::integer = @timestamp";
+                string strQuery = "SELECT   ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id";
                 try
                 {
                     conn.Open();
-                    t = conn.Query<SsMenu>(strQuery, new { ss_menu_id = key, timestamp = timestamp }).SingleOrDefault();
+                    t = conn.Query<SsMenu>(strQuery, new { ss_menu_id = key }).SingleOrDefault();
                 }
                 catch (Exception ex)
                 {

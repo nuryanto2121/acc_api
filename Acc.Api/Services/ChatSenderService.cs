@@ -40,8 +40,15 @@ namespace Acc.Api.Services
                     {
                         dtChat.user_id_from = EncryptionLibrary.EncryptText(dtChat.user_id_from);
                     });
-                    ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
-                    ObjOutput.Add("user_to", EncryptionLibrary.EncryptText(dataHedaer.user_id_to));
+                    List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                    string user_ids = string.Empty;
+                    foreach (string dtUser in Users)
+                    {
+                        user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
+                    }
+                    user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")) : user_ids;
+                    //ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
+                    ObjOutput.Add("user_ids", user_ids);
                     ObjOutput.Add("row_id", HeaderId);
                     ObjOutput.Add("chat", dataChat);
                     _result.Data = ObjOutput;
@@ -68,14 +75,21 @@ namespace Acc.Api.Services
                 {
                     dtList.ForEach(delegate (GetChat dt)
                     {
-                        chatRepo.UpdateStatusChat(dt);
+                        chatRepo.UpdateStatusChatRead(dt.ss_chat_d_id, dt.user_id_from, user_id);
                         dt.user_id_from = EncryptionLibrary.EncryptText(dt.user_id_from);
                     });
 
                 }
                 var dataHedaer = chatRepo.GetDataHeader(id);
-                ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
-                ObjOutput.Add("user_to", EncryptionLibrary.EncryptText(dataHedaer.user_id_to));
+                //ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
+                List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                string user_ids = string.Empty;
+                foreach (string dtUser in Users)
+                {
+                    user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
+                }
+                user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")): user_ids;
+                ObjOutput.Add("user_ids", user_ids);
                 ObjOutput.Add("row_id", id);
                 ObjOutput.Add("chat", dtList);
                 _result.Data = ObjOutput;
@@ -94,6 +108,9 @@ namespace Acc.Api.Services
                 Model.portfolio_id = fn.DecryptString(Model.portfolio_id);
                 Model.subportfolio_id = fn.DecryptString(Model.subportfolio_id);
                 Model.user_input = fn.DecryptString(Model.user_input);
+
+                Model.user_id_from = fn.DecryptString(Model.user_id_from);
+                Model.user_id_to = fn.DecryptString(Model.user_id_to) + "," + Model.user_id_from;
                 _result.Data = chatRepo.SaveHeader(Model);
             }
             catch (Exception ex)
@@ -113,7 +130,37 @@ namespace Acc.Api.Services
                 Model.user_id_to = fn.DecryptString(Model.user_id_to);
                 Model.user_id_from = fn.DecryptString(Model.user_id_from);
                 Model.user_input = fn.DecryptString(Model.user_input);
-                chatRepo.SendChat(Model);
+
+                // check header
+                var dataHedaer = chatRepo.GetDataHeader(Model.ss_chat_h_id);
+                //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
+                List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+
+                if (!Users.Any(dt => dt == Model.user_id_from))
+                {
+                    Users.Add(Model.user_id_from);
+                    dataHedaer.user_id_to = string.Join(",", Users);//string.Format(",{0}", Model.user_id_from);
+                    chatRepo.UpdateUserHeader(Model.ss_chat_h_id, dataHedaer.user_id_to);
+
+
+                }
+                List<string> UserTO = Users;
+                UserTO.Remove(Model.user_id_from);
+
+                Model.user_id_to = string.Join(",", UserTO);
+                var _ret = chatRepo.SendChat(Model);
+
+                foreach (string dtUserTo in UserTO)
+                {
+
+                    ChatDetail dtDetail = new ChatDetail();
+                    dtDetail.ss_chat_d_id = _ret.row_id;
+                    dtDetail.user_id_from = Model.user_id_from;
+                    dtDetail.user_id_to = dtUserTo;
+                    dtDetail.user_input = Model.user_input;
+                    chatRepo.SendChatRead(dtDetail);
+
+                }
                 _result.Message = "Success.";
             }
             catch (Exception ex)

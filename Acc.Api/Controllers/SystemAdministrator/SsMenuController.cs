@@ -20,22 +20,22 @@ namespace Acc.Api.Controllers
     {
         private IConfiguration config;
         private ICrudService<SsMenu, int> sysMenuService;
+        private SsMenuService menuService;
         public SsMenuController(IConfiguration configuration)
         {
             config = configuration;
             sysMenuService = new SsMenuService(configuration);
+            menuService = new SsMenuService(configuration);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="option_url"></param>
-        /// <param name="line_no"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult Delete(string option_url, int line_no, [Required]int id)
+        public IActionResult Delete([Required]int id)
         {
             var output = new Output();
             try
@@ -53,13 +53,11 @@ namespace Acc.Api.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="option_url"></param>
-        /// <param name="line_no"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetById(string option_url, int line_no, [Required]int id)
+        public IActionResult GetById(int id)
         {
             var output = new Output();
             try
@@ -73,7 +71,24 @@ namespace Acc.Api.Controllers
 
             return Ok(output);
         }
+       
 
+        [HttpGet("GetMenuJson")]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult GetMenuJson(string portfolio_id,string group_id)
+        {
+            var output = new Output();
+            try
+            {
+                output = menuService.GetMenuJson(portfolio_id, group_id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
 
 
         [HttpGet("datalist")]

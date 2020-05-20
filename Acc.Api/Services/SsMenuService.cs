@@ -74,6 +74,23 @@ namespace Acc.Api.Services
             return _result;
         }
 
+        public Output GetMenuJson(string portfolio_id, string group_id)
+        {
+            Output _result = new Output();
+            try
+            {
+                int? ss_portfolio_id = portfolio_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(portfolio_id));
+                int? ss_group_id = group_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(group_id));
+                _result.Data = SsMenuRepo.GetMenuJson(ss_portfolio_id, ss_group_id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
+
         public DTResultListDyn<dynamic> GetList(ParamList JModel)
         {
             throw new NotImplementedException();
