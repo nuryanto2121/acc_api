@@ -26,6 +26,7 @@ namespace Acc.Api.Models
         public string is_inactive { get; set; }
         public string job_title { get; set; }
         public string hand_phone { get; set; }
+        public DateTime date_added { get; set; }
         public DateTime last_change_password { get; set; }
         public string default_language { get; set; }
         public string notes { get; set; }
