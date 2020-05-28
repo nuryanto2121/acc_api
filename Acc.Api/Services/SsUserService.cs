@@ -166,13 +166,13 @@ namespace Acc.Api.Services
             {
                 Model.is_inactive = "N";
                 Model.expired_date = DateTime.Now.AddYears(1);
-                Model.subportfolio_id = Convert.ToInt32(EncryptionLibrary.DecryptText(Model.ss_subportfolio_id));
-                Model.portfolio_id = Convert.ToInt32(EncryptionLibrary.DecryptText(Model.ss_portfolio_id));
-                Model.group_id = Convert.ToInt32(EncryptionLibrary.DecryptText(Model.ss_group_id));
+                Model.subportfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_subportfolio_id));
+                Model.portfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id));
+                Model.group_id = Convert.ToInt32(fn.DecryptString(Model.ss_group_id));
                 Model.password = EncryptionLibrary.EncryptText(Model.password);
                 Model.time_input = DateTime.Now;
                 Model.time_edit = DateTime.Now;
-                Model.user_input = EncryptionLibrary.DecryptText(Model.user_input);
+                Model.user_input = fn.DecryptString(Model.user_input);
                 Model.user_edit = Model.user_input;
                 UserRepo.Save(Model);
             }
