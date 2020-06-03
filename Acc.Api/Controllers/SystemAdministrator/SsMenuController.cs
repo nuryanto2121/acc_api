@@ -11,6 +11,7 @@ using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
 using System.ComponentModel.DataAnnotations;
+using Acc.Api.Authorize;
 
 namespace Acc.Api.Controllers
 {
@@ -34,6 +35,7 @@ namespace Acc.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete([Required]int id)
         {
@@ -56,6 +58,7 @@ namespace Acc.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetById(int id)
         {
@@ -74,6 +77,7 @@ namespace Acc.Api.Controllers
        
 
         [HttpGet("GetMenuJson")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetMenuJson(string portfolio_id,string group_id)
         {
@@ -92,6 +96,7 @@ namespace Acc.Api.Controllers
 
 
         [HttpGet("datalist")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetDataList(string initialwhere = "")
         {
@@ -112,6 +117,7 @@ namespace Acc.Api.Controllers
 
 
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert([FromBody] SsMenu Model)
         {
@@ -128,6 +134,7 @@ namespace Acc.Api.Controllers
         }
 
         [HttpPut]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Update([FromBody] SsMenu Model)
         {
@@ -144,6 +151,7 @@ namespace Acc.Api.Controllers
         }
 
         [HttpPost("Shortcut")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetList([FromBody] ParamList ModelList)
         {

@@ -42,7 +42,7 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
-                Model.DataHeader.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id));
+                Model.DataHeader.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(Model.portfolio_id));
                 Model.DataHeader.user_input = fn.DecryptString(Model.DataHeader.user_input);
                 Model.DataHeader.user_edit = Model.DataHeader.user_input;
 
@@ -70,7 +70,7 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
-                Model.DataHeader.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id));
+                Model.DataHeader.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(Model.portfolio_id));
                 Model.DataHeader.user_edit = fn.DecryptString(Model.DataHeader.user_edit);
                 //Model.DataHeader.ss_group_id = Convert.ToInt32(fn.DecryptString(Model.group_id));
 

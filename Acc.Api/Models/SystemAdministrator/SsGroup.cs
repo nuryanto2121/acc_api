@@ -20,7 +20,7 @@ namespace Acc.Api.Models
     }
     public class VmSsGroup
     {
-        public string ss_portfolio_id { get; set; }
+        public string portfolio_id { get; set; }
         public string group_id { get; set; }
         public SsGroup DataHeader { get; set; }
         public List<SsMenuGroup> DataDetail { get; set; }

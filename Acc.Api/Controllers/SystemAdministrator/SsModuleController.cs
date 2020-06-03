@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
@@ -26,6 +27,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
             sysMenuService = new SsModuleService(configuration);
         }
         [HttpDelete("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete(string option_url, int line_no, [Required]int id)
         {
@@ -33,6 +35,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         }
 
         [HttpGet("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetById(string option_url, int line_no, [Required]int id)
         {
@@ -42,6 +45,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         }
 
         [HttpPost("GetList")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetList([FromBody] ParamList ModelList)
         {
@@ -49,6 +53,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         }
 
         [HttpGet("datalist")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetDataList(string initialwhere = "")
         {
@@ -67,6 +72,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
 
 
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert([FromBody] SsModule Model)
         {
@@ -83,6 +89,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         }
 
         [HttpPut]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Update([FromBody] SsModule Model)
         {

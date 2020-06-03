@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Enum;
 using Acc.Api.Helper;
 using Acc.Api.Interface;
@@ -32,6 +33,8 @@ namespace Acc.Api.Controllers.Dynamic
         /// <param name="Jmodel">option_function_cd : required,module_cd : required, sisa'a parameter untuk functionnya</param>
         /// <returns></returns>
         [HttpPost("GetData")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetData([FromBody] JObject Jmodel)
         {
             var output = new Output();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Enum;
 using Acc.Api.Interface;
 using Acc.Api.Models;
@@ -21,8 +22,9 @@ namespace Acc.Api.Controllers.Dynamic
         {
             DynServeice = new DynamicService(configuration);
         }
-        // [APIAuthorizeAttribute]
+        
         [HttpPost("Delete")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete([FromBody] DynamicMultiParam Jmodel)
         {
@@ -44,8 +46,13 @@ namespace Acc.Api.Controllers.Dynamic
 
         }
 
-        // [APIAuthorizeAttribute]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Jmodel"></param>
+        /// <returns></returns>
         [HttpPost("Insert")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert([FromBody] DynamicMultiParam Jmodel)
         {
@@ -67,8 +74,8 @@ namespace Acc.Api.Controllers.Dynamic
 
         }
 
-        // [APIAuthorizeAttribute]
         [HttpPut("Update")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Update([FromBody] DynamicMultiParam Jmodel)
         {
@@ -90,7 +97,7 @@ namespace Acc.Api.Controllers.Dynamic
 
         }
 
-        // [APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [HttpPost("Post")]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Post([FromBody] DynamicMultiParam Jmodel)
@@ -113,7 +120,7 @@ namespace Acc.Api.Controllers.Dynamic
 
         }
 
-        // [APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [HttpPost("ProsesDataPostMulti")]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult ProsesDataPostMulti([FromBody] DynamicMultiParam Jmodel)

@@ -43,7 +43,7 @@ namespace Acc.Api.Services
                     Required = true // set to false if this is optional
                 });
             }
-          
+
 
         }
     }
@@ -87,30 +87,36 @@ namespace Acc.Api.Services
             if (operation.Parameters == null)
                 operation.Parameters = new List<IParameter>();
 
-            var authorizeAttributes = context.ApiDescription
-              .ControllerAttributes()
-              .Union(context.ApiDescription.ActionAttributes())
-              .OfType<APIAuthorizeAttribute>();
+            //var authorizeAttributes = context.ApiDescription
+            //  .ControllerAttributes()
+            //  .Union(context.ApiDescription.ActionAttributes())
+            //  .OfType<APIAuthorizeAttribute>();
 
-            var allowAnonymousAttributes = context.ApiDescription.ActionAttributes().OfType<AllowAnonymousAttribute>();//context.ApiDescription.ActionAttributes().OfType<AllowAnonymousAttribute>();
-            var ddd = context.MethodInfo.CustomAttributes.OfType<AllowAnonymousAttribute>().Any();
-            var yyy = context.MethodInfo.CustomAttributes.OfType<APIAuthorizeAttribute>().Any();
+            //var allowAnonymousAttributes = context.ApiDescription.ActionAttributes().OfType<AllowAnonymousAttribute>();//context.ApiDescription.ActionAttributes().OfType<AllowAnonymousAttribute>();
+            //var ddd = context.MethodInfo.CustomAttributes.OfType<AllowAnonymousAttribute>().Any();
+            //var yyy = context.MethodInfo.CustomAttributes.OfType<APIAuthorizeAttribute>().Any();
             var dta = context.MethodInfo.CustomAttributes.ToList();
 
+            bool isHeader = false;
             foreach (var aa in dta)
             {
-                var ddddd = aa.AttributeType.Attributes; 
+                var ddddd = aa.AttributeType.Attributes;
+                if (aa.AttributeType.ToString() == "Acc.Api.Authorize.APIAuthorizeAttribute")
+                {
+                    isHeader = true;
+                }
+
             }
 
-            
-            if (!authorizeAttributes.Any() && !allowAnonymousAttributes.Any())
+
+            if (!isHeader)
             {
                 return;
             }
 
             operation.Parameters.Add(new NonBodyParameter
             {
-                Name = "MY-HEADER",
+                Name = "Token",
                 In = "header",
                 Type = "string",
                 Required = true // set to false if this is optional

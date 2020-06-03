@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Models;
 using Acc.Api.Models.SystemAdministrator;
@@ -31,6 +32,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert(ParamMenuFav Model)
         {
@@ -48,6 +50,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
 
       
         [HttpDelete("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete(int id)
         {

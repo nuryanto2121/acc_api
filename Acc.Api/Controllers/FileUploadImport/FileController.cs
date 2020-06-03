@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Models;
 using Acc.Api.Services;
@@ -40,6 +41,7 @@ namespace Acc.Api.Controllers.FileUploadImport
         /// <param name="uploadFile"></param>
         /// <returns></returns>
         [HttpPost("UploadFile")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         //public void UploadFile([FromForm]UploadFile uploadFile)
         public async Task<Output> UploadFile([FromForm]UploadFile uploadFile)
@@ -336,6 +338,7 @@ namespace Acc.Api.Controllers.FileUploadImport
         /// <param name="Jmodel"></param>
         /// <returns></returns>
         [HttpPost("GetTokenExport")]
+        [APIAuthorizeAttribute]
         public IActionResult GetTokenExport([FromBody]ExportExcelJson Jmodel)
         {
             Output result = new Output();

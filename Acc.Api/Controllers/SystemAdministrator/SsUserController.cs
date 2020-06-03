@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
@@ -30,6 +31,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="lastupdatestamp"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete([Required] int id, [Required] int lastupdatestamp)
         {
@@ -53,6 +55,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="lastupdatestamp"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetById([Required] int id, [Required] int lastupdatestamp)
         {
@@ -70,6 +73,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         }
 
         [HttpPost("GetList")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetList([FromBody] ParamList ModelList)
         {
@@ -92,6 +96,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert([FromBody] SsUser Model)
         {
@@ -115,6 +120,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPut]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Update([FromBody] SsUser Model)
         {

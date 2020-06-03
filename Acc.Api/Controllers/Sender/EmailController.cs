@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
@@ -27,6 +28,7 @@ namespace Acc.Api.Controllers.Sender
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public async Task<IActionResult> SendAsync([FromBody] EmailModel Model)
         {

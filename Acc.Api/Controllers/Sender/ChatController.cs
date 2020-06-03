@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Models;
 using Acc.Api.Services;
@@ -27,6 +28,7 @@ namespace Acc.Api.Controllers.Sender
         /// <param name="Model"> parameter yg dipake : {"portfolio_id":"","subportfolio_id":"","doc_type":"","doc_no":"","current_page":1}</param>
         /// <returns></returns>
         [HttpPost("Check")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Check(ChatSender Model)
         {
@@ -49,6 +51,7 @@ namespace Acc.Api.Controllers.Sender
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost("SaveHeader")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult SaveHeader(ChatSender Model)
         {
@@ -71,6 +74,7 @@ namespace Acc.Api.Controllers.Sender
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Send(ChatDetail Model)
         {
@@ -95,6 +99,7 @@ namespace Acc.Api.Controllers.Sender
         /// <param name="user_id">user_id dari yg menerima/login</param>
         /// <returns></returns>
         [HttpGet]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetChat(int id, string user_id)
         {

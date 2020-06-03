@@ -118,7 +118,7 @@ namespace Acc.Api.DataAccess
                                     FROM 
                                       public.ss_user_session 
                                     where user_id = @user_id
-                                    And token = @token?;";
+                                    And token = @token;";
                 try
                 {
                     conn.Open();

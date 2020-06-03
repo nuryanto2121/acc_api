@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acc.Api.Authorize;
 using Acc.Api.Helper;
 using Acc.Api.Models;
 using Acc.Api.Services;
@@ -29,6 +30,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="group_id"></param>
         /// <returns></returns>
         [HttpGet("Json")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetMenuJson(string portfolio_id, string group_id)
         {
@@ -51,6 +53,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult SaveJson(VmSsGroup Model)
         {
@@ -73,6 +76,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// <param name="Model"></param>
         /// <returns></returns>
         [HttpPut]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult UpdateJson(VmSsGroup Model)
         {

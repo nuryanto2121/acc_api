@@ -37,7 +37,7 @@ namespace Acc.Api.Controllers
         /// <param name="lastupdatestamp"></param>
         /// <returns></returns>
         [HttpDelete]
-        //[APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Delete([Required]string option_url, [Required]int line_no, [Required]int id, [Required]int lastupdatestamp)
         {
@@ -63,7 +63,7 @@ namespace Acc.Api.Controllers
         /// <param name="lastupdatestamp">ini xmin data yg ingin diGet</param>
         /// <returns></returns>
         [HttpGet]
-        //[APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetById([Required]string option_url, [Required]int line_no, [Required]int id, [Required]int lastupdatestamp)
         {
@@ -86,6 +86,7 @@ namespace Acc.Api.Controllers
         /// <param name="ModelList"></param>
         /// <returns></returns>
         [HttpPost("GetList")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetList([FromBody] ParamList ModelList)
         {
@@ -109,6 +110,7 @@ namespace Acc.Api.Controllers
         /// <param name="ModelList"></param>
         /// <returns></returns>
         [HttpPost("GetListLookup")]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult GetListLookup([FromBody] ParamLookupList ModelList)
         {
@@ -132,6 +134,7 @@ namespace Acc.Api.Controllers
         /// <param name="Model">paramter wajib : option_url dan line_no ,selebih'a parameter utk function</param>
         /// <returns></returns>
         [HttpPost]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Insert([FromBody] JObject Model)
         {
@@ -154,6 +157,7 @@ namespace Acc.Api.Controllers
         /// <param name="Model">paramter wajib : option_url dan line_no ,selebih'a parameter utk function</param>
         /// <returns></returns>
         [HttpPut]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Update([FromBody] JObject Model)
         {
