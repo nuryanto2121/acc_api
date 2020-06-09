@@ -933,9 +933,9 @@ namespace Acc.Api.Helper
             string valStrEncrypt = string.Empty;
             string valStrDecrypt = string.Empty;
 
-            if (data.ToUpper().Contains("user"))
+            if (data.ToLower().Contains("user"))
             {
-                if (data.ToUpper().Contains("user_edit"))
+                if (data.ToLower().Contains("user_edit"))
                 {
                     valStrEncrypt = this.getString(data, "user_edit='", "'");
                     valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_edit='", "'") : valStrEncrypt;
@@ -951,7 +951,7 @@ namespace Acc.Api.Helper
 
                 }
 
-                if (data.ToUpper().Contains("user_input"))
+                if (data.ToLower().Contains("user_input"))
                 {
                     valStrEncrypt = this.getString(data, "user_input='", "'");
                     valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_input='", "'") : valStrEncrypt;
@@ -965,8 +965,24 @@ namespace Acc.Api.Helper
 
                     valStrDecrypt = string.Empty;
                 }
+                //
 
-                if (data.ToUpper().Contains("user_id"))
+                if (data.ToLower().Contains("user_id_login"))
+                {
+                    valStrEncrypt = this.getString(data, "user_id_login='", "'");
+                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_id_login='", "'") : valStrEncrypt;
+                    if (isBase64(valStrEncrypt))
+                    {
+                        valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
+                    }
+
+                    if (!string.IsNullOrEmpty(valStrDecrypt))
+                        data = data.Replace(valStrEncrypt, valStrDecrypt);
+
+                    valStrDecrypt = string.Empty;
+                }
+
+                if (data.ToLower().Contains("user_id"))
                 {
                     valStrEncrypt = this.getString(data, "user_id='", "'");
                     valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_id='", "'") : valStrEncrypt;
@@ -981,7 +997,7 @@ namespace Acc.Api.Helper
                     valStrDecrypt = string.Empty;
                 }
 
-                if (data.ToUpper().Contains("user"))
+                if (data.ToLower().Contains("user"))
                 {
                     valStrEncrypt = this.getString(data, "user='", "'");
                     valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user='", "'") : valStrEncrypt;

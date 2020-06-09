@@ -1,0 +1,67 @@
+MoM 9 juni 2020
+
+Marketing Setup
+  - Marketing Master List
+  - Marketing Master Team
+  - Marketing Master Target
+  - Add Target
+  - Marketing Master Customer List
+
+Marketing Spec
+Customer Status
+  - ada customer status list
+  - ada customer status add
+  - ada customer status edit
+
+Customer List
+   - Customer List View
+
+ToDo List
+  - Todo List Action
+
+Appointment
+ - Appointment List
+ - Appointment Action
+
+Quotation
+ - List
+ - view
+
+Dashboard Target
+ - Target Detail
+
+Dashbord New Prospect
+ - New Prospect Detail
+
+TimeLine 
+Selasa
+ - Marketing Master List : rubah gk bisa view
+ - Marketing Target : list dari table detail marketing target detail
+ - Marketing Add Target : pilih marketing dan years proses insert ke detail 
+			(brrti ada table detail dan table header utk years dan marketing id)
+ - Marketing Team :
+ - Marketing Customer list : 
+
+Rabu
+Marketing Setup : buat 3 card (akmal)
+Marketing Spec (yanto)
+Customer Status : list, add, edit(akmal) *add field colour 
+Customer List (yanto)
+
+Kamis
+Quotation LIst (akmal)
+ - pas klik masuk ke quotation detail, siapin button confirm -> klik button tsb balik ke list
+ - Log book list -> add
+To Do List (yanto)
+ - buang jam
+ - next action < today muncul tanda seru!!
+ - status warna dari customer status
+ - action
+	- + PIC rubah tampilan
+	- action descs kosong, pas klik add hrus ada validasi
+	- next appointmnet tambah pic
+  Appoinment (yanto) save as
+
+Jumat
+ - Dashboard Target dan Detail (akmal)
+ - Dashboard New Prospect dan detail (yanto)
