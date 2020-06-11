@@ -53,10 +53,10 @@ namespace Acc.Api.Services
 
                 Model.data_team.ForEach(delegate (MarketingTeam data)
                 {
-                    if (data.is_my_team)
-                    {
-                        marketingRepo.Insert(ss_porfolio_id, UserId, data.marketing_id);
-                    }
+                    //if (data.is_my_team)
+                    //{
+                        marketingRepo.Insert(ss_porfolio_id, UserId, data.marketing_id, data.monthly_point, data.monthly_new_prospect,data.is_my_team);
+                    //}
                 });
             }
             catch (Exception ex)

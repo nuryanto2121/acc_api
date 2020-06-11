@@ -46,7 +46,7 @@ namespace Acc.Api.DataAccess
                                                a.monthly_new_prospect,b.child_marketing_id,a.user_id
                                         HAVING a.user_id <> @user_id;";
                     conn.Open();
-                    tt = conn.Query<MarketingTeam>(SqlQuery, new { user_id = UserId, ss_portfolio_id = ss_portfolio_id }).ToList();                    
+                    tt = conn.Query<MarketingTeam>(SqlQuery, new { user_id = UserId, ss_portfolio_id = ss_portfolio_id }).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -60,7 +60,7 @@ namespace Acc.Api.DataAccess
             return tt;
         }
 
-        public bool Insert(int p_ss_portfolio_id, string user_id, string ChildMarketing)
+        public bool Insert(int p_ss_portfolio_id, string user_id, string ChildMarketing, int monthly_point, int monthly_new_prospect, bool is_my_team)
         {
             bool _result = false;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -73,7 +73,10 @@ namespace Acc.Api.DataAccess
                     SpName = "fmk_marketing_team_i";
                     spParam.Add("@p_ss_portfolio_id", p_ss_portfolio_id, dbType: DbType.Int32);
                     spParam.Add("@p_user_id", user_id, dbType: DbType.String);
+                    spParam.Add("@p_monthly_point", monthly_point, dbType: DbType.Int32);
+                    spParam.Add("@p_monthly_new_prospect", monthly_new_prospect, dbType: DbType.Int32);
                     spParam.Add("@p_child_marketing_id", ChildMarketing);
+                    spParam.Add("@p_my_team", is_my_team, dbType: DbType.Boolean);
                     spParam.Add("@p_user_input", user_id, dbType: DbType.String);
 
                     conn.Query(SpName, spParam, commandType: CommandType.StoredProcedure);

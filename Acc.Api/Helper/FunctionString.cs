@@ -626,7 +626,8 @@ namespace Acc.Api.Helper
                             {
                                 if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
                                 {
-                                    sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                    //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                                 }
                                 else
                                 {
@@ -650,7 +651,8 @@ namespace Acc.Api.Helper
                                             }
                                             else
                                             {
-                                                sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                                             }
 
                                         }
@@ -683,7 +685,8 @@ namespace Acc.Api.Helper
                         {
                             if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
                             {
-                                sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                             }
                             else
                             {
