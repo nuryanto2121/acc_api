@@ -1,0 +1,144 @@
+<template>
+  <div class="dashboard-page-chart">
+    <div class="dashboard-page-chart__body">
+      <b-row class="dashboardBody">
+        <b-col md="12">
+          <div class="card" style="font-size: 12px !important;">
+            <div class="card__title">
+              <b-row>
+                <b-col style="max-width:fit-content !important;">
+                  <span>{Title}</span>
+                </b-col>
+                <b-col style="text-align: right;">
+                  <ABSButton
+                    :text="'Back'"
+                    classButton="button button--back"
+                    classIcon="icon-style-1"
+                    @click="doBack"
+                  />
+                </b-col>
+              </b-row>
+            </div>
+            <div class="card__body">
+              <b-form :data-vv-scope="'{Table}'" :data-vv-value-path="'{Table}'">
+               </b-form>
+            </div>
+          </div>
+        </b-col>
+      </b-row>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+{DataViewModel},
+{DataPropModel}     
+    };
+  },
+  computed: {
+    paramFromList() {
+      var param = this.$route.params;
+      // if (param == null || param == undefined) {
+      //   this.doBack();
+      // } else {
+      //   if (Object.keys(param).length < 1) {
+      //     this.doBack();
+      //   } else {
+      return param;
+      //   }
+      // }
+    },
+    inputStatus() {
+      var param = this.$route.params;
+      if (param.isEdit && param.isEdit === true) {
+        return "edit";
+      } else {
+        return "new";
+      }
+    }
+  },
+  methods: {
+    doBack() {
+      this.$router.go(-1);
+    },
+   M_ClearForm() {
+ {DataNew}
+    },
+    doSave() {
+      this.$validator._base.validateAll("{Table}").then(result => {
+        console.log(result)
+        if (!result) return;
+        this.alertConfirmation("Are You Sure Want To Save This Data ?").then(
+          ress => {
+            if (ress.value) {
+              this.$validator.errors.clear("{Table}");
+              if (this.inputStatus == "edit") {
+                this.M_Update();
+              } else {
+                this.M_Save();
+              }
+            }
+          }
+        );
+      });
+    },
+    M_Save() {
+      var param = {
+        option_url: "{OptionUrlSave}",
+        line_no: {OptionLineNo},
+{ParameterSave}       
+      };
+
+      this.postJSON(this.getUrlCRUD(), param).then(response => {
+        if (response == null) return;
+        this.alertSuccess(response.Message).then(() => {
+          this.doBack();
+        });
+      });
+    },
+    M_Update() {
+      var param = {
+        option_url: "{OptionUrlUpdate}",
+        line_no: {OptionLineNo},
+{ParameterUpdate}
+      };
+
+      this.putJSON(this.getUrlCRUD(), param).then(response => {
+        if (response == null) return;
+        this.alertSuccess(response.Message).then(() => {
+          this.doBack();
+        });
+      });
+    },
+    GetDataBy() {
+      var param = {
+        option_url: "{OptionUrl}",
+        line_no: {OptionUrlGetDataby},
+        id: this.paramFromList.row_id,
+        lastupdatestamp: this.paramFromList.lastupdatestamp
+      };
+
+      this.getJSON(this.getUrlCRUD(), param).then(response => {
+        // response from API
+        if (response == null) return;
+
+        var data = response.Data[0];
+
+{DataSetModelGetDataBy}        
+      });
+    }
+  },
+  mounted() {
+    this.M_ClearForm();
+    if (this.inputStatus == "edit") {
+      this.GetDataBy();
+    }
+  }
+};
+</script>
+
+<style>
+</style>

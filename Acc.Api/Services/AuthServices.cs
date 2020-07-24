@@ -143,6 +143,7 @@ namespace Acc.Api.Services
 
                     DataUser.Add("user_id", dataAuth.Rows[0]["user_id"].ToString());
                     DataUser.Add("user_name", dataAuth.Rows[0]["user_name"].ToString());
+                    DataUser.Add("path_file", dataAuth.Rows[0]["path_file"].ToString());
                     DataUser.Add("group_id", dataAuth.Rows[0]["ss_group_id"].ToString());
                     DataUser.Add("subportfolio_id", dataAuth.Rows[0]["subportfolio_id"].ToString());
                     DataUser.Add("subportfolio_short_name", dataAuth.Rows[0]["subportfolio_short_name"].ToString());

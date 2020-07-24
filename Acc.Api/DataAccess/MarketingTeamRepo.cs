@@ -73,8 +73,8 @@ namespace Acc.Api.DataAccess
                     SpName = "fmk_marketing_team_i";
                     spParam.Add("@p_ss_portfolio_id", p_ss_portfolio_id, dbType: DbType.Int32);
                     spParam.Add("@p_user_id", user_id, dbType: DbType.String);
-                    spParam.Add("@p_monthly_point", monthly_point, dbType: DbType.Int32);
-                    spParam.Add("@p_monthly_new_prospect", monthly_new_prospect, dbType: DbType.Int32);
+                    //spParam.Add("@p_monthly_point", monthly_point, dbType: DbType.Int32);
+                    //spParam.Add("@p_monthly_new_prospect", monthly_new_prospect, dbType: DbType.Int32);
                     spParam.Add("@p_child_marketing_id", ChildMarketing);
                     spParam.Add("@p_my_team", is_my_team, dbType: DbType.Boolean);
                     spParam.Add("@p_user_input", user_id, dbType: DbType.String);

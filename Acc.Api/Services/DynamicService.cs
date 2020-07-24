@@ -242,6 +242,7 @@ namespace Acc.Api.Services
                     var initialwhere = JModel.initial_where;
                     initialwhere = string.IsNullOrEmpty(initialwhere) ? initialwhere : "WHERE " + initialwhere;
                     sWhere = fn.DecryptDataString(initialwhere);
+
                     string sWhereLike = fn.sWhereLikeList(fieldWhere, ParamWHere); //fn.sWhereLikeList(DefineColumn, ParamWHere)
                     sWhere += !string.IsNullOrEmpty(ParamWHere) ? !string.IsNullOrEmpty(sWhere) ? " AND " + sWhereLike : sWhereLike : string.Empty;
                     #endregion
@@ -797,6 +798,8 @@ namespace Acc.Api.Services
                     {
                         trans.Commit();
                     }
+                    _result.Data = dataParamOutput;
+
                     _result.Message = "";
                 }
                 catch (Exception ex)

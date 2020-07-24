@@ -12,9 +12,11 @@ namespace GenerateFunctionPostgres.ClassGenerateFunction
     public class FunctionPostgres
     {
         public IDbConnection DBconnection;
+        private string connectionString;
         public FunctionPostgres(string ConnectionString)
         {
             DBconnection = new NpgsqlConnection(ConnectionString);
+            connectionString = ConnectionString;
         }
 
         public List<MOptionLookUpPostgres> LookupGetListBy(string LookUpCd, string ColumnCd)
@@ -40,7 +42,45 @@ namespace GenerateFunctionPostgres.ClassGenerateFunction
             }
             return dataList;
         }
+        public List<MOptionDB> OptionDBList(string OptionUrl)
+        {
+            List<MOptionDB> dataList = new List<MOptionDB>();
+            using (IDbConnection conn = DBconnection)
+            {
+                string sqlQuery = string.Format(@"SELECT 
+                                              ss_option_db_id,
+                                              option_url,
+                                              method_api,
+                                              sp,
+                                              line_no,
+                                              table_name,
+                                              user_input,
+                                              user_edit,
+                                              time_input,
+                                              time_edit,
+                                                method_vue,
+                                                order_save,
+                                                order_update
+                                            FROM 
+                                              public.ss_option_db 
+                                            WHERE option_url iLike @option_url;");
+                try
+                {
+                    conn.Open();
+                    dataList = conn.Query<MOptionDB>(sqlQuery, new { option_url = OptionUrl }).ToList();
 
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return dataList;
+        }
         public List<ParameterPostgres> GetResultFieldFunction(string FunctionName)
         {
             List<ParameterPostgres> tt = new List<ParameterPostgres>();
@@ -48,19 +88,20 @@ namespace GenerateFunctionPostgres.ClassGenerateFunction
             {
                 try
                 {
+                    string DbName = GetString(connectionString, "Database=", ";");
                     string Query = @"   SELECT routines.routine_name as routine_name,
 	                                        parameters.parameter_name as column_name, 
 	                                        parameters.data_type,
 	                                        parameters.ordinal_position as position
                                         FROM information_schema.routines
                                         LEFT JOIN information_schema.parameters ON routines.specific_name = parameters.specific_name
-                                        WHERE routines.specific_catalog = 'TAMS' 
+                                        WHERE routines.specific_catalog = @catalog 
                                         AND routines.specific_schema = 'public' 
                                         AND routines.routine_name = @routine_name 
                                         AND parameters.parameter_mode <> 'IN'
                                         ORDER BY routines.specific_name, routines.routine_name, parameters.ordinal_position; ";
                     conn.Open();
-                    tt = conn.Query<ParameterPostgres>(Query, new { routine_name = FunctionName }).ToList();
+                    tt = conn.Query<ParameterPostgres>(Query, new { routine_name = FunctionName, catalog = DbName }).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -73,6 +114,28 @@ namespace GenerateFunctionPostgres.ClassGenerateFunction
             }
             return tt;
         }
+        public static string GetString(string strSource, string strStart, string strEnd)
+        {
+            int Start, End;
+            if (strSource.Contains(strStart) && strSource.Contains(strEnd))
+            {
+                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
+                End = strSource.IndexOf(strEnd, Start);
+                try
+                {
+                    return strSource.Substring(Start, End - Start);
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+
+            }
+            else
+            {
+                return null;
+            }
+        }
         public List<ParameterPostgres> getParameterFunction(string fn_name)
         {
             List<ParameterPostgres> tt = new List<ParameterPostgres>();
@@ -80,7 +143,8 @@ namespace GenerateFunctionPostgres.ClassGenerateFunction
             {
                 try
                 {
-                    string Query = string.Format("select routine_name,parameter_name as column_name,data_type,oridinal_position as position from public.get_param_function('{0}');", fn_name);
+                    string Query = string.Format(@"select routine_name,parameter_name as column_name,
+                                    data_type,oridinal_position as position from public.get_param_function('{0}');", fn_name);
                     conn.Open();
                     tt = conn.Query<ParameterPostgres>(Query).ToList();
                 }

@@ -1,0 +1,13 @@
+      var param = {
+        option_url: "{OptionUrlUrl}",
+        line_no: {OptionLineNo},
+{ParameterSave}       
+      };
+
+      this.postJSON(this.getUrlCRUD(), param).then(response => {
+        if (response == null) return;
+        this.alertSuccess(response.Message).then(() => {
+          this.doBack();
+        });
+      });
+    

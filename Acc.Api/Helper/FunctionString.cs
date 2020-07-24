@@ -228,6 +228,16 @@ namespace Acc.Api.Helper
 
                 JObj["user_id"] = user_id;
             }
+            if (JObj["marketing_id"] != null)
+            {
+                var marketing_id = JObj["marketing_id"].ToString();
+                if (isBase64(JObj["marketing_id"].ToString()))
+                {
+                    marketing_id = EncryptionLibrary.DecryptText(JObj["marketing_id"].ToString());
+                }
+
+                JObj["marketing_id"] = marketing_id;
+            }
             if (JObj["user_edit"] != null)
             {
                 var user_edit = JObj["user_edit"].ToString();
@@ -461,7 +471,15 @@ namespace Acc.Api.Helper
                             else
                             {
                                 valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
-                                sp.Add("@" + validName, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
+                                if (valData.ToString().Contains("."))
+                                {
+                                    sp.Add("@" + validName, Convert.ToInt32(Convert.ToDecimal(valData.ToString())), dbType: DbType.Int32);
+                                }
+                                else
+                                {
+                                    sp.Add("@" + validName, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
+                                }
+                                
                             }
                         }
 
@@ -624,9 +642,14 @@ namespace Acc.Api.Helper
                         {
                             if (List)
                             {
-                                if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
+                                if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                                 {
                                     //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+
+                                }
+                                else if (data.data_type.ToLower() == "date")
+                                {
                                     sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                                 }
                                 else
@@ -642,7 +665,22 @@ namespace Acc.Api.Helper
                                     // field query *convert format date
                                     if (!List)
                                     {
-                                        if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
+                                        if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
+                                        {
+                                            if (dfColumn[x].Contains("AS"))
+                                            {
+                                                string[] stF = dfColumn[x].Split("AS");
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                            }
+                                            else
+                                            {
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                            }
+
+                                        }
+                                        else if (data.data_type.ToLower() == "date")
                                         {
                                             if (dfColumn[x].Contains("AS"))
                                             {
@@ -654,7 +692,6 @@ namespace Acc.Api.Helper
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
                                                 sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                                             }
-
                                         }
                                         else
                                         {
@@ -683,9 +720,14 @@ namespace Acc.Api.Helper
                         }
                         else
                         {
-                            if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
+                            if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                             {
                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+
+                            }
+                            else if (data.data_type.ToLower() == "date")
+                            {
                                 sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
                             }
                             else
@@ -705,6 +747,8 @@ namespace Acc.Api.Helper
 
 
                             sSize += dtSize + ",";
+                            string Stype = data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date") ? "T" : "S";
+                            fieldWhere += string.Format("{0}:{1},", data.column_name, Stype);//;
                         }
 
 

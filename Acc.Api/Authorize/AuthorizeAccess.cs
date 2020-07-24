@@ -94,11 +94,11 @@ namespace Acc.Api.Authorize
                 
 
 
-                if (Ip != IpAddress)
-                {
-                    _Message = "Invalid Ip Address";
-                    return false;
-                }
+                //if (Ip != IpAddress)
+                //{
+                //    _Message = "Invalid Ip Address";
+                //    return false;
+                //}
 
                 var Auth = new AuthLogin();
                 Auth.UserLog = UserID;

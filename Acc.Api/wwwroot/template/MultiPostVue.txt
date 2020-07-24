@@ -1,0 +1,35 @@
+var param{No} = {
+        _Method_: "{MethodAPI}",
+        _LineNo_: 0,
+{ParameterSaveHeader}
+      };
+
+      var paramD = [];
+      this.M_SIM.forEach((doc, index) => {
+        paramD.push({
+          _Method_: "{MethodApiDetail}",
+          _LineNo_: {LineNoDetail},
+{ParameterSaveDetail}
+        });
+      });
+     
+      var param = {
+        option_url: "{OptionUrlUrl}",
+        line_no: 0,
+        Data: [
+          {
+            A_Insert: paramH,
+            B_Looping: paramD
+          }
+        ]
+      };
+
+      this.postJSONMulti(this.getUrlProsesDataPostMulti(), param).then(
+        response => {
+          // console.log(response)
+          if (response == null) return;
+          this.alertSuccess("Save Data Has Been Successfully").then(() => {
+            this.doBack();
+          });
+        }
+      );

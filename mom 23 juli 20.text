@@ -1,0 +1,15 @@
+MOM 23/07/20
+
+Common Spec 
+	Actoion : diharuskan mencapai target point dalam sebulan
+	working day : nnti dibahas lagi pak steve rada lupa *setting utk hari kerja (kata pak irfan)
+	General : 
+Customer Master view 
+	Order: bakal di ganti jadi hanya menampilkan informatsi status'a saja
+	Quotation tampilan bakal berubah seperti di dashborad, tdak ush tampilkan nama customer
+Vendor : pengiriman barang pihak k-3
+
+ada screen yg hrus confirm ke pak steve krna ada yg salah link ada jga yg memang harus sama kaya mockaup (maka'a dsruh confirm)
+Delete : klo tdak punya child  bisa langsung delete di list'a selain itu di view'a
+list view 8 row teratas (descending entry)
+screen list yg ada searching'a dikasih paging
