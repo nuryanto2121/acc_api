@@ -149,7 +149,7 @@ namespace Acc.Api
                 DefaultRequestCulture = new RequestCulture("en-GB"),
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
-            });
+            });           
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

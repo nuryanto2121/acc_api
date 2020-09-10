@@ -20,24 +20,29 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
         }
-        public SsUser GetDataAuth(string Code, string Password)
+        public SsUser GetDataAuthByEmail(string Email)  
         {
             SsUser t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = @"SELECT ss_user_id, user_id,
-                                      user_name,    email,
-                                      handphone,    is_active,
-                                      pwd,          company_id,
-                                      picture_path, user_input,
-                                      user_edit,    time_input,
-                                      time_edit
+                string strQuery = @"SELECT   ss_user_id,  user_id,
+                                          ss_group_id,  user_name,
+                                          email,  user_level,
+                                          expired_date,  is_inactive,
+                                          job_title,  hand_phone,
+                                          last_change_password,  default_language,
+                                          user_input,  user_edit,
+                                          portfolio_id,  subportfolio_id,
+                                          time_input,  time_edit,
+                                          file_name,  path_file,
+                                          address,  notes,  otp
                                     FROM
-                                      sys_user WHERE user_id = @user_id AND pwd iLIKE @pwd;";
+                                      ss_user WHERE email = @email 
+                                    ";
                 try
                 {
                     conn.Open();
-                    t = conn.Query<SsUser>(strQuery, new { user_id = Code, pwd = Password }).SingleOrDefault();
+                    t = conn.Query<SsUser>(strQuery, new { email = Email }).SingleOrDefault();
                 }
                 catch (Exception ex)
                 {
@@ -50,6 +55,110 @@ namespace Acc.Api.DataAccess
 
             }
             return t;
+        }
+
+        public SsUser GetDataAuthByOTP(string OTP)
+        {
+            SsUser t = null;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string strQuery = @"SELECT   ss_user_id,  user_id,
+                                          ss_group_id,  user_name,
+                                          email,  user_level,
+                                          expired_date,  is_inactive,
+                                          job_title,  hand_phone,
+                                          last_change_password,  default_language,
+                                          user_input,  user_edit,
+                                          portfolio_id,  subportfolio_id,
+                                          time_input,  time_edit,
+                                          file_name,  path_file,
+                                          address,  notes,  otp
+                                    FROM
+                                      ss_user WHERE otp = @otp 
+                                    ";
+                try
+                {
+                    conn.Open();
+                    t = conn.Query<SsUser>(strQuery, new { otp = OTP }).SingleOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+            }
+            return t;
+        }
+
+        public SsUser GetDataAuthByUserId(string UserID)
+        {
+            SsUser t = null;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string strQuery = @"SELECT   ss_user_id,  user_id,
+                                          ss_group_id,  user_name,
+                                          email,  user_level,
+                                          expired_date,  is_inactive,
+                                          job_title,  hand_phone,
+                                          last_change_password,  default_language,
+                                          user_input,  user_edit,
+                                          portfolio_id,  subportfolio_id,
+                                          time_input,  time_edit,
+                                          file_name,  path_file,
+                                          address,  notes,  otp
+                                    FROM
+                                      ss_user WHERE user_id = @UserID 
+                                    ";
+                try
+                {
+                    conn.Open();
+                    t = conn.Query<SsUser>(strQuery, new { UserID = UserID }).SingleOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+            }
+            return t;
+        }
+
+        public bool UpdateOTP(string otp,string email,int ss_user_id)
+        {
+            bool result = false;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = @"UPDATE 
+                                      ss_user
+                                    SET                                  
+                                      otp = @otp
+                                    WHERE ss_user_id = @user_id
+                                      AND email = @email
+                                    ;";
+                try
+                {
+                    conn.Open();
+                    conn.Execute(sqlQuery, new { otp = otp, user_id = ss_user_id, email = email });
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return result;
         }
         public DataTable GetDataAuth(AuthLogin Param)
         {
@@ -309,6 +418,35 @@ namespace Acc.Api.DataAccess
                 {
                     conn.Open();
                     conn.Execute(sqlQuery, new { user_id = UserLogin, token = Token, ip_address = Ip });
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return result;
+        }
+        public bool UpdatePass(int ss_user_id, string Pwd)
+        {
+            bool result = false;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = @"UPDATE 
+                                      ss_user
+                                    SET
+                                      password = @Passwrod,
+                                      otp=''
+                                    WHERE ss_user_id = @ss_user_id
+                                    ;";
+                try
+                {
+                    conn.Open();
+                    conn.Execute(sqlQuery, new { ss_user_id = ss_user_id, Passwrod = Pwd });
                     result = true;
                 }
                 catch (Exception ex)

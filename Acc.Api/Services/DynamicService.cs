@@ -77,6 +77,7 @@ namespace Acc.Api.Services
                 catch (Exception ex)
                 {
                     throw ex;
+                    //_result = Tools.Error(ex);
                 }
                 finally
                 {
@@ -275,7 +276,10 @@ namespace Acc.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    //throw ex;
+
+                    OutputList.Error = true;// Tools.Error(ex);
+                    OutputList.Message = ex.Message;
                 }
                 finally
                 {
@@ -371,8 +375,9 @@ namespace Acc.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    OutputList.Error = true;
-                    OutputList.Message = ex.Message;
+                    Tools.Error(ex);
+                    //OutputList.Error = true;
+                    //OutputList.Message = ex.Message;
                 }
                 finally
                 {
@@ -805,8 +810,9 @@ namespace Acc.Api.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    _result.Error = true;
-                    _result.Message = ex.Message;
+                    _result = Tools.Error(ex);
+                    //_result.Error = true;
+                    //_result.Message = ex.Message;
                 }
                 finally
                 {
@@ -951,8 +957,9 @@ namespace Acc.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    OP.Error = true;
-                    OP.Message = ex.Message;
+                    OP = Tools.Error(ex);
+                    //OP.Error = true;
+                    //OP.Message = ex.Message;
                 }
                 finally
                 {
@@ -1020,7 +1027,10 @@ namespace Acc.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    //throw ex;
+                    OutputList = Tools.Error(ex);
+                    //OutputList.Error = true;// Tools.Error(ex);
+                    //OutputList.Message = ex.Message;
                 }
             }
 
@@ -1081,7 +1091,7 @@ namespace Acc.Api.Services
 
                     sParameter = string.IsNullOrEmpty(sParameter) ? sParameter : sParameter.ToUpper().Contains("WHERE") ? sParameter : "WHERE " + sParameter;
                     StringBuilder sQuery = new StringBuilder();
-                    sQuery.AppendFormat("SELECT {0} FROM {1} ", sField, sTable);
+                    sQuery.AppendFormat("SELECT distinct {0} FROM {1} ", sField, sTable);
                     sQuery.AppendFormat(" {0} ", sParameter);
                     if (!string.IsNullOrEmpty(Limit))
                     {

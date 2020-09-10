@@ -1,0 +1,128 @@
+MoM 27-07-2020
+
+Marketing Master :
+	- dropdown marketing ambil dari user login/User Master
+	- monthly point utk mengecek kegiatan dalam 1 bulan
+	- Point itu lebih ke waktu kerja 
+	  TUjuan -> di marketing dashbord
+	- new prospect : dalam 1 bulan mw dpt brpa prospect
+	- Min Margin
+	- Commision Type : value dalam uang; percentage dikali dalam sekian persen dari target
+	- above target :target atas
+	- below target : target bawah
+	saat save ke detail
+  Marketing menaungi/dibawah marketing
+  Marketing Detail
+		
+
+Marketing Target :
+	kondisi yg boleh input target
+	- klo sendiri bisa isi sniri
+	- klo atasan bisa isi sendiri dan anak buah, asal gk puya atasann
+	- klo punya atasn gk bsa isi sendiri, yg isi atasn'a
+   	Year : diisi ada table'a
+	ada settingan utk hitung komisi,kecuali utk rental adalah ada quotation
+	rencal quotation udh diconfirm =  achivement
+	FTL/LTL/Project terima booking = achiment
+
+Customer Target : *tambahan klo mw diisi, sbg laporan
+
+Document Type : dipakai pada waktu quotation ada requied document utk dropdown'a
+Customer Status : 
+	Call 1buln 4x(Freq)
+	Visit 1bulan 2x(Freq)
+	Entertainmetn 3bulan 1x(freq)
+
+Marketing Reassignment :
+	memindahkan dari 1 marketing(target) ke marketing yg lain
+	marketing yg dibawah dya dan dibawah'a lagi *yg login
+dropdown change marketing muncul semua marketing
+
+Opertaion Setup =>
+Fleet Master :
+	di spec akan ditambahkan utk brpa x Hari info expired muncul (nti mncul di dashboard).
+	GPS Vendor kita sediakan, customer acclog tdk bsa edit2
+	Millage hanya bisa diisi saat Add,edit tidak bsa. *nnti yg isi operation
+   button maintenance type
+	service kecil atau service besar.
+	Maintenance type hanya muncul != adHoc
+	bisa ditrigger 3 hal : 
+		usage = utk lock biar gk bisa jalan klo km ada dibatas usage->tolerance
+			stiap usage dijaga waktu,klo usage tercapai tapi waktu'a blm tercapai maka salah 1'a
+		waktu = stiap 6 bulan harus service dan bila > tolerance di lock
+		adhoc = by kejadian2,, contoh mobil ban'a lepas,, aki'a habis blabla
+	cek KM tgl last maintenance date bila sudah mencapai akan membuat work order
+*disurat jalan ada info utk do maintenance
+
+Driver Mgm :
+	bisa input foto si driver.
+	tambah alamat
+	bank name dan bank account
+	join date
+	employee status != permanent then kapan berkhir'a
+
+Vehicle brand
+Vehicle type
+Vehicle carosery
+	*entry biasa
+Tiket Category :
+	create tiket system isi category'a apa, untuk menentukan solving time'a
+Field Clerk
+	coverage : kerani jakarta
+
+Operation dash=>
+	operation petty cash : 
+GPS Vendor tidak boleh ada add
+
+New Prospect
+To Do List
+	Co Marketing dan co2 marketing harus ada confirm agar dpt point
+	logbook akan terbuat di co marketing yg ikut dengan status pending
+	yg di list ada status pending di view/form'a ada button confirm
+	yg mncul di list adalah yg login dan bawahan dan dibawah'a bawahan jga
+
+
+Appointment Dash :
+	buat janji dgn customer utk call,visit atau entertainment
+
+Quotation :
+	cancel 
+	quotation nnti ada dimobil bsa confirm
+	waktu di propoes tidak bsa edit, button propoes bisa berwarna, merah dan abu2
+	cara ke-2 logout minta atasan login,, atasn yg proposed
+
+waktu buat quotation itu from to address, waktu starndart costing itu zone,
+pada saat buat pickup delivery address ada zone'a itu yg di ambil
+
+Order : utk info2 order2 marketing yg blm selesai
+  view all hnya info marketing2 jga
+  pending itu blm di eksekusi, new
+  on progress POD/dispath, selesi pod hilang
+  Issue bagian dari on progress, misal ada 10 order, 8 dispath 2 pending, dari 8 ada 2 yg issue
+ didetail'a
+	ada row merah => sudah di pickup tp blm dijalankan
+
+Outstanding Payment :
+	Informasi ambil dari seatlement,
+	bahwa customer saya atau dibawah anak buah sya yg belum dibayar (total'a)
+	pas di klik row'a terdiri dari invoice yg blm bayar, pas dikilk lgi invoice'a terdiri dari order2
+
+	
+Commision
+	Paid (last 12 month hanya ada disini)	
+		commisi yg sudah dibayar 12 bln trakhir
+		diGroup By month baru marketing
+	Overdue : tergantung comisi setelah di generate tp blm dibayar
+	Pending : Commisi yg belum di generate/ belm di bayar
+
+Open Bidding : adalah custom order yg datang bukan dari customer kita
+	klo kita take order dsini maka akan ke 2 tmpat
+		1.buatkan quotation
+		2.buatkan order	
+		+customer, from dan to bertambah
+	*order takan berjalan tanpa quotation
+
+*Outsource order adalah order yg dilakukan oleh customer kita
+
+
+	

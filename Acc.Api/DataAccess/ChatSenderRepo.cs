@@ -59,6 +59,9 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_doc_date", DateTime.Now, dbType: DbType.DateTime);
                     Parameters.Add("p_doc_type", Model.doc_type);
                     Parameters.Add("p_doc_no", Model.doc_no);
+                    Parameters.Add("p_mk_quotation_id",Model.mk_quotation_id,dbType:DbType.Int32);
+                    Parameters.Add("p_op_order_id",Model.op_order_id, dbType: DbType.Int32);
+                    Parameters.Add("p_mk_open_order_id",Model.mk_open_order_id, dbType: DbType.Int32);
                     Parameters.Add("p_user_input", Model.user_input);
                     _result = conn.Query<dynamic>("fss_chat_h_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
 

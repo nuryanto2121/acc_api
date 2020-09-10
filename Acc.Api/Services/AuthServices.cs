@@ -23,18 +23,46 @@ namespace Acc.Api.Services
         IConfiguration config;
         private string _Session_Id;
         private FunctionString fn;
-        public AuthServices(IConfiguration Configuration)
+        private readonly IEmailService _emailSender;
+        public AuthServices(IConfiguration Configuration, IEmailService EmailSender)
         {
             authRepo = new AuthRepo(Tools.ConnectionString(Configuration));
             fn = new FunctionString(Tools.ConnectionString(Configuration));
             menuRepo = new SsMenuRepo(Tools.ConnectionString(Configuration));
             favRepo = new SysMenuFavoriteRepo(Tools.ConnectionString(Configuration));
+            _emailSender = EmailSender;
             config = Configuration;
         }
 
         public Output ChangePassword(ChangePassword Model)
         {
-            throw new NotImplementedException();
+            Output _result = new Output();
+            Dictionary<string, object> DataUser = new Dictionary<string, object>();
+            try
+            {                
+                if (Model.ConfirmPassword != Model.NewPassword)
+                {
+                    throw new Exception("New Password and Confirm must be same.");
+                }
+                string User_id = EncryptionLibrary.DecryptText(Model.UserId);
+                SsUser dataUser = authRepo.GetDataAuthByUserId(User_id);
+                if (dataUser == null)
+                {
+                    throw new Exception("Account Not Valid.");
+                }
+
+                Model.NewPassword = EncryptionLibrary.EncryptText(Model.NewPassword);
+                authRepo.UpdatePass(dataUser.ss_user_id, Model.NewPassword);
+                _result.Message = "Please Login";
+                //DataUser.Add("user_id", EncryptionLibrary.EncryptText(dataUser.user_id));
+                //_result.Data = DataUser;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                //_result = Tools.Error(ex);
+            }
+            return _result;
         }
 
         public Output Login(AuthLogin Model)
@@ -280,7 +308,94 @@ namespace Acc.Api.Services
             }
             catch (Exception ex)
             {
+                _result = Tools.Error(ex);
+                //throw ex;
+            }
+            return _result;
+        }
+
+        //public async Task<Output> ForgotPassword(ForgotPassword Model)
+        public async Task<Output> ForgotPassword(ForgotPassword Model)
+        {
+            Output _result = new Output();
+            try
+            {
+                SsUser dataUser = authRepo.GetDataAuthByEmail(Model.Email);
+                if (dataUser.is_inactive == "Y")
+                {
+                    throw new Exception("Your Account Is InActive. Please Contact Your Administrator.");
+                }
+
+                if (dataUser==null)
+                {
+                    throw new Exception("Your Email Is Not Valid.");
+                }
+                string GenOTP = EncryptionLibrary.KeyGenerator.GetUniqueKey(6);
+                string OPTEncryp = EncryptionLibrary.EncryptText(GenOTP);
+
+                authRepo.UpdateOTP(OPTEncryp, Model.Email, dataUser.ss_user_id);
+
+                await SendEmailForgotAsync(dataUser, GenOTP);
+
+                _result.Message = "Please check Your email.";
+            }
+            catch (Exception ex)
+            {
+                _result = Tools.Error(ex);
+            }
+            return _result;
+        }
+
+        async Task SendEmailForgotAsync(SsUser dataUser,string OTP)
+        {
+            try
+            {
+                EmailModel ModelEmail = new EmailModel();
+                ModelEmail.to = dataUser.email;
+                ModelEmail.subject = "Forgot Password";
+                ModelEmail.body = string.Format("Hi {0}", dataUser.user_name) + System.Environment.NewLine;
+                ModelEmail.body +=  System.Environment.NewLine;
+                ModelEmail.body += string.Format("We heard that you lost your Password. Sory about that.") + System.Environment.NewLine;
+                ModelEmail.body += string.Format("This Your OTP for Reset Your Password : {0}", OTP) + System.Environment.NewLine;
+                ModelEmail.body += System.Environment.NewLine;
+                ModelEmail.body += System.Environment.NewLine;
+                ModelEmail.body += string.Format("Thanks.") + System.Environment.NewLine;
+
+                ModelEmail.user_id = EncryptionLibrary.EncryptText(dataUser.user_id);
+
+                Output _result = await _emailSender.SendEmailAsync(ModelEmail);
+            }
+            catch (Exception ex)
+            {
                 throw ex;
+            }
+        }
+
+        public Output Validate(string OTP)
+        {
+            Output _result = new Output();
+            Dictionary<string, object> DataUser = new Dictionary<string, object>();
+            try
+            {
+                string OtpEncrypt = EncryptionLibrary.EncryptText(OTP);
+                SsUser dataUser = authRepo.GetDataAuthByOTP(OtpEncrypt);
+                if (dataUser.is_inactive == "Y")
+                {
+                    throw new Exception("Your Account Is InActive. Please Contact Your Administrator.");
+                }
+
+                if (dataUser == null)
+                {
+                    throw new Exception("Your OTP Is Not Valid.");
+                }
+
+                DataUser.Add("user_id", EncryptionLibrary.EncryptText(dataUser.user_id));
+                _result.Data = DataUser;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                //_result = Tools.Error(ex);
             }
             return _result;
         }

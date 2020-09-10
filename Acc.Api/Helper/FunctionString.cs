@@ -607,23 +607,14 @@ namespace Acc.Api.Helper
         public JObject SetFieldList(List<FieldSource> fieldSources, int len = 0, string ParamWhere = "", string definedColumn = "", bool List = false)
         {
             JObject _result = new JObject();
+            Dictionary<int, string> OBjSize = new Dictionary<int, string>();
             string sField = string.Empty;
             string sFieldQuery = string.Empty;
             string sSize = string.Empty;
             string sType = string.Empty;
             string dtSize = string.Empty;
             string fieldWhere = string.Empty;
-            string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;
-            if (dfColumn != null)
-            {
-                if (dfColumn[0] == "no")
-                {
-                    dfColumn = dfColumn.Skip(1).Take(dfColumn.Length - 1).ToArray();
-                    sSize = "S,";
-                }
-            }
-
-
+            string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;         
             //dfColumn = List ? null : dfColumn;
             //string sWhere = string.Empty;
             int dtType = 0;
@@ -703,15 +694,16 @@ namespace Acc.Api.Helper
                                     //define size
                                     if (data.data_type.ToLower() == "character varying" || data.data_type.ToLower() == "character" || data.data_type.ToLower() == "char" || data.data_type.ToLower() == "text")
                                     {
-                                        dtSize = data.max_length <= 19 ? "S" : data.max_length >= 20 && data.max_length <= 49 ? "M" : data.max_length >= 50 ? "L" : "S";
+                                        dtSize = data.max_length <= 20 ? "S" : data.max_length >= 21 && data.max_length <= 49 ? "M" : data.max_length >= 50 ? "L" : "S";
                                     }
                                     else
                                     {
                                         dtSize = "S";
                                     }
 
+                                    OBjSize.Add(x, dtSize);
 
-                                    sSize += dtSize + ",";
+                                    //sSize += dtSize + ",";
                                     string Stype = data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date") ? "T" : "S";
                                     fieldWhere += string.Format("{0}:{1},", dfColumn[x], Stype);//;
                                 }
@@ -738,7 +730,7 @@ namespace Acc.Api.Helper
                             //define size
                             if (data.data_type.ToLower() == "character varying" || data.data_type.ToLower() == "character" || data.data_type.ToLower() == "char" || data.data_type.ToLower() == "text")
                             {
-                                dtSize = data.max_length <= 19 ? "S" : data.max_length >= 20 && data.max_length <= 49 ? "M" : data.max_length >= 50 ? "L" : "S";
+                                dtSize = data.max_length <= 20 ? "S" : data.max_length >= 21 && data.max_length <= 49 ? "M" : data.max_length >= 50 ? "L" : "S";
                             }
                             else
                             {
@@ -778,6 +770,17 @@ namespace Acc.Api.Helper
                 fieldWhere = !string.IsNullOrEmpty(fieldWhere) ? fieldWhere.Remove(fieldWhere.LastIndexOf(",")) : fieldWhere;
                 //sWhere = !string.IsNullOrEmpty(sWhere) ? "( " + sWhere.Remove(sWhere.LastIndexOf("OR")) + " )" : sWhere;
             }
+            var dtsize = definedColumn != null ? definedColumn.Split(",") : null;
+            if (dtsize != null)
+            {
+                if (dtsize[0] == "no")
+                {
+                    OBjSize.Add(0, "S");
+                }
+            }
+            sSize = string.Join(",", OBjSize.OrderBy(key => key.Key).ToList().Select(s => s.Value).ToArray());
+            //if (dt)
+            //OBjSize.OrderBy()
             _result.Add("FieldQuery", sFieldQuery);
             _result.Add("Field", sField);
             _result.Add("DefineSize", sSize);
@@ -1060,6 +1063,20 @@ namespace Acc.Api.Helper
                 }
             }
 
+            if (data.ToLower().Contains("ss_portfolio_id"))
+            {
+                valStrEncrypt = this.getString(data, "ss_portfolio_id='", "'");
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_portfolio_id='", "'") : valStrEncrypt;
+                if (isBase64(valStrEncrypt))
+                {
+                    valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
+                }
+
+                if (!string.IsNullOrEmpty(valStrDecrypt))
+                    data = data.Replace(valStrEncrypt, valStrDecrypt);
+
+                valStrDecrypt = string.Empty;
+            }
             if (data.ToLower().Contains("portfolio_id"))
             {
                 valStrEncrypt = this.getString(data, "portfolio_id='", "'");
@@ -1074,6 +1091,22 @@ namespace Acc.Api.Helper
 
                 valStrDecrypt = string.Empty;
             }
+
+            if (data.ToLower().Contains("ss_subportfolio_id"))
+            {
+                valStrEncrypt = this.getString(data, "ss_subportfolio_id='", "'");
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_subportfolio_id='", "'") : valStrEncrypt;
+                if (isBase64(valStrEncrypt))
+                {
+                    valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
+                }
+
+                if (!string.IsNullOrEmpty(valStrDecrypt))
+                    data = data.Replace(valStrEncrypt, valStrDecrypt);
+
+                valStrDecrypt = string.Empty;
+            }
+
 
             if (data.ToLower().Contains("subportfolio_id"))
             {
@@ -1107,14 +1140,22 @@ namespace Acc.Api.Helper
                     }
 
                     sFIeld[0] = string.Format("{0}", sFIeld[0]);
-                    if (sFIeld[1] == "T")
+                    if (sFIeld.Count()>1)
                     {
-                        _result += string.Format("lower(TO_CHAR({0}, 'DD/MM/YYYY HH24:MI')) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
+                        if (sFIeld[1] == "T")
+                        {
+                            _result += string.Format("lower(TO_CHAR({0}, 'DD/MM/YYYY HH24:MI')) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
+                        }
+                        else
+                        {
+                            _result += string.Format("lower({0}::varchar) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
+                        }
                     }
                     else
                     {
                         _result += string.Format("lower({0}::varchar) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
                     }
+                    
 
                 }
                 _result = !string.IsNullOrEmpty(_result) ? "( " + _result.Remove(_result.LastIndexOf("OR")) + " )" : _result;

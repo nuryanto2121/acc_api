@@ -42,4 +42,16 @@ namespace Acc.Api.Models
         public string sort_field { get; set; }
         public string param_view { get; set; }
     }
+
+    public class ParamGet
+    {
+        [Required]
+        public string option_url { get; set; }
+        [Required]
+        public int? line_no { get; set; }
+        [Required]
+        public int? id { get; set; }
+        [Required]
+        public int lastupdatestamp { get; set; }
+    }
 }

@@ -12,6 +12,7 @@ using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Acc.Api.Controllers
 {
@@ -20,11 +21,18 @@ namespace Acc.Api.Controllers
     public class AuthController : ControllerBase, IAuthAPI
     {
         private IAuthService AuthService;
-        public AuthController(IConfiguration configuration)
+        private readonly IEmailService _emailSender;
+        public AuthController(IConfiguration configuration, IEmailService emailSender)
         {
-            AuthService = new AuthServices(configuration);
+            AuthService = new AuthServices(configuration, emailSender);
+            _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// change password
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("Auth/ChangePassword")]
         [ProducesResponseType(typeof(Output), 200)]
@@ -33,11 +41,36 @@ namespace Acc.Api.Controllers
             var _result = new Output();
             try
             {
+                _result =  AuthService.ChangePassword(Model);
 
             }
             catch (Exception ex)
             {
-                _result = Tools.Error(ex);
+                //_result = Tools.Error(ex);
+                return StatusCode(StatusCodes.Status409Conflict, Tools.Error(ex));
+            }
+            return this.Ok(_result);
+        }
+
+        /// <summary>
+        /// kirim OTP utk mendapatkan user id kemudian change password
+        /// </summary>
+        /// <param name="OTP"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("Auth/Validate")]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult Validate([Required]string OTP)
+        {
+            var _result = new Output();
+            try
+            {
+                _result = AuthService.Validate(OTP);
+            }
+            catch (Exception ex)
+            {
+                //_result = Tools.Error(ex);
+                return StatusCode(StatusCodes.Status409Conflict, Tools.Error(ex));
             }
             return this.Ok(_result);
         }
@@ -113,19 +146,27 @@ namespace Acc.Api.Controllers
             return StatusCode(StatusCodes.Status200OK, _result);
         }
 
+        /// <summary>
+        /// Forgot Password masukan email, setelah dapat OTP jalankan Validate
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
         [AllowAnonymous]
-        [HttpPost("Auth/Reset")]
+        [HttpPost("Auth/ForgotPassword")]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult ResetPassword([FromBody] ChangePassword Model)
+        public async Task<IActionResult> ResetPassword([FromBody] ForgotPassword Model)
         {
             var _result = new Output();
             try
             {
-
+                _result = await AuthService.ForgotPassword(Model);
+                //IEmailService _emailSender
+                // _emailSender
             }
             catch (Exception ex)
             {
-                _result = Tools.Error(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+                //_result = Tools.Error(ex);
             }
             return this.Ok(_result);
         }

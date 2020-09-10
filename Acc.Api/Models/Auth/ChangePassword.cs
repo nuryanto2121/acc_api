@@ -13,9 +13,9 @@ namespace Acc.Api.Models
         [JsonProperty("user_id")]
         public string UserId { get; set; }
 
-        [Required]
-        [JsonProperty("current_password")]
-        public string CurrentPassword { get; set; }
+        //[Required]
+        //[JsonProperty("current_password")]
+        //public string CurrentPassword { get; set; }
 
         [Required]
         [JsonProperty("new_password")]
@@ -24,5 +24,12 @@ namespace Acc.Api.Models
         [Required]
         [JsonProperty("confirm_password")]
         public string ConfirmPassword { get; set; }
+    }
+
+    public class ForgotPassword
+    {
+        [Required]
+        [JsonProperty("email")]
+        public string Email { get; set; }
     }
 }

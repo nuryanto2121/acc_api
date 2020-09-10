@@ -13,3 +13,8 @@ ada screen yg hrus confirm ke pak steve krna ada yg salah link ada jga yg memang
 Delete : klo tdak punya child  bisa langsung delete di list'a selain itu di view'a
 list view 8 row teratas (descending entry)
 screen list yg ada searching'a dikasih paging
+
+di spec commont tambah customer name
+
+http://localhost:8084/MK/MK_Customer/LogBook
+tambah co marketing 1 dan 2

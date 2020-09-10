@@ -32,7 +32,7 @@ namespace Acc.Api.Services
             {
                 UserID = fn.DecryptString(UserID);
                 int ss_porfolio_id = Convert.ToInt32(fn.DecryptString(PortfolioID));
-                _result.Data = marketingRepo.GetList(UserID, 1);
+                _result.Data = marketingRepo.GetList(UserID, ss_porfolio_id);
             }
             catch (Exception ex)
             {
