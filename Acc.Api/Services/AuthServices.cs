@@ -12,6 +12,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Acc.Api.Services
 {
@@ -24,7 +26,8 @@ namespace Acc.Api.Services
         private string _Session_Id;
         private FunctionString fn;
         private readonly IEmailService _emailSender;
-        public AuthServices(IConfiguration Configuration, IEmailService EmailSender)
+        private IHostingEnvironment _environment;
+        public AuthServices(IConfiguration Configuration, IEmailService EmailSender, IHostingEnvironment environment)
         {
             authRepo = new AuthRepo(Tools.ConnectionString(Configuration));
             fn = new FunctionString(Tools.ConnectionString(Configuration));
@@ -32,6 +35,7 @@ namespace Acc.Api.Services
             favRepo = new SysMenuFavoriteRepo(Tools.ConnectionString(Configuration));
             _emailSender = EmailSender;
             config = Configuration;
+            _environment = environment;
         }
 
         public Output ChangePassword(ChangePassword Model)
@@ -321,16 +325,17 @@ namespace Acc.Api.Services
             try
             {
                 SsUser dataUser = authRepo.GetDataAuthByEmail(Model.Email);
+                if (dataUser == null)
+                {
+                    throw new Exception("Your Email Is Not Valid.");
+                }
                 if (dataUser.is_inactive == "Y")
                 {
                     throw new Exception("Your Account Is InActive. Please Contact Your Administrator.");
                 }
 
-                if (dataUser==null)
-                {
-                    throw new Exception("Your Email Is Not Valid.");
-                }
-                string GenOTP = EncryptionLibrary.KeyGenerator.GetUniqueKey(6);
+                
+                string GenOTP = EncryptionLibrary.KeyGenerator.GetUniqueNumber(6);
                 string OPTEncryp = EncryptionLibrary.EncryptText(GenOTP);
 
                 authRepo.UpdateOTP(OPTEncryp, Model.Email, dataUser.ss_user_id);
@@ -350,16 +355,28 @@ namespace Acc.Api.Services
         {
             try
             {
+                string BodyTemplateFunction = string.Empty;
+                if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                {
+                    _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
+                string PathFile = Path.Combine(_environment.WebRootPath, "Template", "ForgotPassword.html");
+
+                //if (dataHeader.form_type.ToUpper() == "FORM")
+                //{
+                //    PathFile = Path.Combine(PathRoot, "Template", "MasterCrudPostgresForm.txt");
+                //}
+                using (StreamReader reader = new StreamReader(PathFile))
+                {
+                    BodyTemplateFunction = reader.ReadToEnd();
+                }
+                BodyTemplateFunction = BodyTemplateFunction.Replace("{UserName}", dataUser.user_name);
+                BodyTemplateFunction = BodyTemplateFunction.Replace("{OTP}", OTP);
+
                 EmailModel ModelEmail = new EmailModel();
                 ModelEmail.to = dataUser.email;
                 ModelEmail.subject = "Forgot Password";
-                ModelEmail.body = string.Format("Hi {0}", dataUser.user_name) + System.Environment.NewLine;
-                ModelEmail.body +=  System.Environment.NewLine;
-                ModelEmail.body += string.Format("We heard that you lost your Password. Sory about that.") + System.Environment.NewLine;
-                ModelEmail.body += string.Format("This Your OTP for Reset Your Password : {0}", OTP) + System.Environment.NewLine;
-                ModelEmail.body += System.Environment.NewLine;
-                ModelEmail.body += System.Environment.NewLine;
-                ModelEmail.body += string.Format("Thanks.") + System.Environment.NewLine;
+                ModelEmail.body = BodyTemplateFunction;
 
                 ModelEmail.user_id = EncryptionLibrary.EncryptText(dataUser.user_id);
 
@@ -379,15 +396,16 @@ namespace Acc.Api.Services
             {
                 string OtpEncrypt = EncryptionLibrary.EncryptText(OTP);
                 SsUser dataUser = authRepo.GetDataAuthByOTP(OtpEncrypt);
+                if (dataUser == null)
+                {
+                    throw new Exception("Your OTP Is Not Valid.");
+                }
                 if (dataUser.is_inactive == "Y")
                 {
                     throw new Exception("Your Account Is InActive. Please Contact Your Administrator.");
                 }
 
-                if (dataUser == null)
-                {
-                    throw new Exception("Your OTP Is Not Valid.");
-                }
+                
 
                 DataUser.Add("user_id", EncryptionLibrary.EncryptText(dataUser.user_id));
                 _result.Data = DataUser;

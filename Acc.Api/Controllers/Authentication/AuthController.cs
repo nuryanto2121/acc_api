@@ -13,6 +13,7 @@ using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Acc.Api.Controllers
 {
@@ -22,9 +23,10 @@ namespace Acc.Api.Controllers
     {
         private IAuthService AuthService;
         private readonly IEmailService _emailSender;
-        public AuthController(IConfiguration configuration, IEmailService emailSender)
+        
+        public AuthController(IConfiguration configuration, IEmailService emailSender, IHostingEnvironment environment)
         {
-            AuthService = new AuthServices(configuration, emailSender);
+            AuthService = new AuthServices(configuration, emailSender, environment);
             _emailSender = emailSender;
         }
 
