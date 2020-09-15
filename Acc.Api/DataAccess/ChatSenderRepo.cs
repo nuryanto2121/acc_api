@@ -17,16 +17,18 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
         }
 
-        public ChatSender GetDataHeader(int key)
+        public ChatHeader GetDataHeader(int key)
         {
-            ChatSender t = null;
+            ChatHeader t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = "SELECT   subject,  user_id_from,  user_id_to,  doc_no,  user_input FROM public.ss_chat_h  WHERE ss_chat_h_id = @ss_chat_h_id";
+                string strQuery = @"SELECT ss_chat_h_id,  ss_portfolio_id,  ss_subportfolio_id,  subject,
+                                    user_id_to,  doc_date,  doc_type,  doc_no,   user_id_from,
+                                    row_id,  option_url,  line_no,  url_view_detail FROM public.ss_chat_h  WHERE ss_chat_h_id = @ss_chat_h_id";
                 try
                 {
                     conn.Open();
-                    t = conn.Query<ChatSender>(strQuery, new { ss_chat_h_id = key }).SingleOrDefault();
+                    t = conn.Query<ChatHeader>(strQuery, new { ss_chat_h_id = key }).SingleOrDefault();
                 }
                 catch (Exception ex)
                 {
@@ -59,9 +61,10 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_doc_date", DateTime.Now, dbType: DbType.DateTime);
                     Parameters.Add("p_doc_type", Model.doc_type);
                     Parameters.Add("p_doc_no", Model.doc_no);
-                    Parameters.Add("p_mk_quotation_id",Model.mk_quotation_id,dbType:DbType.Int32);
-                    Parameters.Add("p_op_order_id",Model.op_order_id, dbType: DbType.Int32);
-                    Parameters.Add("p_mk_open_order_id",Model.mk_open_order_id, dbType: DbType.Int32);
+                    Parameters.Add("p_option_url", Model.option_url);
+                    Parameters.Add("p_line_no", Model.line_no, dbType: DbType.Int32);
+                    Parameters.Add("p_url_view_detail", Model.url_view_detail);
+                    Parameters.Add("p_row_id", Model.row_id, dbType: DbType.Int32);
                     Parameters.Add("p_user_input", Model.user_input);
                     _result = conn.Query<dynamic>("fss_chat_h_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
 

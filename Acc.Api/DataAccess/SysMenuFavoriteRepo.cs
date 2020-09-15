@@ -136,7 +136,7 @@ namespace Acc.Api.DataAccess
                                             and smg.ss_menu_id = sm.ss_menu_id          
                                        where f.ss_portfolio_id = @ss_portfolio_id
                                         and f.user_id iLIKE @user_id      
-                                        order by f.row_no ;";
+                                        order by case when sm.title ILIKE'%dashboard%' then 0 else 1 end,f.row_no ;";
                     conn.Open();
                     _result = conn.Query<dynamic>(sQuery,new { ss_portfolio_id = PortfolioId, user_id = UserId }).ToList();
                     

@@ -26,7 +26,6 @@ namespace Acc.Api.Services
             config = Configuration;
             fn = new FunctionString(Tools.ConnectionString(Configuration));
             dn = new DynamicService(Configuration);
-            config = Configuration;
             _environment = environment;
         }
         public DataTable GetDataExport(string encodeString)

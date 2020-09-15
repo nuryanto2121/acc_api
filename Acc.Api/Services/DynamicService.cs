@@ -748,7 +748,7 @@ namespace Acc.Api.Services
                                 }
 
                                 spParam = fn.SpParameters(isiData, OptionRepo.getListParamType(SPName));
-                                var dt = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure);
+                                var dt = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure,transaction: trans);
 
                                 if (dt.Count() > 0)
                                 {
@@ -786,7 +786,7 @@ namespace Acc.Api.Services
                                         isiData = fn.SetParamWithValueOutput(isiData, dataParamOutput);
                                     }
                                     spParam = fn.SpParameters(isiData, OptionRepo.getListParamType(SPName));
-                                    var dt = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure);
+                                    var dt = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure,transaction:trans);
                                     if (dt.Count() > 0)
                                     {
                                         var ddd = dt.ToList()[0];
@@ -941,7 +941,7 @@ namespace Acc.Api.Services
 
                     string source_field = fn.SetFieldListLookup(OptionLookUp.source_field, OptionLookUp.display_lookup);
 
-
+                    ParamView = fn.SparamViewDecrypt(ParamView);
                     MvSpName = string.IsNullOrEmpty(ParamView) ? OptionLookUp.view_name : string.Format("{0}({1})", OptionLookUp.view_name, ParamView);
                     #region Parameter Where
                     var ParamWHere = JModel["ParamWhere"].ToString();

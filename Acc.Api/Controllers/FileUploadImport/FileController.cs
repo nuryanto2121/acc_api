@@ -77,46 +77,7 @@ namespace Acc.Api.Controllers.FileUploadImport
 
                 //}
                 po.Data = data;
-                //string pModuleCd = !string.IsNullOrEmpty(Request.Form["ModuleCd"]) ? Request.Form["ModuleCd"].ToString() : "";
-                //string pSubportfolioCd = !string.IsNullOrEmpty(Request.Form["SubPortfolio"]) ? Request.Form["SubPortfolio"].ToString() : "";
-                //string pDelimiter = !string.IsNullOrEmpty(Request.Form["Delimiter"]) ? Request.Form["Delimiter"].ToString() : "";
-                //string pPath = !string.IsNullOrEmpty(Request.Form["Path"]) ? fn.PathString(Request.Form["Path"].ToString()) : "";
-
-                //string pathToSave2 = !string.IsNullOrEmpty(pModuleCd) ? Path.Combine("FileUpload", pSubportfolioCd, pModuleCd) : Path.Combine("Picture", pSubportfolioCd, "Uploads");
-                //string pathToSave = !string.IsNullOrEmpty(pPath) ? pPath : pathToSave2;
-                //if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
-                //{
-                //    _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                //}
-                //pathToSave = Path.Combine(_environment.WebRootPath, pathToSave);
-                ////pathToSave = _environment.WebRootPath + pathToSave;
-
-                //if (!Directory.Exists(pathToSave))
-                //{
-                //    Directory.CreateDirectory(pathToSave);
-                //}
-
-                //var docfiles = new List<string>();
-                //foreach (var file in Request.Form.Files)
-                //{
-
-                //    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                //    string fileType = Path.GetExtension(fileName).ToLower();
-                //    string PathSaveWithName = Path.Combine(pathToSave, fileName);
-                //    if (System.IO.File.Exists(PathSaveWithName))
-                //    {
-                //        fileName = string.Format("{0}_{1}{2}", fileName.Replace(fileType, ""), DateTime.Now.ToString("ddMMyyyyhhmmss"), fileType);
-                //    }
-
-                //    using (var stream = new FileStream(Path.Combine(pathToSave, fileName), FileMode.Create))
-                //    {
-                //        await file.CopyToAsync(stream);
-                //    }
-
-                //    docfiles.Add(fileName);
-                //}
-
-                //po.Data = docfiles;
+               
             }
             catch (Exception ex)
             {

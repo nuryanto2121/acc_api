@@ -27,7 +27,11 @@ namespace Acc.Api.Helper
             using (IDbConnection conn = Tools.DBConnection(connectionstring))
             {
                 StringBuilder sbQuery = new StringBuilder();
-                parameters = !string.IsNullOrEmpty(parameters) ? " WHERE " + parameters : parameters;
+                //parameters = !string.IsNullOrEmpty(parameters) ? " WHERE " + parameters : parameters;
+                if (!string.IsNullOrEmpty(parameters))
+                {
+                    parameters = parameters.Contains("WHERE") ? parameters : " WHERE " + parameters;
+                }
                 switch (function)
                 {
                     case SQL.Function.Aggregate.Max:
@@ -479,7 +483,7 @@ namespace Acc.Api.Helper
                                 {
                                     sp.Add("@" + validName, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
                                 }
-                                
+
                             }
                         }
 
@@ -595,6 +599,180 @@ namespace Acc.Api.Helper
             }
             return sp;
         }
+        public DynamicParameters SpParameterPortIn(List<ParamFunction> ListParam, ParamPortIn DataPort)
+        {
+            DynamicParameters sp = new DynamicParameters();
+            try
+            {
+                ListParam.ForEach(delegate (ParamFunction dt)
+                {
+                    foreach (JProperty x in DataPort.data_port.Properties())
+                    {
+                        var valData = x.Value;
+                        //long result;
+                        var validName = string.Format("p_{0}", x.Name);
+                        var pName = x.Name.ToString().Trim();
+                        if (dt.parameter_name == validName)
+                        {
+                            if (dt.data_type.ToLower() == "character varying" || dt.data_type.ToLower() == "character" || dt.data_type.ToLower() == "char" || dt.data_type.ToLower() == "text")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.String);
+                                }
+                                else
+                                {
+                                    sp.Add(dt.parameter_name, valData.ToString(), dbType: DbType.String);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "integer")
+                            {
+                                if (valData != null)
+                                {
+                                    if (valData.ToString().ToLower() == "null")
+                                    {
+                                        sp.Add(dt.parameter_name, null, dbType: DbType.Int32);
+                                        //return;
+                                    }
+                                    else
+                                    {
+                                        valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
+                                        if (valData.ToString().Contains("."))
+                                        {
+                                            sp.Add(dt.parameter_name, Convert.ToInt32(Convert.ToDecimal(valData.ToString())), dbType: DbType.Int32);
+                                        }
+                                        else
+                                        {
+                                            sp.Add(dt.parameter_name, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
+                                        }
+
+                                    }
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "decimal")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.Int32);
+                                    //return;
+                                }
+                                else
+                                {
+                                    valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
+                                    sp.Add(dt.parameter_name, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "numeric")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.Int32);
+                                    //return;
+                                }
+                                else
+                                {
+                                    valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
+                                    sp.Add(dt.parameter_name, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "bigint")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.Int64);
+                                    //return;
+                                }
+                                else
+                                {
+                                    valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
+                                    sp.Add(dt.parameter_name, Convert.ToInt64(valData.ToString()), dbType: DbType.Int64);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "boolean")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.Boolean);
+                                    //return;
+                                }
+                                else
+                                {
+                                    sp.Add(dt.parameter_name, Convert.ToBoolean(valData), dbType: DbType.Boolean);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "json")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, (DbType)NpgsqlDbType.Json);
+                                    //return;
+                                }
+                                else
+                                {
+                                    sp.Add(dt.parameter_name, valData, (DbType)NpgsqlDbType.Json);
+                                }
+
+                            }
+                            else if (dt.data_type.ToLower() == "datetime" || dt.data_type.ToLower() == "timestamp without time zone" || dt.data_type.ToLower() == "date" || dt.data_type.ToLower() == "timestamp")
+                            {
+                                if (valData.ToString().ToLower() == "null")
+                                {
+                                    sp.Add(dt.parameter_name, null, dbType: DbType.DateTime);
+                                    //return;
+                                }
+                                else
+                                {
+                                    if (dt.data_type.ToLower() == "date")
+                                    {
+                                        sp.Add(dt.parameter_name, DateTime.Parse(valData.ToString()), dbType: DbType.Date);
+                                    }
+                                    else
+                                    {
+                                        sp.Add(dt.parameter_name, DateTime.Parse(valData.ToString()), dbType: DbType.DateTime);
+                                    }
+
+                                }
+
+                            }
+                            //sp.Add(dt.parameter_name,);
+                        }
+                    }
+                    if (dt.parameter_name.Contains("p_user_input")|| dt.parameter_name.Contains("p_user_edit"))
+                    {
+                        if (!sp.ParameterNames.Contains("p_user_input")|| !sp.ParameterNames.Contains("p_user_edit"))
+                        {
+                            sp.Add(dt.parameter_name, DataPort.user_input);
+                        }
+                    }
+                    if (dt.parameter_name.Contains("p_ss_portfolio_id")|| dt.parameter_name.Contains("p_portfolio_id"))
+                    {
+                        if (!sp.ParameterNames.Contains("p_ss_portfolio_id") || !sp.ParameterNames.Contains("p_portfolio_id"))
+                        {
+                            sp.Add(dt.parameter_name, DataPort.ss_portfolio_id);
+                        }
+                    }
+                    if (dt.parameter_name.Contains("p_ss_subportfolio_id") || dt.parameter_name.Contains("p_subportfolio_id"))
+                    {
+                        if (!sp.ParameterNames.Contains("p_ss_subportfolio_id") || !sp.ParameterNames.Contains("p_subportfolio_id"))
+                        {
+                            sp.Add(dt.parameter_name, DataPort.ss_subportfolio_id);
+                        }
+                    }
+
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return sp;
+        }
         public string DecryptString(string data)
         {
             string _result = data;
@@ -614,7 +792,7 @@ namespace Acc.Api.Helper
             string sType = string.Empty;
             string dtSize = string.Empty;
             string fieldWhere = string.Empty;
-            string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;         
+            string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;
             //dfColumn = List ? null : dfColumn;
             //string sWhere = string.Empty;
             int dtType = 0;
@@ -1140,7 +1318,7 @@ namespace Acc.Api.Helper
                     }
 
                     sFIeld[0] = string.Format("{0}", sFIeld[0]);
-                    if (sFIeld.Count()>1)
+                    if (sFIeld.Count() > 1)
                     {
                         if (sFIeld[1] == "T")
                         {
@@ -1155,7 +1333,7 @@ namespace Acc.Api.Helper
                     {
                         _result += string.Format("lower({0}::varchar) LIKE '%{1}%' OR ", sFIeld[0], sParam.ToLower());
                     }
-                    
+
 
                 }
                 _result = !string.IsNullOrEmpty(_result) ? "( " + _result.Remove(_result.LastIndexOf("OR")) + " )" : _result;
@@ -1166,7 +1344,34 @@ namespace Acc.Api.Helper
             }
             return _result;
         }
+        public string SparamViewDecrypt(string ParamView)
+        {
+            string _result = string.Empty;
+            try
+            {
+                string[] fields = ParamView.Split(',');
+                for (int x = 0; x < fields.Count(); x++)
+                {
+                    if (fields[x] != "")
+                    {
+                        string Key = fields[x].Replace("'", "");
 
+                        if (isBase64(Key))
+                        {
+                            fields[x] = string.Format("'{0}'", EncryptionLibrary.DecryptText(Key));
+                        }
+                    }
+
+                }
+
+                _result = string.Join(",", fields);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
         public string SetFieldListLookup(string SourceField, string DisplayField)
         {
             string _result = string.Empty;

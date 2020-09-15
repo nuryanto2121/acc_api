@@ -91,7 +91,7 @@ namespace Acc.Api.Authorize
                 DateTime tokenCreate = new DateTime(tik);
                 long tik2 = long.Parse(Parts[5]);
                 DateTime ExpireOn = new DateTime(tik2);
-                
+
 
 
                 //if (Ip != IpAddress)
@@ -112,7 +112,9 @@ namespace Acc.Api.Authorize
                 else
                 {
                     UserSession uslog = _AuthRepor.GetDataSessionLog(Auth.UserLog, Token);
-                    if (DateTime.Now > uslog.expire_on)
+                    DateTime SessionCreate = DateTime.Parse(uslog.expire_on.ToString());
+                    //if (DateTime.Now > uslog.expire_on)
+                    if (DateTime.Now.Date > SessionCreate.Date)
                     {
                         _Message = "Your Session Has Expired";
                         return false;
@@ -130,6 +132,6 @@ namespace Acc.Api.Authorize
             }
             return _result;
         }
-       
+
     }
 }

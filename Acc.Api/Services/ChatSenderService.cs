@@ -27,8 +27,10 @@ namespace Acc.Api.Services
             try
             {
                 //check chat header
-                string paramWhere = string.Format("doc_type = '{0}' AND doc_no = '{1}' AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
-                                                    Model.doc_type, Model.doc_no, Model.portfolio_id, Model.subportfolio_id);
+                //string paramWhere = string.Format("doc_type = '{0}' AND doc_no = '{1}' AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
+                //                                    Model.doc_type, Model.doc_no, Model.portfolio_id, Model.subportfolio_id);
+                string paramWhere = string.Format("doc_type = '{0}' AND row_id = {1} AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
+                                                    Model.doc_type, Model.row_id, Model.portfolio_id, Model.subportfolio_id);
                 paramWhere = fn.DecryptDataString(paramWhere);
                 var HeaderId = fn.SelectScalar(Enum.SQL.Function.Aggregate.Max, "ss_chat_h", "ss_chat_h_id", paramWhere);
                 if (HeaderId != null)
@@ -48,6 +50,7 @@ namespace Acc.Api.Services
                     }
                     user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")) : user_ids;
                     //ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
+                    ObjOutput.Add("subject", dataHedaer.subject);
                     ObjOutput.Add("user_ids", user_ids);
                     ObjOutput.Add("row_id", HeaderId);
                     ObjOutput.Add("chat", dataChat);
@@ -89,6 +92,7 @@ namespace Acc.Api.Services
                     user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
                 }
                 user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")): user_ids;
+                ObjOutput.Add("subject", dataHedaer.subject);
                 ObjOutput.Add("user_ids", user_ids);
                 ObjOutput.Add("row_id", id);
                 ObjOutput.Add("chat", dtList);
