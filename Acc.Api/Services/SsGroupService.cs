@@ -83,6 +83,11 @@ namespace Acc.Api.Services
                     dt.ss_portfolio_id = Model.DataHeader.ss_portfolio_id;
                     dt.ss_group_id = dtHeader.ss_group_id;
                     dt.user_input = Model.DataHeader.user_edit;
+                    dt.add_status = dt.add_status == null ? false : dt.add_status;
+                    dt.edit_status = dt.edit_status == null ? false : dt.edit_status;
+                    dt.delete_status = dt.delete_status == null ? false : dt.delete_status;
+                    dt.view_status = dt.view_status == null ? false : dt.view_status;
+                    dt.post_status = dt.post_status == null ? false : dt.post_status;
                     SsGroupRepo.SaveDetail(dt);
                 });
 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Acc.Api.DataAccess
@@ -169,9 +170,53 @@ namespace Acc.Api.DataAccess
             }
         }
 
-        public object SelectScalar(SQL.Function.Aggregate function, string column)
+        public object SelectScalar(SQL.Function.Aggregate function, string column,string ParamWhere)
         {
-            throw new NotImplementedException();
+            object _result = null;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                ParamWhere = string.IsNullOrEmpty(ParamWhere) ? string.Empty : "WHERE "+ ParamWhere;
+                StringBuilder sbQuery = new StringBuilder();
+                switch (function)
+                {
+                    case SQL.Function.Aggregate.Max:
+                        sbQuery.AppendFormat("SELECT MAX({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    case SQL.Function.Aggregate.Min:
+                        sbQuery.AppendFormat("SELECT MIN({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    case SQL.Function.Aggregate.Distinct:
+                        sbQuery.AppendFormat("SELECT DISTINCT({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    case SQL.Function.Aggregate.Count:
+                        sbQuery.AppendFormat("SELECT COUNT({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    case SQL.Function.Aggregate.Sum:
+                        sbQuery.AppendFormat("SELECT SUM({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    case SQL.Function.Aggregate.Avg:
+                        sbQuery.AppendFormat("SELECT AVG({0}) FROM public.ss_group {1}", column, ParamWhere);
+                        break;
+                    default:
+                        // do nothing 
+                        break;
+                }
+
+                try
+                {
+                    conn.Open();
+                    _result = conn.ExecuteScalar(sbQuery.ToString());
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return _result;
         }
 
         public bool Update(SsGroup domain)

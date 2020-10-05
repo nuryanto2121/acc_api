@@ -13,9 +13,8 @@ namespace Acc.Api.Models
         [JsonProperty("user_id")]
         public string UserId { get; set; }
 
-        //[Required]
-        //[JsonProperty("current_password")]
-        //public string CurrentPassword { get; set; }
+        [JsonProperty("current_password")]
+        public string CurrentPassword { get; set; }
 
         [Required]
         [JsonProperty("new_password")]

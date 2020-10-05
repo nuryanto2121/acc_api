@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Acc.Api.Authorize;
 using Acc.Api.Helper;
+using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -23,12 +24,12 @@ namespace Acc.Api.Controllers.FileUploadImport
         private FileService FileService;
         private FunctionString fn;
         private PortInService PortService;
-        public PortInController(IConfiguration configuration, IHostingEnvironment environment)
+        public PortInController(IConfiguration configuration, IEmailService emailSender, IHostingEnvironment environment)
         {
             _environment = environment;
             fn = new FunctionString(Tools.ConnectionString(configuration));
             FileService = new FileService(configuration, environment);
-            PortService = new PortInService(configuration, environment);
+            PortService = new PortInService(configuration, emailSender, environment);
         }
         /// <summary>
         /// 
@@ -44,8 +45,7 @@ namespace Acc.Api.Controllers.FileUploadImport
             var _result = new Output();
             try
             {               
-                _result = await PortService.ReadDataExcelToDB(portinFile);
-
+                _result = await PortService.ReadDataExcelToDBNew(portinFile);            
             }
             catch (Exception ex)
             {

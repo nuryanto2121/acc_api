@@ -69,6 +69,29 @@ namespace Acc.Api.Controllers.Sender
         }
 
         /// <summary>
+        /// untuk delete header dan detail2nya
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult DeleteHeader(int id)
+        {
+            var output = new Output();
+            try
+            {
+                output = chatService.DeleteHeader(id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
+
+        /// <summary>
         /// untuk kirim pesan
         /// </summary>
         /// <param name="Model"></param>

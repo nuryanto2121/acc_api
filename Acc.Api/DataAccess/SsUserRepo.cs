@@ -66,14 +66,107 @@ namespace Acc.Api.DataAccess
             }
             return (result > 0);
         }
+        public object GetMenuJson(int? portfolio_id, string user_id)
+        {
+            object _result = new object();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
 
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+
+                    Parameters.Add("p_user_id", user_id);
+
+                    if (portfolio_id == 0)
+                    {
+                        Parameters.Add("p_ss_portfolio_id", null, dbType: DbType.Int32);
+                    }
+                    else
+                    {
+                        Parameters.Add("p_ss_portfolio_id", portfolio_id, dbType: DbType.Int32);
+                    }
+
+
+                    var dd = conn.Query<dynamic>("get_menu_json_user", Parameters, commandType: CommandType.StoredProcedure);
+                    //var dd = conn.Query<dynamic>("get_menu_json", Parameters, commandType: CommandType.StoredProcedure);
+                    _result = dd;
+                    //result = conn.Execute(sqlQuery, new { ss_menu_id = key });
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return _result;
+        }
+        public bool SaveDetail(SsMenuUser Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", Model.ss_portfolio_id, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_menu_id", Model.ss_menu_id);
+                    Parameters.Add("p_user_id", Model.user_id);
+                    Parameters.Add("p_add_status", Model.add_status, dbType: DbType.Boolean);
+                    Parameters.Add("p_edit_status", Model.edit_status, dbType: DbType.Boolean);
+                    Parameters.Add("p_delete_status", Model.delete_status, dbType: DbType.Boolean);
+                    Parameters.Add("p_view_status", Model.view_status, dbType: DbType.Boolean);
+                    Parameters.Add("p_post_status", Model.post_status, dbType: DbType.Boolean);
+                    Parameters.Add("p_user_input", Model.user_input);
+                    var dd = conn.Query<dynamic>("fss_menu_user_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool DeleteDetailMenu(int portfolioId, string user_id)
+        {
+            int result = 0;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = "DELETE FROM public.ss_menu_user WHERE ss_portfolio_id = @ss_portfolio_id AND user_id = @user_id";
+                try
+                {
+                    conn.Open();
+                    result = conn.Execute(sqlQuery, new { ss_portfolio_id = portfolioId, user_id = user_id });
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return (result > 0);
+        }
         public SsUser GetById(int key, int lastupdatestamp)
         {
             SsUser t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
                 string strQuery = @"SELECT  *
-                        FROM public.vss_user_by  WHERE ss_user_id = @ss_user_id and lastupdatestamp = @lastupdatestamp";
+                        FROM public.vss_user_by  WHERE ss_user_id = @ss_user_id";
                 try
                 {
                     conn.Open();
@@ -138,6 +231,7 @@ namespace Acc.Api.DataAccess
                 {
                     conn.Open();
                     conn.Execute(sqlQuery, domain);
+
                     result = true;
                 }
                 catch (Exception ex)
@@ -152,7 +246,7 @@ namespace Acc.Api.DataAccess
             return result;
         }
 
-        public object SelectScalar(SQL.Function.Aggregate function, string column)
+        public object SelectScalar(SQL.Function.Aggregate function, string column, string ParamWhere)
         {
             throw new NotImplementedException();
         }
@@ -220,10 +314,10 @@ namespace Acc.Api.DataAccess
                                       file_name = @file_name,
                                       path_file = @path_file,
                                       address = @address,                
-                                      notes = @notes
+                                      notes = @notes,
+                                      is_inactive = @is_inactive
                                     WHERE 
                                       ss_user_id = @ss_user_id
-                                        and  xmin::text::integer = @lastupdatestamp
                                     ; ";
 
                 try

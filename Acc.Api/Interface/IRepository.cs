@@ -14,7 +14,7 @@ namespace Acc.Api.Interface
         List<T> GetList();
         List<T> GetList(int pageSize, int currentPage, string sortName, string sortOrder,string Parameter);
         T GetById(K key,K timestamp);
-        object SelectScalar(SQL.Function.Aggregate function, string column);
+        object SelectScalar(SQL.Function.Aggregate function, string column,string ParamWHere = null);
 
     }
 }

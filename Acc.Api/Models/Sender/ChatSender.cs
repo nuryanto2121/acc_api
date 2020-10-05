@@ -41,6 +41,7 @@ namespace Acc.Api.Models
         //public int? mk_open_order_id { get; set; }
         public int current_page { get; set; }
         public string user_input { get; set; }
+
     }
     public class ChatDetail
     {

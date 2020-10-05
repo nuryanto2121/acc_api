@@ -21,7 +21,7 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
         }
-        public object SelectScalar(SQL.Function.Aggregate function, string column)
+        public object SelectScalar(SQL.Function.Aggregate function, string column, string ParamWhere)
         {
             object _result = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))

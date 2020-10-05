@@ -728,8 +728,9 @@ namespace Acc.Api.Helper
                                 }
                                 else
                                 {
+                                    valData = valData.ToString().Replace(";@","").Replace(":@","");
                                     if (dt.data_type.ToLower() == "date")
-                                    {
+                                    {                                    
                                         sp.Add(dt.parameter_name, DateTime.Parse(valData.ToString()), dbType: DbType.Date);
                                     }
                                     else
@@ -743,14 +744,14 @@ namespace Acc.Api.Helper
                             //sp.Add(dt.parameter_name,);
                         }
                     }
-                    if (dt.parameter_name.Contains("p_user_input")|| dt.parameter_name.Contains("p_user_edit"))
+                    if (dt.parameter_name.Contains("p_user_input") || dt.parameter_name.Contains("p_user_edit"))
                     {
-                        if (!sp.ParameterNames.Contains("p_user_input")|| !sp.ParameterNames.Contains("p_user_edit"))
+                        if (!sp.ParameterNames.Contains("p_user_input") || !sp.ParameterNames.Contains("p_user_edit"))
                         {
                             sp.Add(dt.parameter_name, DataPort.user_input);
                         }
                     }
-                    if (dt.parameter_name.Contains("p_ss_portfolio_id")|| dt.parameter_name.Contains("p_portfolio_id"))
+                    if (dt.parameter_name.Contains("p_ss_portfolio_id") || dt.parameter_name.Contains("p_portfolio_id"))
                     {
                         if (!sp.ParameterNames.Contains("p_ss_portfolio_id") || !sp.ParameterNames.Contains("p_portfolio_id"))
                         {
@@ -940,6 +941,204 @@ namespace Acc.Api.Helper
                     }
                     n++;
                 });
+
+                sField = !string.IsNullOrEmpty(sField) ? sField.Remove(sField.LastIndexOf(",")) : sField;
+                sFieldQuery = !string.IsNullOrEmpty(sFieldQuery) ? sFieldQuery.Remove(sFieldQuery.LastIndexOf(",")) : sFieldQuery;
+                sSize = !string.IsNullOrEmpty(sSize) ? sSize.Remove(sSize.LastIndexOf(",")) : sSize;
+                sType = !string.IsNullOrEmpty(sType) ? sType.Remove(sType.LastIndexOf(",")) : sType;
+                fieldWhere = !string.IsNullOrEmpty(fieldWhere) ? fieldWhere.Remove(fieldWhere.LastIndexOf(",")) : fieldWhere;
+                //sWhere = !string.IsNullOrEmpty(sWhere) ? "( " + sWhere.Remove(sWhere.LastIndexOf("OR")) + " )" : sWhere;
+            }
+            var dtsize = definedColumn != null ? definedColumn.Split(",") : null;
+            if (dtsize != null)
+            {
+                if (dtsize[0] == "no")
+                {
+                    OBjSize.Add(0, "S");
+                }
+            }
+            sSize = string.Join(",", OBjSize.OrderBy(key => key.Key).ToList().Select(s => s.Value).ToArray());
+            //if (dt)
+            //OBjSize.OrderBy()
+            _result.Add("FieldQuery", sFieldQuery);
+            _result.Add("Field", sField);
+            _result.Add("DefineSize", sSize);
+            _result.Add("DefineDataType", sType);
+            _result.Add("fieldWhere", fieldWhere);
+            //_result.Add("sWhereLikeList", sWhere);
+            return _result;
+        }
+        public JObject SetFieldListNew(List<FieldSource> fieldSources, int len = 0, string ParamWhere = "", string definedColumn = "", bool List = false)
+        {
+            JObject _result = new JObject();
+            Dictionary<int, string> OBjSize = new Dictionary<int, string>();
+            string sField = string.Empty;
+            string sFieldQuery = string.Empty;
+            string sSize = string.Empty;
+            string sType = string.Empty;
+            string dtSize = string.Empty;
+            string fieldWhere = string.Empty;
+            string[] dfColumn = definedColumn != null ? definedColumn.Split(",") : null;
+            //dfColumn = List ? null : dfColumn;
+            //string sWhere = string.Empty;
+            int dtType = 0;
+            len = len == 0 ? fieldSources.Count : len > fieldSources.Count ? fieldSources.Count : len;
+            if (fieldSources.Count > 0)
+            {
+                int n = 1;
+                fieldSources.ForEach(delegate (FieldSource data)
+                {
+                    if (n <= len)
+                    {
+
+                        sField += string.Format("{0},", data.column_name);
+
+                        if (dfColumn != null && List)
+                        {
+                            if (List)
+                            {
+                                if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
+                                {
+                                    //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+
+                                }
+                                else if (data.data_type.ToLower() == "date")
+                                {
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                }
+                                else
+                                {
+                                    sFieldQuery += string.Format("{0},", data.column_name);
+                                }
+                            }
+
+                            for (int x = 0; x < dfColumn.Length; x++)
+                            {
+                                if (dfColumn[x].ToLower() == (data.column_name.ToLower()))
+                                {
+                                    // field query *convert format date
+                                    if (!List)
+                                    {
+                                        if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
+                                        {
+                                            if (dfColumn[x].Contains("AS"))
+                                            {
+                                                string[] stF = dfColumn[x].Split("AS");
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                            }
+                                            else
+                                            {
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                            }
+
+                                        }
+                                        else if (data.data_type.ToLower() == "date")
+                                        {
+                                            if (dfColumn[x].Contains("AS"))
+                                            {
+                                                string[] stF = dfColumn[x].Split("AS");
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                            }
+                                            else
+                                            {
+                                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sFieldQuery += string.Format("{0},", dfColumn[x]); //data.column_name);
+                                        }
+                                    }
+
+                                    //sSize += dtSize + ",";
+                                    string Stype = data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date") ? "T" : "S";
+                                    fieldWhere += string.Format("{0}:{1},", dfColumn[x], Stype);//;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
+                            {
+                                //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+
+                            }
+                            else if (data.data_type.ToLower() == "date")
+                            {
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                            }
+                            else
+                            {
+                                sFieldQuery += string.Format("{0},", data.column_name);
+                            }
+
+                            //define size
+                            if (data.data_type.ToLower() == "character varying" || data.data_type.ToLower() == "character" || data.data_type.ToLower() == "char" || data.data_type.ToLower() == "text")
+                            {
+                                dtSize = data.max_length <= 20 ? "S" : data.max_length >= 21 && data.max_length <= 49 ? "M" : data.max_length >= 50 ? "L" : "S";
+                            }
+                            else
+                            {
+                                dtSize = "S";
+                            }
+
+
+                            sSize += dtSize + ",";
+                            string Stype = data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date") ? "T" : "S";
+                            fieldWhere += string.Format("{0}:{1},", data.column_name, Stype);//;
+                        }
+
+
+
+                        if (data.precision != null && data.scale != null)
+                        {
+                            dtType = 1;
+                        }
+                        else if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower().Contains("date"))
+                        {
+                            dtType = 2;
+                        }
+                        else
+                        {
+                            dtType = 3;
+                        }
+                        sType += string.Format("{0},", dtType);
+
+                    }
+                    n++;
+                });
+
+                ////define size
+                if (List && dfColumn != null)
+                {
+                    for (int x = 0; x < dfColumn.Length; x++)
+                    {
+                        if (dfColumn[x] == "no") continue;
+                        var dataField = fieldSources.Where(w => w.column_name.ToLower() == dfColumn[x].ToLower()).FirstOrDefault();
+                        if (dataField == null) continue;
+                        //if (dataField != null)
+                        //{
+                        if (dataField.data_type.ToLower() == "character varying" || dataField.data_type.ToLower() == "character" || dataField.data_type.ToLower() == "char" || dataField.data_type.ToLower() == "text")
+                        {
+                            dtSize = dataField.max_length <= 20 ? "S" : dataField.max_length >= 21 && dataField.max_length <= 49 ? "M" : dataField.max_length >= 50 ? "L" : "S";
+                        }
+                        else
+                        {
+                            dtSize = "S";
+                        }
+
+                        OBjSize.Add(x, dtSize);
+                        //}
+                    }
+
+                }
+
 
                 sField = !string.IsNullOrEmpty(sField) ? sField.Remove(sField.LastIndexOf(",")) : sField;
                 sFieldQuery = !string.IsNullOrEmpty(sFieldQuery) ? sFieldQuery.Remove(sFieldQuery.LastIndexOf(",")) : sFieldQuery;
@@ -1213,7 +1412,9 @@ namespace Acc.Api.Helper
                 if (data.ToLower().Contains("user_id"))
                 {
                     valStrEncrypt = this.getString(data, "user_id='", "'");
-                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_id='", "'") : valStrEncrypt;
+                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_id<>'", "'") : valStrEncrypt;
+                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user_id!='", "'") : valStrEncrypt;
+                    
                     if (isBase64(valStrEncrypt))
                     {
                         valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
@@ -1228,7 +1429,8 @@ namespace Acc.Api.Helper
                 if (data.ToLower().Contains("user"))
                 {
                     valStrEncrypt = this.getString(data, "user='", "'");
-                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user='", "'") : valStrEncrypt;
+                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user<>'", "'") : valStrEncrypt;
+                    valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "user!='", "'") : valStrEncrypt;
                     if (isBase64(valStrEncrypt))
                     {
                         valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
@@ -1245,6 +1447,8 @@ namespace Acc.Api.Helper
             {
                 valStrEncrypt = this.getString(data, "ss_portfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_portfolio_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_portfolio_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_portfolio_id!='", "'") : valStrEncrypt;
                 if (isBase64(valStrEncrypt))
                 {
                     valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
@@ -1259,6 +1463,8 @@ namespace Acc.Api.Helper
             {
                 valStrEncrypt = this.getString(data, "portfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "portfolio_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "portfolio_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "portfolio_id!='", "'") : valStrEncrypt;
                 if (isBase64(valStrEncrypt))
                 {
                     valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
@@ -1274,6 +1480,8 @@ namespace Acc.Api.Helper
             {
                 valStrEncrypt = this.getString(data, "ss_subportfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_subportfolio_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_subportfolio_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_subportfolio_id!='", "'") : valStrEncrypt;
                 if (isBase64(valStrEncrypt))
                 {
                     valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
@@ -1290,6 +1498,8 @@ namespace Acc.Api.Helper
             {
                 valStrEncrypt = this.getString(data, "subportfolio_id='", "'");
                 valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "subportfolio_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "subportfolio_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "subportfolio_id!='", "'") : valStrEncrypt;
                 if (isBase64(valStrEncrypt))
                 {
                     valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);

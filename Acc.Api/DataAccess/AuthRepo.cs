@@ -109,7 +109,7 @@ namespace Acc.Api.DataAccess
                                           portfolio_id,  subportfolio_id,
                                           time_input,  time_edit,
                                           file_name,  path_file,
-                                          address,  notes,  otp
+                                          address,  notes,  otp,password
                                     FROM
                                       ss_user WHERE user_id = @UserID 
                                     ";

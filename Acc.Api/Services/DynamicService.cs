@@ -212,7 +212,7 @@ namespace Acc.Api.Services
                     var dataDefineColumn = OptionRepo.GetDefineColumn(user_id, subportfolio_id, option_url, line_no);
 
                     var fieldsource = OptionRepo.getListFieldType(MvSpName, isViewFUnction);
-                    JObject dataFieldList = fn.SetFieldList(fieldsource, JmlahField, definedColumn: dataDefineColumn?.column_field, List: true);
+                    JObject dataFieldList = fn.SetFieldListNew(fieldsource, JmlahField, definedColumn: dataDefineColumn?.column_field, List: true);
                     string AllColumn = fn.SetFieldList(fieldsource, fieldsource.Count)["Field"].ToString();
                     string allCoulumnQUery = dataFieldList["FieldQuery"].ToString();
                     string DefineSize = dataFieldList["DefineSize"].ToString();
@@ -239,7 +239,7 @@ namespace Acc.Api.Services
                     #endregion
 
                     #region Parameter Where
-                    var ParamWHere = JModel.param_where;
+                    var ParamWHere = JModel.param_where.Replace("'","");
                     var initialwhere = JModel.initial_where;
                     initialwhere = string.IsNullOrEmpty(initialwhere) ? initialwhere : "WHERE " + initialwhere;
                     sWhere = fn.DecryptDataString(initialwhere);
@@ -737,9 +737,15 @@ namespace Acc.Api.Services
                             if (!Name.ToUpper().Contains("LOOPING"))
                             {
                                 isiData = JObject.Parse(x.Value.ToString());
+                                if (isiData.Count == 0) continue;
                                 string MethodIsi = isiData["_Method_"].ToString();
                                 int LineNoIsi = Convert.ToInt32(isiData["_LineNo_"]);
                                 string SPName = OptionDB.Where(w => w.line_no == LineNoIsi && w.method_api == MethodIsi).Select(s => s.sp).FirstOrDefault();
+
+                                if (string.IsNullOrEmpty(SPName))
+                                {
+                                    throw new Exception(string.Format("Please check yg paramter {0} : line_no,method and option url ", Name));
+                                }
 
                                 isiData = fn.DecryptData(isiData);
                                 if (dataParamOutput.Count > 0)
@@ -766,20 +772,16 @@ namespace Acc.Api.Services
                                 {
                                     isiData = new JObject();
                                     isiData = JObject.Parse(xx.ToString());
-
+                                    if (isiData.Count == 0) continue;
                                     string MethodIsi = isiData["_Method_"].ToString();
                                     int LineNoIsi = Convert.ToInt32(isiData["_LineNo_"]);
 
                                     string SPName = OptionDB.Where(w => w.line_no == LineNoIsi && w.method_api == MethodIsi).Select(s => s.sp).FirstOrDefault();
                                     if (string.IsNullOrEmpty(SPName))
                                     {
-                                        _result.Error = true;
-                                        _result.Message = "SPName can't be null.";
-                                        trans.Rollback();
-                                        sError = true;
-                                        //return OutputAPi;
-                                        continue;
+                                        throw new Exception(string.Format("Please check yg paramter {0} : line_no,method and option url ", Name));
                                     }
+
                                     isiData = fn.DecryptData(isiData);
                                     if (dataParamOutput.Count > 0)
                                     {

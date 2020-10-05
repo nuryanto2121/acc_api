@@ -26,12 +26,14 @@ namespace Acc.Api.Services
             Dictionary<string, object> ObjOutput = new Dictionary<string, object>();
             try
             {
+                Model.user_id_to = fn.DecryptString(Model.user_id_to);
                 //check chat header
                 //string paramWhere = string.Format("doc_type = '{0}' AND doc_no = '{1}' AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
                 //                                    Model.doc_type, Model.doc_no, Model.portfolio_id, Model.subportfolio_id);
                 string paramWhere = string.Format("doc_type = '{0}' AND row_id = {1} AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
                                                     Model.doc_type, Model.row_id, Model.portfolio_id, Model.subportfolio_id);
                 paramWhere = fn.DecryptDataString(paramWhere);
+
                 var HeaderId = fn.SelectScalar(Enum.SQL.Function.Aggregate.Max, "ss_chat_h", "ss_chat_h_id", paramWhere);
                 if (HeaderId != null)
                 {
@@ -40,12 +42,14 @@ namespace Acc.Api.Services
                     var dataChat = chatRepo.GetAllChat(ChatId, Model.current_page);
                     dataChat.ForEach(delegate (GetChat dtChat)
                     {
+                        chatRepo.UpdateStatusChatRead(dtChat.ss_chat_d_id, dtChat.user_id_from, Model.user_id_to);
                         dtChat.user_id_from = EncryptionLibrary.EncryptText(dtChat.user_id_from);
                     });
                     List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
                     string user_ids = string.Empty;
                     foreach (string dtUser in Users)
                     {
+
                         user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
                     }
                     user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")) : user_ids;
@@ -116,6 +120,20 @@ namespace Acc.Api.Services
                 Model.user_id_from = fn.DecryptString(Model.user_id_from);
                 Model.user_id_to = fn.DecryptString(Model.user_id_to) + "," + Model.user_id_from;
                 _result.Data = chatRepo.SaveHeader(Model);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
+        public Output DeleteHeader(int ID)
+        {
+            Output _result = new Output();
+            try
+            {
+                _result.Data = chatRepo.DeleteChat(ID);
             }
             catch (Exception ex)
             {

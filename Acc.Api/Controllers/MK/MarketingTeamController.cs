@@ -29,7 +29,7 @@ namespace Acc.Api.Controllers.MK
         /// <param name="user_id"></param>
         /// <returns></returns>
         [HttpGet]
-        //[APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Getlist(string portfolio_id, string user_id)
         {
@@ -47,7 +47,7 @@ namespace Acc.Api.Controllers.MK
         }
 
         [HttpPost]
-        //[APIAuthorizeAttribute]
+        [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Save(MarketingTeamParam Model)
         {

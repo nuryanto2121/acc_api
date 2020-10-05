@@ -8,6 +8,7 @@ using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
 using Acc.Api.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +20,15 @@ namespace Acc.Api.Controllers.SystemAdministrator
     public class SsUserController : ControllerBase//, IAPIController<SsUser>
     {
         private ICrudService<SsUser, int> SsUserService;
-        public SsUserController(IConfiguration configuration)
+        private SsUserService UserService;
+        private SsUserService UserSer;
+        private PortInService PortService;
+        public SsUserController(IConfiguration configuration, IEmailService EmailSender, IHostingEnvironment environment)
         {
             SsUserService = new SsUserService(configuration);
+            UserService = new SsUserService(configuration);
+            PortService = new PortInService(configuration, EmailSender, environment);
+            UserSer = new SsUserService(configuration);
         }
 
         /// <summary>
@@ -72,6 +79,30 @@ namespace Acc.Api.Controllers.SystemAdministrator
             return Ok(output);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="portfolio_id"></param>
+        /// <param name="user_id"></param>
+        /// <returns></returns>
+        [HttpGet("Json")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult GetMenuJson(string portfolio_id, string user_id)
+        {
+            var output = new Output();
+            try
+            {
+                output = UserSer.GetMenuJson(portfolio_id, user_id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
+
         [HttpPost("GetList")]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
@@ -103,7 +134,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
             var output = new Output();
             try
             {
-                SsUserService.Insert(Model);
+                output = SsUserService.Insert(Model);
             }
             catch (Exception ex)
             {
@@ -127,7 +158,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
             var output = new Output();
             try
             {
-                SsUserService.Update(Model);
+                output = SsUserService.Update(Model);
             }
             catch (Exception ex)
             {
@@ -135,6 +166,50 @@ namespace Acc.Api.Controllers.SystemAdministrator
             }
 
             return Ok(output);
+        }
+
+        [HttpPut("Menu")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult UpdateJson(VmSsUser Model)
+        {
+            var output = new Output();
+            try
+            {
+                output = UserSer.Update(Model);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+
+            return Ok(output);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="portinFile"></param>
+        /// <returns></returns>
+        [HttpPost("ChangePassword")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult ChangePassword([FromBody]ChangePassword Model)
+        //public async Task<IActionResult> UploadFile([FromBody] PortInFile portinFile)
+        {
+            var _result = new Output();
+            try
+            {
+                //_result = await PortService.ReadDataExcelToDBUser(portinFile);
+                _result = UserService.ChangePassword(Model);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+            return Ok(_result);
+
         }
     }
 }

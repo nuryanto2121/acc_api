@@ -44,4 +44,13 @@ namespace Acc.Api.Models
 
     }
 
+    public class VmSsUser
+    {
+        public string portfolio_id { get; set; }
+        public string user_id { get; set; }
+        public List<SsMenuUser> DataDetail { get; set; }
+        public string user_input { get; set; }
+
+    }
+
 }

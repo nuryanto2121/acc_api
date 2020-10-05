@@ -177,6 +177,7 @@ namespace Acc.Api.Services
                     DataUser.Add("user_name", dataAuth.Rows[0]["user_name"].ToString());
                     DataUser.Add("path_file", dataAuth.Rows[0]["path_file"].ToString());
                     DataUser.Add("group_id", dataAuth.Rows[0]["ss_group_id"].ToString());
+                    DataUser.Add("dashboard_url", dataAuth.Rows[0]["dashboard_url"].ToString());
                     DataUser.Add("subportfolio_id", dataAuth.Rows[0]["subportfolio_id"].ToString());
                     DataUser.Add("subportfolio_short_name", dataAuth.Rows[0]["subportfolio_short_name"].ToString());
                     DataUser.Add("subportfolio_name", dataAuth.Rows[0]["subportfolio_name"].ToString());
@@ -273,7 +274,8 @@ namespace Acc.Api.Services
         {
             int GroupId = Convert.ToInt32(dataUser.Rows[0]["ss_group_id"]);
             int PortfolioId = Convert.ToInt32(dataUser.Rows[0]["portfolio_id"]);
-            return menuRepo.getMenuGroup(PortfolioId, GroupId);
+            string UserID = dataUser.Rows[0]["user_id"].ToString();
+            return menuRepo.getMenuGroup(PortfolioId, GroupId,UserID);
         }
 
         private object favoriteMenu(DataTable dataUser)

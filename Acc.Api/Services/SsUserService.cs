@@ -15,12 +15,14 @@ namespace Acc.Api.Services
     public class SsUserService : ICrudService<SsUser, int>
     {
         private FunctionString fn;
+        private AuthRepo authRepo;
         private SsUserRepo UserRepo;
         private IConfiguration config;
         private OptionTemplateRepo OptionRepo;
         public SsUserService(IConfiguration configuration)
         {
             config = configuration;
+            authRepo = new AuthRepo(Tools.ConnectionString(configuration));
             fn = new FunctionString(Tools.ConnectionString(configuration));
             UserRepo = new SsUserRepo(Tools.ConnectionString(configuration));
             OptionRepo = new OptionTemplateRepo(configuration);
@@ -60,6 +62,53 @@ namespace Acc.Api.Services
         {
             throw new NotImplementedException();
         }
+        public Output GetMenuJson(string portfolio_id, string user_id)
+        {
+            Output _result = new Output();
+            try
+            {
+                int? ss_portfolio_id = portfolio_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(portfolio_id));
+                user_id = user_id.ToLower() == "null" ? null : fn.DecryptString(user_id);
+                _result.Data = UserRepo.GetMenuJson(ss_portfolio_id, user_id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+        public Output Update(VmSsUser Model)
+        {
+            Output _result = new Output();
+            try
+            {
+                Model.portfolio_id = fn.DecryptString(Model.portfolio_id);
+                Model.user_input = fn.DecryptString(Model.user_input);
+                Model.user_id = fn.DecryptString(Model.user_id);
+                //Model.DataHeader.ss_group_id = Convert.ToInt32(fn.DecryptString(Model.group_id));
+
+                UserRepo.DeleteDetailMenu(Convert.ToInt32(Model.portfolio_id), Model.user_id);
+
+                Model.DataDetail.ForEach(delegate (SsMenuUser dt)
+                {
+                    dt.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(dt.portfolio_id));
+                    dt.user_id = Model.user_id;
+                    dt.user_input = Model.user_input;
+                    dt.add_status = dt.add_status == null ? false : dt.add_status;
+                    dt.edit_status = dt.edit_status == null ? false : dt.edit_status;
+                    dt.delete_status = dt.delete_status == null ? false : dt.delete_status;
+                    dt.view_status = dt.view_status == null ? false : dt.view_status;
+                    dt.post_status = dt.post_status == null ? false : dt.post_status;
+                    UserRepo.SaveDetail(dt);
+                });
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
 
         public DTResultListDyn<dynamic> GetList(ParamList JModel)
         {
@@ -83,7 +132,7 @@ namespace Acc.Api.Services
 
 
 
-                string MvSpName = "vss_user";
+                string MvSpName = "vss_user_list";
 
                 
                 //var dataDefineColumn = OptionRepo.GetDefineColumn(user_id, subportfolio_id, option_url, line_no);
@@ -101,19 +150,6 @@ namespace Acc.Api.Services
                 string DefineColumnFormat = string.Empty;
                 //cek defineColumn dlu
 
-                //if (dataDefineColumn != null)
-                //{
-
-                //    DefineColumn = dataDefineColumn.column_field;
-                //    DefineColumnFormat = fn.FormatField(dataDefineColumn.column_field);
-
-                //}
-                //else
-                //{
-                //    DefineColumn = "no," + dataFieldList["Field"].ToString();
-                //    DefineColumnFormat = fn.FormatField(dataFieldList["Field"].ToString());
-                //    OptionRepo.InsertDefineColumn(user_id, subportfolio_id, option_url, line_no, DefineColumn);
-                //}
                 #endregion
 
                 #region Parameter Where
@@ -149,7 +185,7 @@ namespace Acc.Api.Services
                 OutputList.AllColumn = AllColumn;
                 OutputList.ExportToken = EncryptionLibrary.EncryptText(Encript);
                 OutputList.DefineColumn = DefineColumn;
-                OutputList.DefineSize = DefineSize;
+                OutputList.DefineSize = "S,L,S,S,L";
             }
             catch (Exception ex)
             {
@@ -164,7 +200,8 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
-                Model.is_inactive = "N";
+                JObject dataOut = new JObject();
+                //Model.is_inactive = "N";
                 Model.expired_date = DateTime.Now.AddYears(1);
                 Model.subportfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_subportfolio_id));
                 Model.portfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id));
@@ -175,6 +212,9 @@ namespace Acc.Api.Services
                 Model.user_input = fn.DecryptString(Model.user_input);
                 Model.user_edit = Model.user_input;
                 UserRepo.Save(Model);
+
+                dataOut.Add("row_id", Model.ss_user_id);
+                _result.Data = dataOut;
             }
             catch (Exception ex)
             {
@@ -188,7 +228,7 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
-                
+                JObject dataOut = new JObject();
                 if (string.IsNullOrEmpty(Model.password))
                 {
                     SsUser dataUser = new SsUser();
@@ -205,10 +245,53 @@ namespace Acc.Api.Services
                 Model.time_edit = DateTime.Now;
                 Model.user_edit = EncryptionLibrary.DecryptText(Model.user_edit);
                 UserRepo.Update(Model);
+                dataOut.Add("row_id", Model.ss_user_id);
+                _result.Data = dataOut;
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+            return _result;
+        }
+
+        public Output ChangePassword(ChangePassword Model)
+        {
+            Output _result = new Output();
+            Dictionary<string, object> DataUser = new Dictionary<string, object>();
+            try
+            {
+                if (Model.ConfirmPassword != Model.NewPassword)
+                {
+                    throw new Exception("New Password and Confirm must be same.");
+                }
+                if(Model.CurrentPassword == Model.NewPassword)
+                {
+                    throw new Exception("Please Insert New Password.");
+                }
+                string User_id = EncryptionLibrary.DecryptText(Model.UserId);
+                SsUser dataUser = authRepo.GetDataAuthByUserId(User_id);
+                if (dataUser == null)
+                {
+                    throw new Exception("Account Not Valid.");
+                }
+
+                string OldPassword = EncryptionLibrary.EncryptText(Model.CurrentPassword);
+                if (OldPassword != dataUser.password)
+                {
+                    throw new Exception("Password Not Valid.");
+                }
+
+                Model.NewPassword = EncryptionLibrary.EncryptText(Model.NewPassword);
+                authRepo.UpdatePass(dataUser.ss_user_id, Model.NewPassword);
+                _result.Message = "Change Password Successfuly.";
+                //DataUser.Add("user_id", EncryptionLibrary.EncryptText(dataUser.user_id));
+                //_result.Data = DataUser;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                //_result = Tools.Error(ex);
             }
             return _result;
         }

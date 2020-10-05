@@ -23,7 +23,7 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
         }
-        public object SelectScalar(SQL.Function.Aggregate function, string column)
+        public object SelectScalar(SQL.Function.Aggregate function, string column, string ParamWhere)
         {
             object _result = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -280,7 +280,7 @@ namespace Acc.Api.DataAccess
             }
             return (result > 0);
         }
-        public DataTable getMenuGroup(int PortfolioId, int GroupId)
+        public DataTable getMenuGroup(int PortfolioId, int GroupId,string UserID)
         {
             DataTable _result = new DataTable();
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -292,6 +292,7 @@ namespace Acc.Api.DataAccess
                     DynamicParameters Parameters = new DynamicParameters();
                     Parameters.Add("p_portfolio_id", PortfolioId, dbType: DbType.Int32);
                     Parameters.Add("p_group_id", GroupId, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", UserID);
                     var dd = conn.Query<dynamic>("fss_menu_list_s", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = fn.ToDataTable(dd);
                     //result = conn.Execute(sqlQuery, new { ss_menu_id = key });
@@ -466,7 +467,7 @@ namespace Acc.Api.DataAccess
             SsMenu t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = "SELECT   ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id";
+                string strQuery = "SELECT ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id";
                 try
                 {
                     conn.Open();

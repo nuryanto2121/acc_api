@@ -82,7 +82,32 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
+        public object DeleteChat(int ID)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                object _result = null;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_row_id", ID, dbType: DbType.Int32);
+                    _result = conn.Query<dynamic>("fss_chat_h_d", Parameters, commandType: CommandType.StoredProcedure).ToList();
 
+                    //result = conn.Execute(sqlQuery, new { ss_menu_id = key });
+
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+                return _result;
+            }
+        }
         public List<GetChat> GetAllChat(int HeaderId, int curr_page)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
