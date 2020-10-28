@@ -44,6 +44,113 @@ namespace Acc.Api.DataAccess
             return t;
         }
 
+        public List<ChatListUser> GetDataUserList(int HeaderId,int PortfolioId)
+        {
+            List<ChatListUser> t = new List<ChatListUser>();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string strQuery = @"SELECT a.ss_chat_h_id,  a.ss_portfolio_id, a.user_id, a.is_admin  ,b.user_name
+                                    FROM public.ss_chat_h_user a
+                                    join ss_user b 
+                                        on b.user_id = a.user_id  
+                                        AND a.ss_portfolio_id = b.portfolio_id
+                                    WHERE a.ss_chat_h_id = @ss_chat_h_id AND a.ss_portfolio_id = @ss_portfolio_id";
+                try
+                {
+                    conn.Open();
+                    t = conn.Query<ChatListUser>(strQuery, new { ss_chat_h_id = HeaderId, ss_portfolio_id= PortfolioId }).ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+            }
+
+            return t;
+        }
+        public object RemoveUser(int ID,string UserRemove)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                object _result = null;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_id", ID, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", UserRemove);
+                    _result = conn.Query<dynamic>("fss_chat_remove_user", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+                return _result;
+            }
+            
+        }
+        public object RemoveUserAll(int ID)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                object _result = null;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_id", ID, dbType: DbType.Int32);
+                    _result = conn.Query<dynamic>("fss_chat_remove_user_a", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+                return _result;
+            }
+
+        }
+
+        public object AddUser(int ID, string AddUser,bool IsAdmin = false)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                object _result = null;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_chat_h_id", ID, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_portfolio_id", Tools.PortfolioId, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", AddUser);
+                    Parameters.Add("p_is_admin", IsAdmin);
+                    Parameters.Add("p_user_input", Tools.UserId);
+                    _result = conn.Query<dynamic>("fss_chat_h_user_m_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+                return _result;
+            }
+            
+        }
         public object SaveHeader(ChatSender Model)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -222,8 +329,40 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_chat_date", Model.chat_date, dbType: DbType.DateTime);
                     Parameters.Add("p_user_id_from", Model.user_id_from);
                     Parameters.Add("p_user_id_to", Model.user_id_to);
+                    Parameters.Add("p_is_file", Model.is_file);
+                    Parameters.Add("p_ss_chat_attachment_id", Model.ss_chat_attachment_id);                    
                     Parameters.Add("p_user_input", Model.user_input);
                     _result = conn.Query<ChatID>("fss_chat_d_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    //_result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public ChatID SendAttachment(ChatAttachment Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                ChatID _result = new ChatID();
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_chat_h_id", Model.ss_chat_h_id, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_portfolio_id", Model.ss_portfolio_id);
+                    Parameters.Add("p_file_name", Model.file_name);
+                    Parameters.Add("p_file_type", Model.file_type);
+                    Parameters.Add("p_path_file", Model.path_file);
+                    Parameters.Add("p_user_input", Tools.UserId);
+                    _result =  conn.Query<ChatID>("fss_chat_attachment_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
                 }
                 catch (Exception ex)

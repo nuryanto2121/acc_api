@@ -21,6 +21,7 @@ namespace Acc.Api.Models
         public string option_url { get; set; }
         public int line_no { get; set; }
         public string url_view_detail { get; set; }
+       // public string name_user_chat { get; set; }
     }
     public class ChatSender
     {
@@ -51,6 +52,8 @@ namespace Acc.Api.Models
         public DateTime chat_date { get; set; }
         public string user_id_from { get; set; }
         public string user_id_to { get; set; }
+        public bool is_file { get; set; } = false;
+        public int? ss_chat_attachment_id { get; set; }
         public string user_input { get; set; }
         public string user_edit { get; set; }
         public DateTime time_input { get; set; }
@@ -63,9 +66,37 @@ namespace Acc.Api.Models
         public DateTime chat_date { get; set; }
         public string user_id_from { get; set; }
         public string user_name { get; set; }
+        public bool is_file { get; set; }
+        public int ss_chat_attachment_id { get; set; }
+        public string file_name { get; set; }
+        public string file_type { get; set; }
+        public string path_file { get; set; }
+
     }
     public class ChatID
     {
         public int row_id { get; set; }
+
+        public static implicit operator int(ChatID v)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ChatListUser
+    {
+        public int ss_chat_h_id { get; set; }
+        public int ss_portfolio_id { get; set; }
+        public string user_id { get; set; }
+        public string user_name { get; set; }
+        public bool is_admin { get; set; }
+    }
+    public class ChatAttachment
+    {
+        public int ss_chat_h_id { get; set; }
+        public int ss_portfolio_id { get; set; }
+        public DateTime chat_date { get; set; }
+        public string file_name { get; set; }
+        public string file_type { get; set; }
+        public string path_file { get; set; }
     }
 }

@@ -25,6 +25,23 @@ namespace Acc.Api.Models
         public string ConfirmPassword { get; set; }
     }
 
+    public class ChangePortfolio
+    {
+        [Required]
+        [JsonProperty("user_id")]
+        public string UserId { get; set; }
+
+        [JsonProperty("ss_portfolio_id")]
+        public int SsPortfolioId { get; set; }
+
+        [JsonProperty("portfolio_name")]
+        public string PortfolioName { get; set; }
+
+        [JsonProperty("group_id")]
+        public string GroupId { get; set; }
+
+    }
+
     public class ForgotPassword
     {
         [Required]

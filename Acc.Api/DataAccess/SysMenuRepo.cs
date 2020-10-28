@@ -193,7 +193,8 @@ namespace Acc.Api.DataAccess
                                       icon_class,                   order_seq,
                                       ss_module_id,                 user_input,
                                       user_edit,                    time_input,
-                                      time_edit,                    level_no
+                                      time_edit,                    level_no,
+                                      menu_access
                                 )
                                 VALUES (
                                       @title,                        @menu_url,
@@ -201,7 +202,8 @@ namespace Acc.Api.DataAccess
                                       @icon_class,                   @order_seq,
                                       @ss_module_id,                 @user_input,
                                       @user_edit,                    @time_input,
-                                      @time_edit,                    @level_no
+                                      @time_edit,                    @level_no,
+                                      @menu_access
                                 );";
                 try
                 {
@@ -236,6 +238,7 @@ namespace Acc.Api.DataAccess
                                       icon_class = @icon_class,
                                       order_seq = @order_seq,
                                       ss_module_id = @ss_module_id,
+                                      menu_access = @menu_access,
                                       user_edit = @user_edit,
                                       time_edit = @time_edit
                                     WHERE 
@@ -467,7 +470,7 @@ namespace Acc.Api.DataAccess
             SsMenu t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                string strQuery = "SELECT ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id";
+                string strQuery = "SELECT ss_menu_id,  title,  menu_url,  menu_type,  parent_menu_id,  icon_class,  order_seq,  ss_module_id,  user_input,  user_edit,  time_input,  time_edit,  level_no,menu_access FROM public.ss_menu  WHERE ss_menu_id = @ss_menu_id";
                 try
                 {
                     conn.Open();

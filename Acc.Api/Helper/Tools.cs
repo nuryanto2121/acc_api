@@ -70,10 +70,30 @@ namespace Acc.Api.Helper
                     }
                 }
                 var Key = EncryptionLibrary.DecryptText(Token);
-                string[] Parts = Key.Split(new string[] { "~!@#$%" }, StringSplitOptions.None);
+                string[] Parts = Key.Split(new string[] { "~!@#$%^" }, StringSplitOptions.None);
                 return Parts[0];
             }
 
+        }
+
+        public static int PortfolioId
+        {
+            get
+            {
+                HttpContextAccessor dd = new HttpContextAccessor();
+                var Headers = dd.HttpContext.Request.Headers;
+                string Token = string.Empty;
+                foreach (var key in Headers.Keys)
+                {
+                    if (key.ToLower() == "token")
+                    {
+                        Token = Headers[key].ToString();
+                    }
+                }
+                var Key = EncryptionLibrary.DecryptText(Token);
+                string[] Parts = Key.Split(new string[] { "~!@#$%^" }, StringSplitOptions.None);
+                return Convert.ToInt32(Parts[1]);
+            }
         }
         public static string DecryptString(string data)
         {
@@ -286,7 +306,7 @@ namespace Acc.Api.Helper
             {
                 string randomnumber = string.Join("~!@#$%^", new string[] {
                     dtTableLogin.Rows[0]["user_id"].ToString(),
-                    EncryptionLibrary.KeyGenerator.GetUniqueKey(),
+                    dtTableLogin.Rows[0]["portfolio_id"].ToString(),
                     dtTableLogin.Rows[0]["password"].ToString(),
                     IpAddress,
                     Convert.ToString(DateTime.Now.Ticks),

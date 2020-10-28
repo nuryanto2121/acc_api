@@ -28,16 +28,17 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// </summary>
         /// <param name="portfolio_id"></param>
         /// <param name="group_id"></param>
+        /// <param name="group_access"></param>
         /// <returns></returns>
         [HttpGet("Json")]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetMenuJson(string portfolio_id, string group_id)
+        public IActionResult GetMenuJson(string portfolio_id, string group_id,string group_access)
         {
             var output = new Output();
             try
             {
-                output = SsGroupService.GetMenuJson(portfolio_id, group_id);
+                output = SsGroupService.GetMenuJson(portfolio_id, group_id, group_access);
             }
             catch (Exception ex)
             {

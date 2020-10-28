@@ -16,6 +16,16 @@ namespace Acc.Api.Models
         //public ICollection<IFormFile> images { get; set; }
     }
 
+    public class Attachement
+    {
+        [Required]
+        public int ss_chat_h_id { get; set; }
+        public DateTime chat_date { get; set; }
+
+        public IFormFile images { get; set; }
+        //public ICollection<IFormFile> images { get; set; }
+    }
+
     public class PortInFile
     {
         [Required]

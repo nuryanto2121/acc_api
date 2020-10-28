@@ -21,14 +21,13 @@ namespace Acc.Api.Controllers.SystemAdministrator
     {
         private ICrudService<SsUser, int> SsUserService;
         private SsUserService UserService;
-        private SsUserService UserSer;
         private PortInService PortService;
         public SsUserController(IConfiguration configuration, IEmailService EmailSender, IHostingEnvironment environment)
         {
-            SsUserService = new SsUserService(configuration);
-            UserService = new SsUserService(configuration);
+            SsUserService = new SsUserService(configuration, EmailSender, environment);
+            UserService = new SsUserService(configuration, EmailSender, environment);
             PortService = new PortInService(configuration, EmailSender, environment);
-            UserSer = new SsUserService(configuration);
+            //UserSer = new SsUserService(configuration, EmailSender, environment);
         }
 
         /// <summary>
@@ -84,16 +83,17 @@ namespace Acc.Api.Controllers.SystemAdministrator
         /// </summary>
         /// <param name="portfolio_id"></param>
         /// <param name="user_id"></param>
+        /// <param name="group_access"></param>
         /// <returns></returns>
         [HttpGet("Json")]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetMenuJson(string portfolio_id, string user_id)
+        public IActionResult GetMenuJson(string portfolio_id, string user_id, string group_access)
         {
             var output = new Output();
             try
             {
-                output = UserSer.GetMenuJson(portfolio_id, user_id);
+                output = UserService.GetMenuJson(portfolio_id, user_id, group_access);
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
             var output = new Output();
             try
             {
-                output = UserSer.Update(Model);
+                output = UserService.Update(Model);
             }
             catch (Exception ex)
             {
@@ -202,6 +202,27 @@ namespace Acc.Api.Controllers.SystemAdministrator
             {
                 //_result = await PortService.ReadDataExcelToDBUser(portinFile);
                 _result = UserService.ChangePassword(Model);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+            return Ok(_result);
+
+        }
+
+        
+        [HttpPost("ChangePortfolio")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult ChangePortfolio([FromBody]ChangePortfolio Model)
+        //public async Task<IActionResult> UploadFile([FromBody] PortInFile portinFile)
+        {
+            var _result = new Output();
+            try
+            {
+                _result = UserService.ChangePortfolio(Model);
 
             }
             catch (Exception ex)

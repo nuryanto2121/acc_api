@@ -947,7 +947,7 @@ namespace Acc.Api.Services
                     MvSpName = string.IsNullOrEmpty(ParamView) ? OptionLookUp.view_name : string.Format("{0}({1})", OptionLookUp.view_name, ParamView);
                     #region Parameter Where
                     var ParamWHere = JModel["ParamWhere"].ToString();
-                    var initialwhere = JModel["InitialWhere"].ToString();
+                    var initialwhere = JModel["InitialWhere"].ToString(); 
                     initialwhere = string.IsNullOrEmpty(initialwhere) ? initialwhere : "WHERE " + initialwhere;
                     string sWhere = fn.DecryptDataString(initialwhere);
 

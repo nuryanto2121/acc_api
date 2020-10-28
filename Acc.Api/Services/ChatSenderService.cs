@@ -27,6 +27,8 @@ namespace Acc.Api.Services
             try
             {
                 Model.user_id_to = fn.DecryptString(Model.user_id_to);
+                Model.portfolio_id = fn.DecryptString(Model.portfolio_id);
+                Model.subportfolio_id = fn.DecryptString(Model.subportfolio_id);
                 //check chat header
                 //string paramWhere = string.Format("doc_type = '{0}' AND doc_no = '{1}' AND ss_portfolio_id='{2}' AND ss_subportfolio_id='{3}'",
                 //                                    Model.doc_type, Model.doc_no, Model.portfolio_id, Model.subportfolio_id);
@@ -45,19 +47,36 @@ namespace Acc.Api.Services
                         chatRepo.UpdateStatusChatRead(dtChat.ss_chat_d_id, dtChat.user_id_from, Model.user_id_to);
                         dtChat.user_id_from = EncryptionLibrary.EncryptText(dtChat.user_id_from);
                     });
-                    List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                    List<ChatListUser> Users = chatRepo.GetDataUserList(ChatId, Convert.ToInt32(Model.portfolio_id));// dataHedaer.user_id_to.Split(",").ToList();
                     string user_ids = string.Empty;
-                    foreach (string dtUser in Users)
+                    bool is_admin = false;
+                    string user_names = string.Empty;
+                    Users.ForEach(delegate (ChatListUser dt)
                     {
+                        if (dt.is_admin)
+                        {
+                            if (Model.user_id_to == dt.user_id)
+                            {
+                                is_admin = true;
+                            }
+                        }
+                        user_ids += dt.user_id + ","; //EncryptionLibrary.EncryptText(dt.user_id) + ",";
+                        user_names += dt.user_name + ",";
+                    });
+                    //foreach (string dtUser in Users)
+                    //{
 
-                        user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
-                    }
+                    //    user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
+                    //}
                     user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")) : user_ids;
+                    user_names = !string.IsNullOrEmpty(user_names) ? user_names.Remove(user_names.LastIndexOf(",")) : user_names;
                     //ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
                     ObjOutput.Add("subject", dataHedaer.subject);
+                    ObjOutput.Add("user_names", user_names);
                     ObjOutput.Add("user_ids", user_ids);
                     ObjOutput.Add("row_id", HeaderId);
                     ObjOutput.Add("chat", dataChat);
+                    ObjOutput.Add("is_admin", is_admin);
                     _result.Data = ObjOutput;
                 }
 
@@ -83,23 +102,38 @@ namespace Acc.Api.Services
                     dtList.ForEach(delegate (GetChat dt)
                     {
                         chatRepo.UpdateStatusChatRead(dt.ss_chat_d_id, dt.user_id_from, user_id);
-                        dt.user_id_from = EncryptionLibrary.EncryptText(dt.user_id_from);
+                        dt.user_id_from = dt.user_id_from;//EncryptionLibrary.EncryptText(dt.user_id_from);
                     });
 
                 }
                 var dataHedaer = chatRepo.GetDataHeader(id);
                 //ObjOutput.Add("user_from", EncryptionLibrary.EncryptText(dataHedaer.user_id_from));
-                List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                //List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                List<ChatListUser> Users = chatRepo.GetDataUserList(id, Tools.PortfolioId);// dataHedaer.user_id_to.Split(",").ToList();
                 string user_ids = string.Empty;
-                foreach (string dtUser in Users)
+                bool is_admin = false;
+                Users.ForEach(delegate (ChatListUser dt)
                 {
-                    user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
-                }
-                user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")): user_ids;
+                    if (dt.is_admin)
+                    {
+                        if (user_id == dt.user_id)
+                        {
+                            is_admin = true;
+                        }
+                    }
+                    user_ids += dt.user_id + ","; //EncryptionLibrary.EncryptText(dt.user_id) + ",";
+                });
+                //string user_ids = string.Empty;
+                //foreach (string dtUser in Users)
+                //{
+                //    user_ids += EncryptionLibrary.EncryptText(dtUser) + ",";
+                //}
+                user_ids = !string.IsNullOrEmpty(user_ids) ? user_ids.Remove(user_ids.LastIndexOf(",")) : user_ids;
                 ObjOutput.Add("subject", dataHedaer.subject);
                 ObjOutput.Add("user_ids", user_ids);
                 ObjOutput.Add("row_id", id);
                 ObjOutput.Add("chat", dtList);
+                ObjOutput.Add("is_admin", is_admin);
                 _result.Data = ObjOutput;
             }
             catch (Exception ex)
@@ -142,6 +176,68 @@ namespace Acc.Api.Services
             return _result;
         }
 
+        public Output RemoveUser(int ID,string UserRemove)
+        {
+            Output _result = new Output();
+            try
+            {
+                List<ChatListUser> Users = chatRepo.GetDataUserList(ID, Tools.PortfolioId);
+                var dd = Users.Where(w => w.user_id == Tools.UserId).FirstOrDefault();
+                if (dd == null)
+                {
+                    throw new Exception("You don't have access for remove user.");
+                }
+
+                if (!dd.is_admin)
+                {
+                    throw new Exception("You don't have access for remove user.");
+                }
+                //
+                UserRemove = fn.DecryptString(UserRemove);
+                _result.Data = chatRepo.RemoveUser(ID, UserRemove);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
+        public Output AddUser(int ID, string AddUser)
+        {
+            Output _result = new Output();
+            try
+            {
+                List<ChatListUser> Users = chatRepo.GetDataUserList(ID, Tools.PortfolioId);
+                var dd = Users.Where(w => w.user_id == Tools.UserId).FirstOrDefault();
+                if (dd == null)
+                {
+                    throw new Exception("You don't have access for remove user.");
+                }
+
+                if (!dd.is_admin)
+                {
+                    throw new Exception("You don't have access for remove user.");
+                }
+                chatRepo.RemoveUserAll(ID);
+                //
+                List<string> AddUsers = AddUser.Split(",").ToList();
+                foreach (string UserID in AddUsers)
+                {
+                    string user_id = fn.DecryptString(UserID);
+                    _result.Data  = chatRepo.AddUser(ID, user_id);
+                }
+                
+
+                //_result.Data = chatRepo.RemoveUser(ID, AddUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
         public Output SendChat(ChatDetail Model)
         {
             Output _result = new Output();
@@ -155,35 +251,93 @@ namespace Acc.Api.Services
 
                 // check header
                 var dataHedaer = chatRepo.GetDataHeader(Model.ss_chat_h_id);
-                //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
-                List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
 
-                if (!Users.Any(dt => dt == Model.user_id_from))
-                {
-                    Users.Add(Model.user_id_from);
-                    dataHedaer.user_id_to = string.Join(",", Users);//string.Format(",{0}", Model.user_id_from);
-                    chatRepo.UpdateUserHeader(Model.ss_chat_h_id, dataHedaer.user_id_to);
-
-
-                }
-                List<string> UserTO = Users;
-                UserTO.Remove(Model.user_id_from);
-
-                Model.user_id_to = string.Join(",", UserTO);
+                var ddd = dataHedaer.user_id_to.Split(",").ToList();
+                ddd.Remove(Model.user_id_from);
+                Model.user_id_to = string.Join(",", ddd);
+                Model.ss_chat_attachment_id = null;
                 var _ret = chatRepo.SendChat(Model);
+                //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
+                //List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                List<ChatListUser> Users = chatRepo.GetDataUserList(Model.ss_chat_h_id, Tools.PortfolioId);// dataHedaer.user_id_to.Split(",").ToList();
 
-                foreach (string dtUserTo in UserTO)
+                if (!Users.Any(a=>a.user_id == Model.user_id_from))
+                {
+                    throw new Exception("You cant's send message because you're no longer participant.");
+                }
+
+                string user_ids = string.Empty;
+                Users.ForEach(delegate (ChatListUser dt)
+                {
+                  
+                    if (Model.user_id_from != dt.user_id)
+                    {
+                        ChatDetail dtDetail = new ChatDetail();
+                        dtDetail.ss_chat_d_id = _ret.row_id;
+                        dtDetail.user_id_from = Model.user_id_from;
+                        dtDetail.user_id_to = dt.user_id;
+                        dtDetail.user_input = Model.user_input;
+                        chatRepo.SendChatRead(dtDetail);
+                    }
+                    
+                });
+
+             
+                _result.Message = "Success.";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
+        public async Task<Output> SaveAttachment(ChatAttachment Model)
+        {
+            Output _result = new Output();
+            try
+            {
+                var AttachID = chatRepo.SendAttachment(Model);
+
+                ChatDetail SendChat = new ChatDetail();
+                
+                //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
+                //List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
+                List<ChatListUser> Users = chatRepo.GetDataUserList(Model.ss_chat_h_id, Tools.PortfolioId);// dataHedaer.user_id_to.Split(",").ToList();
+                var UsersTo = Users.Select(s => s.user_id).Aggregate((i, j) => i + "," + j);
+
+                SendChat.ss_chat_h_id = Model.ss_chat_h_id;
+                SendChat.chat_text = Model.path_file;
+                SendChat.chat_date = Model.chat_date;
+                SendChat.user_id_from = Tools.UserId;
+                SendChat.user_id_to = UsersTo;
+                SendChat.is_file = true;
+                SendChat.ss_chat_attachment_id = AttachID.row_id;
+                SendChat.user_input = Tools.UserId;
+                var _ret = chatRepo.SendChat(SendChat);
+
+
+                if (!Users.Any(a => a.user_id == Tools.UserId))
+                {
+                    throw new Exception("You cant's send message because you're no longer participant.");
+                }
+
+                string user_ids = string.Empty;
+                Users.ForEach(delegate (ChatListUser dt)
                 {
 
-                    ChatDetail dtDetail = new ChatDetail();
-                    dtDetail.ss_chat_d_id = _ret.row_id;
-                    dtDetail.user_id_from = Model.user_id_from;
-                    dtDetail.user_id_to = dtUserTo;
-                    dtDetail.user_input = Model.user_input;
-                    chatRepo.SendChatRead(dtDetail);
+                    if (Tools.UserId != dt.user_id)
+                    {
+                        ChatDetail dtDetail = new ChatDetail();
+                        dtDetail.ss_chat_d_id = _ret.row_id;
+                        dtDetail.user_id_from = Tools.UserId;
+                        dtDetail.user_id_to = dt.user_id;
+                        dtDetail.user_input = Tools.UserId;
+                        chatRepo.SendChatRead(dtDetail);
+                    }
 
-                }
-                _result.Message = "Success.";
+                });
+
             }
             catch (Exception ex)
             {

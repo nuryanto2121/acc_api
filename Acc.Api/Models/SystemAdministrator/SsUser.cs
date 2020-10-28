@@ -14,6 +14,7 @@ namespace Acc.Api.Models
         public int ss_user_id { get; set; }
         public string user_id { get; set; }
         public string ss_group_id { get; set; }
+        public string dashboard_url { get; set; }
         public int group_id { get; set; }
         public string group_descs { get; set; }
         public string user_name { get; set; }
@@ -36,6 +37,7 @@ namespace Acc.Api.Models
         public DateTime time_edit { get; set; }
         public int lastupdatestamp { get; set; }
         public int portfolio_id { get; set; }
+        public string portfolio_name { get; set; }
         public int subportfolio_id { get; set; }
         public string file_name { get; set; }
         public string path_file { get; set; }
@@ -48,6 +50,8 @@ namespace Acc.Api.Models
     {
         public string portfolio_id { get; set; }
         public string user_id { get; set; }
+        public string dashboard_url { get; set; }
+        public string group_id { get; set; }
         public List<SsMenuUser> DataDetail { get; set; }
         public string user_input { get; set; }
 

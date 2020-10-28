@@ -21,14 +21,14 @@ namespace Acc.Api.Services
             SsGroupRepo = new SsGroupRepo(Tools.ConnectionString(configuration));
         }
 
-        public Output GetMenuJson(string portfolio_id, string group_id)
+        public Output GetMenuJson(string portfolio_id, string group_id,string group_access)
         {
             Output _result = new Output();
             try
             {
                 int? ss_portfolio_id = portfolio_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(portfolio_id));
                 int? ss_group_id = group_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(group_id));
-                _result.Data = SsGroupRepo.GetMenuJson(ss_portfolio_id, ss_group_id);
+                _result.Data = SsGroupRepo.GetMenuJson(ss_portfolio_id, ss_group_id, group_access);
             }
             catch (Exception ex)
             {
@@ -57,6 +57,8 @@ namespace Acc.Api.Services
                     SsGroupRepo.SaveDetail(dt);
                 });
 
+                _result.Data = dtROw;
+
             }
             catch (Exception ex)
             {
@@ -76,7 +78,8 @@ namespace Acc.Api.Services
 
                 SsGroup dtHeader = Model.DataHeader;
                 var dtROw = SsGroupRepo.Update(dtHeader);
-
+                SsGroupRepo.DeleteButtonGroup(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
+                SsGroupRepo.DeleteDashboardGroup(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
                 SsGroupRepo.DeleteDetail(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
                 Model.DataDetail.ForEach(delegate (SsMenuGroup dt)
                 {

@@ -66,7 +66,7 @@ namespace Acc.Api.DataAccess
             }
             return (result > 0);
         }
-        public object GetMenuJson(int? portfolio_id, string user_id)
+        public object GetMenuJson(int? portfolio_id, string user_id,string group_access)
         {
             object _result = new object();
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -88,6 +88,7 @@ namespace Acc.Api.DataAccess
                         Parameters.Add("p_ss_portfolio_id", portfolio_id, dbType: DbType.Int32);
                     }
 
+                    Parameters.Add("p_group_access", group_access);
 
                     var dd = conn.Query<dynamic>("get_menu_json_user", Parameters, commandType: CommandType.StoredProcedure);
                     //var dd = conn.Query<dynamic>("get_menu_json", Parameters, commandType: CommandType.StoredProcedure);
@@ -124,6 +125,87 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_post_status", Model.post_status, dbType: DbType.Boolean);
                     Parameters.Add("p_user_input", Model.user_input);
                     var dd = conn.Query<dynamic>("fss_menu_user_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool DeleteButtonUser(int PortfolioId, string UserId)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);                   
+                    Parameters.Add("p_user_id", UserId);
+                    var dd = conn.Query<dynamic>("fss_user_menu_button_access_d", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool DeleteDashboardUser(int PortfolioId, string UserId)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", UserId);
+                    var dd = conn.Query<dynamic>("fss_user_menu_dashboard_d_group", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+
+        public bool UpdateDefaultDashboard(int PortfolioId, int SsGroupID,string DashboardUrl,string UserInput)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_group_id", SsGroupID, dbType: DbType.Int32);
+                    Parameters.Add("p_dashboard_url", DashboardUrl);
+                    Parameters.Add("p_user_edit", UserInput);
+                    var dd = conn.Query<dynamic>("fss_group_u_dashboard_url", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = true;
                 }
                 catch (Exception ex)
@@ -301,6 +383,7 @@ namespace Acc.Api.DataAccess
                                     SET 
                                       user_id = @user_id,
                                       ss_group_id = @group_id,
+                                      portfolio_id = @portfolio_id,
                                       user_name = @user_name,
                                       password = @password,
                                       email = @email,

@@ -84,7 +84,7 @@ namespace Acc.Api.Services
                 /*generate Captcha*/
                 //1. cek count user log
                 string sParamUserLog = string.Format(" ip_address = '{0}' AND is_fraud = 'true' ", Tools.GetIpAddress());
-                int cnt_log = authRepo.CountUserLog(sParamUserLog);
+                int cnt_log = authRepo.CountUserLog(Tools.GetIpAddress());
                 int cnt_captcha = config.GetValue<int>("appSetting:CountCaptcha") - 1;
 
 
@@ -106,18 +106,18 @@ namespace Acc.Api.Services
                     {
                         Model.Captcha = EncryptionLibrary.EncryptText(Model.Captcha);
                         string nParam = string.Format("{0} AND captcha = '{1}'", sParamUserLog, Model.Captcha);
-                        var captcha_db = authRepo.MaxCaptchaUserLog(nParam);
+                        var captcha_db = authRepo.MaxCaptchaUserLog(Tools.GetIpAddress(),Model.Captcha);
 
                         if (captcha_db == Model.Captcha)
                         {
-                            nParam = string.Format("{0} AND captcha != '{1}'", sParamUserLog, Model.Captcha);
-                            authRepo.DeleteUserLog(nParam);
-                            nParam = string.Format("{0} AND captcha = '{1}'", sParamUserLog, Model.Captcha);
-                            authRepo.UpdateUserLogisFraud(nParam);
+                            //nParam = string.Format("{0} AND captcha != '{1}'", sParamUserLog, Model.Captcha);
+                            authRepo.DeleteUserLog(Tools.GetIpAddress(), Model.Captcha);
+                            //nParam = string.Format("{0} AND captcha = '{1}'", sParamUserLog, Model.Captcha);
+                            authRepo.UpdateUserLogisFraud(Tools.GetIpAddress(), Model.Captcha);
                         }
                         else
                         {
-
+                            authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
                             SsUserLog.user_id = Model.UserLog;
                             SsUserLog.ip_address = Tools.GetIpAddress();
                             SsUserLog.login_date = DateTime.Now;
@@ -133,6 +133,7 @@ namespace Acc.Api.Services
                             //throw new Exception("Login Failed. Wrong Captcha .^" + StatusCodes.Status401Unauthorized);
                             _result.Message = "Login Failed. Wrong Captcha .^429";
                             _result.Data = Captcha;
+                            _result.Error = true;
                             _result.Status = 429;
                             return _result;
                         }
@@ -153,6 +154,7 @@ namespace Acc.Api.Services
                     authRepo.SaveUserSession(UserSession);
 
                     // Insert User Log
+                    authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
 
                     SsUserLog.user_id = Model.UserLog;
                     SsUserLog.ip_address = Tools.GetIpAddress();
@@ -169,6 +171,7 @@ namespace Acc.Api.Services
 
                     //dataAuth.pwd = "";
                     //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
+                    var dataSpec = authRepo.GetDataMkSpec(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()));
                     var MenuList = this.menuList(dataAuth);
                     var FavMenu = this.favoriteMenu(dataAuth);
                     dataAuth = fn.DataClearEncrypt(dataAuth);
@@ -184,7 +187,8 @@ namespace Acc.Api.Services
                     DataUser.Add("portfolio_id", dataAuth.Rows[0]["portfolio_id"].ToString());
                     DataUser.Add("portfolio_short_name", dataAuth.Rows[0]["portfolio_short_name"].ToString());
                     DataUser.Add("portfolio_name", dataAuth.Rows[0]["portfolio_name"].ToString());
-
+                    DataUser.Add("phone_country_code", dataSpec.Rows[0]["phone_country_code"].ToString());
+                    
                     ObjOutput.Add("data_user", DataUser);
                     ObjOutput.Add("token", _Session_Id);
                     ObjOutput.Add("idle", config.GetValue<int>("appSetting:IdleWeb"));
@@ -207,7 +211,7 @@ namespace Acc.Api.Services
                     {
                         Model.Captcha = EncryptionLibrary.EncryptText(Model.Captcha);
                         sParamUserLog = string.Format("{0} AND captcha = '{1}'", sParamUserLog, Model.Captcha);
-                        var captcha_db = authRepo.MaxCaptchaUserLog(sParamUserLog);
+                        var captcha_db = authRepo.MaxCaptchaUserLog(Tools.GetIpAddress(), Model.Captcha);
 
                         if (captcha_db != Model.Captcha)
                         {
@@ -224,12 +228,13 @@ namespace Acc.Api.Services
                             authRepo.SaveUserLog(SsUserLog);
 
                             //throw new Exception("Login Failed. Wrong Captcha .^" + StatusCodes.Status401Unauthorized);
-                            _result.Message = "Login Failed. Wrong Captcha .^429";
+                            _result.Message = "The user name or password is incorrect.^" + StatusCodes.Status401Unauthorized; //"Login Failed. Wrong Captcha .^429";
                             _result.Error = true;
                             _result.Data = Captcha;
                             return _result;
                         }
                     }
+                    authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
                     SsUserLog.user_id = Model.UserLog;
                     SsUserLog.ip_address = Tools.GetIpAddress();
                     SsUserLog.login_date = DateTime.Now;
@@ -270,7 +275,7 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        private DataTable menuList(DataTable dataUser)
+        public DataTable menuList(DataTable dataUser)
         {
             int GroupId = Convert.ToInt32(dataUser.Rows[0]["ss_group_id"]);
             int PortfolioId = Convert.ToInt32(dataUser.Rows[0]["portfolio_id"]);
@@ -278,7 +283,7 @@ namespace Acc.Api.Services
             return menuRepo.getMenuGroup(PortfolioId, GroupId,UserID);
         }
 
-        private object favoriteMenu(DataTable dataUser)
+        public object favoriteMenu(DataTable dataUser)
         {
             int GroupId = Convert.ToInt32(dataUser.Rows[0]["ss_group_id"]);
             int PortfolioId = Convert.ToInt32(dataUser.Rows[0]["portfolio_id"]);

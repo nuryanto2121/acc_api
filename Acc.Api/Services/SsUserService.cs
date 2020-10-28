@@ -3,6 +3,8 @@ using Acc.Api.Helper;
 using Acc.Api.Interface;
 using Acc.Api.Models;
 using EncryptLibrary.AES256Encryption;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
@@ -16,16 +18,18 @@ namespace Acc.Api.Services
     {
         private FunctionString fn;
         private AuthRepo authRepo;
+        private AuthServices authService;
         private SsUserRepo UserRepo;
         private IConfiguration config;
         private OptionTemplateRepo OptionRepo;
-        public SsUserService(IConfiguration configuration)
+        public SsUserService(IConfiguration configuration, IEmailService EmailSender, IHostingEnvironment environment)
         {
             config = configuration;
             authRepo = new AuthRepo(Tools.ConnectionString(configuration));
             fn = new FunctionString(Tools.ConnectionString(configuration));
             UserRepo = new SsUserRepo(Tools.ConnectionString(configuration));
             OptionRepo = new OptionTemplateRepo(configuration);
+            authService = new AuthServices(configuration, EmailSender, environment);
         }
 
         public Output Delete(int Key, int Timestamp)
@@ -62,14 +66,14 @@ namespace Acc.Api.Services
         {
             throw new NotImplementedException();
         }
-        public Output GetMenuJson(string portfolio_id, string user_id)
+        public Output GetMenuJson(string portfolio_id, string user_id, string group_access)
         {
             Output _result = new Output();
             try
             {
                 int? ss_portfolio_id = portfolio_id.ToLower() == "null" ? 0 : Convert.ToInt16(fn.DecryptString(portfolio_id));
                 user_id = user_id.ToLower() == "null" ? null : fn.DecryptString(user_id);
-                _result.Data = UserRepo.GetMenuJson(ss_portfolio_id, user_id);
+                _result.Data = UserRepo.GetMenuJson(ss_portfolio_id, user_id, group_access);
             }
             catch (Exception ex)
             {
@@ -85,10 +89,12 @@ namespace Acc.Api.Services
                 Model.portfolio_id = fn.DecryptString(Model.portfolio_id);
                 Model.user_input = fn.DecryptString(Model.user_input);
                 Model.user_id = fn.DecryptString(Model.user_id);
+                Model.group_id = fn.DecryptString(Model.group_id);
                 //Model.DataHeader.ss_group_id = Convert.ToInt32(fn.DecryptString(Model.group_id));
-
+                UserRepo.DeleteDashboardUser(Convert.ToInt32(Model.portfolio_id), Model.user_id);
+                UserRepo.DeleteButtonUser(Convert.ToInt32(Model.portfolio_id), Model.user_id);
                 UserRepo.DeleteDetailMenu(Convert.ToInt32(Model.portfolio_id), Model.user_id);
-
+                UserRepo.UpdateDefaultDashboard(Convert.ToInt32(Model.portfolio_id), Convert.ToInt32(Model.group_id), Model.dashboard_url, Model.user_input);
                 Model.DataDetail.ForEach(delegate (SsMenuUser dt)
                 {
                     dt.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(dt.portfolio_id));
@@ -134,13 +140,13 @@ namespace Acc.Api.Services
 
                 string MvSpName = "vss_user_list";
 
-                
+
                 //var dataDefineColumn = OptionRepo.GetDefineColumn(user_id, subportfolio_id, option_url, line_no);
 
                 var fieldsource = OptionRepo.getListFieldType(MvSpName, isViewFUnction);
                 string AllColumn = fn.SetFieldList(fieldsource, fieldsource.Count)["Field"].ToString();
                 JObject dataFieldList = fn.SetFieldList(fieldsource, JmlahField, definedColumn: AllColumn, List: true);
-                
+
                 string allCoulumnQUery = dataFieldList["FieldQuery"].ToString();
                 string DefineSize = dataFieldList["DefineSize"].ToString();
                 string fieldWhere = dataFieldList["fieldWhere"].ToString();
@@ -239,11 +245,11 @@ namespace Acc.Api.Services
                 {
                     Model.password = EncryptionLibrary.EncryptText(Model.password);
                 }
-                Model.subportfolio_id = Convert.ToInt32(EncryptionLibrary.DecryptText(Model.ss_subportfolio_id));
-                Model.portfolio_id = Convert.ToInt32(EncryptionLibrary.DecryptText(Model.ss_portfolio_id));
+                Model.subportfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_subportfolio_id));
+                Model.portfolio_id = Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id));
                 Model.group_id = Convert.ToInt32(Model.ss_group_id);
                 Model.time_edit = DateTime.Now;
-                Model.user_edit = EncryptionLibrary.DecryptText(Model.user_edit);
+                Model.user_edit = fn.DecryptString(Model.user_edit);
                 UserRepo.Update(Model);
                 dataOut.Add("row_id", Model.ss_user_id);
                 _result.Data = dataOut;
@@ -265,7 +271,7 @@ namespace Acc.Api.Services
                 {
                     throw new Exception("New Password and Confirm must be same.");
                 }
-                if(Model.CurrentPassword == Model.NewPassword)
+                if (Model.CurrentPassword == Model.NewPassword)
                 {
                     throw new Exception("Please Insert New Password.");
                 }
@@ -292,6 +298,138 @@ namespace Acc.Api.Services
             {
                 throw ex;
                 //_result = Tools.Error(ex);
+            }
+            return _result;
+        }
+        public Output ChangePortfolio(ChangePortfolio Model)
+        {
+            Output _result = new Output();
+            Dictionary<string, object> DataUser = new Dictionary<string, object>();
+            try
+            {
+
+                Model.UserId = fn.DecryptString(Model.UserId);
+
+                //update user porfolio
+                //authRepo.UpdatePortfolio(Model.SsPortfolioId, Model.UserId);
+
+                //get Data Login
+                _result = this.DataLogin(Model);
+
+
+                //logout user
+                HttpContextAccessor Context = new HttpContextAccessor();
+                var Headers = Context.HttpContext.Request.Headers;
+                string Token = string.Empty;
+                foreach (var key in Headers.Keys)
+                {
+                    if (key.ToLower() == "token")
+                    {
+                        Token = Headers[key].ToString();
+                    }
+                }
+
+                var UserSession = new UserSession();
+                UserSession.user_id = Model.UserId;
+                UserSession.token = Token;
+                UserSession.ip_address = Tools.GetIpAddress();
+                authRepo.DeleteUserSession(UserSession);
+
+                authRepo.UpdateUserLog(Model.UserId, Tools.GetIpAddress(), Token);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                //_result = Tools.Error(ex);
+            }
+            return _result;
+        }
+
+        private Output DataLogin(ChangePortfolio Model)
+        {
+            Output _result = new Output();
+            string _Session_Id = string.Empty;
+            AuthLogin Log = new AuthLogin();
+            try
+            {
+                var UserSession = new UserSession();
+                var SsUserLog = new SsUserLog();
+                Dictionary<string, object> DataUser = new Dictionary<string, object>();
+                Dictionary<string, object> ObjOutput = new Dictionary<string, object>();
+
+                var dataAuth = authRepo.GetDataUser(Model.UserId);
+                if (dataAuth.Rows.Count > 0)
+                {
+                    var expireDate = DateTime.Now.AddMinutes(config.GetValue<int>("appSetting:TokenExpire"));
+                    _Session_Id = Token.GenerateToken(dataAuth, expireDate, Log, Tools.GetIpAddress());
+
+                    // insert user session for authentication
+
+                    UserSession.user_id = Model.UserId;
+                    UserSession.expire_on = expireDate;
+                    UserSession.token = _Session_Id;
+                    UserSession.last_login = DateTime.Now;
+                    UserSession.ip_address = Tools.GetIpAddress();
+                    UserSession.user_input = Model.UserId;
+                    UserSession.user_edit = Model.UserId;
+                    UserSession.time_input = DateTime.Now;
+                    UserSession.time_edit = DateTime.Now;
+                    authRepo.SaveUserSession(UserSession);
+
+                    // Insert User Log
+                    authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
+
+                    SsUserLog.user_id = Model.UserId;
+                    SsUserLog.ip_address = Tools.GetIpAddress();
+                    SsUserLog.login_date = DateTime.Now;
+                    SsUserLog.token = _Session_Id;
+                    SsUserLog.is_fraud = false;
+                    SsUserLog.user_input = Model.UserId;
+                    SsUserLog.user_edit = Model.UserId;
+                    SsUserLog.time_input = DateTime.Now;
+                    SsUserLog.time_edit = DateTime.Now;
+                    authRepo.SaveUserLog(SsUserLog);
+
+
+                    dataAuth.Rows[0]["portfolio_id"] = Model.SsPortfolioId;
+                    //dataAuth.pwd = "";
+                    //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
+                    var MenuList = authService.menuList(dataAuth);
+                    var FavMenu = authService.favoriteMenu(dataAuth);
+                    dataAuth = fn.DataClearEncrypt(dataAuth);
+
+                    DataUser.Add("user_id", dataAuth.Rows[0]["user_id"].ToString());
+                    DataUser.Add("user_name", dataAuth.Rows[0]["user_name"].ToString());
+                    DataUser.Add("path_file", dataAuth.Rows[0]["path_file"].ToString());
+                    DataUser.Add("group_id", dataAuth.Rows[0]["ss_group_id"].ToString());
+                    DataUser.Add("dashboard_url", dataAuth.Rows[0]["dashboard_url"].ToString());
+                    DataUser.Add("subportfolio_id", dataAuth.Rows[0]["subportfolio_id"].ToString());
+                    DataUser.Add("subportfolio_short_name", dataAuth.Rows[0]["subportfolio_short_name"].ToString());
+                    DataUser.Add("subportfolio_name", dataAuth.Rows[0]["subportfolio_name"].ToString());
+                    DataUser.Add("portfolio_id", dataAuth.Rows[0]["portfolio_id"].ToString());
+                    //DataUser.Add("portfolio_short_name", dataAuth.Rows[0]["portfolio_short_name"].ToString());
+                    //DataUser.Add("portfolio_name", dataAuth.Rows[0]["portfolio_name"].ToString());
+                    //DataUser.Add("portfolio_id", Tools.EncryptString(Model.SsPortfolioId.ToString()));
+                    DataUser.Add("portfolio_short_name", Model.PortfolioName);
+                    DataUser.Add("portfolio_name", Model.PortfolioName);
+
+                    ObjOutput.Add("data_user", DataUser);
+                    ObjOutput.Add("token", _Session_Id);
+                    ObjOutput.Add("idle", config.GetValue<int>("appSetting:IdleWeb"));
+                    ObjOutput.Add("menu", MenuList);
+                    ObjOutput.Add("shorcut_menu", FavMenu);
+
+                    _result.Data = ObjOutput;// dataAuth;
+                }
+                else
+                {
+                    throw new Exception("Invalid User.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             return _result;
         }

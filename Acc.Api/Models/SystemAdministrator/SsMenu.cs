@@ -21,6 +21,7 @@ namespace Acc.Api.Models
         public int order_seq { get; set; }
         public int ss_module_id { get; set; }
         public int level_no { get; set; }
+        public string menu_access { get; set; }
         public string user_input { get; set; }
         public string User_edit { get; set; }
         public DateTime time_input { get; set; }

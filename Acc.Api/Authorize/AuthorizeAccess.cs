@@ -112,6 +112,11 @@ namespace Acc.Api.Authorize
                 else
                 {
                     UserSession uslog = _AuthRepor.GetDataSessionLog(Auth.UserLog, Token);
+                    if (uslog==null)
+                    {
+                        _Message = "Invalid Token";
+                        return false;
+                    }
                     DateTime SessionCreate = DateTime.Parse(uslog.expire_on.ToString());
                     //if (DateTime.Now > uslog.expire_on)
                     if (DateTime.Now.Date > SessionCreate.Date)

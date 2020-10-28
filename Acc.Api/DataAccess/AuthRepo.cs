@@ -20,7 +20,7 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
         }
-        public SsUser GetDataAuthByEmail(string Email)  
+        public SsUser GetDataAuthByEmail(string Email)
         {
             SsUser t = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -131,7 +131,7 @@ namespace Acc.Api.DataAccess
             return t;
         }
 
-        public bool UpdateOTP(string otp,string email,int ss_user_id)
+        public bool UpdateOTP(string otp, string email, int ss_user_id)
         {
             bool result = false;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -190,6 +190,62 @@ namespace Acc.Api.DataAccess
 
             return data;
         }
+        public DataTable GetDataMkSpec(int POrtftolio)
+        {
+            var dd = new List<dynamic>();
+            var data = new DataTable();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    var Parameters = new DynamicParameters();
+                    string SpName = "fmk_spec_s";
+                    Parameters.Add("p_portfolio_id", POrtftolio, dbType: DbType.Int32);
+                    dd = conn.Query<dynamic>(SpName, Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    data = fn.ToDataTable(dd);
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+
+            return data;
+        }
+        public DataTable GetDataUser(string UserID)
+        {
+            var dd = new List<dynamic>();
+            var data = new DataTable();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    var Parameters = new DynamicParameters();
+                    string SpName = "_getData_user";
+                    Parameters.Add("p_user_id", UserID, dbType: DbType.String);
+                    dd = conn.Query<dynamic>(SpName, Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    data = fn.ToDataTable(dd);
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+
+            return data;
+        }
         public bool SaveUserSession(UserSession domain)
         {
             bool result = false;
@@ -226,7 +282,7 @@ namespace Acc.Api.DataAccess
                                       time_edit
                                     FROM 
                                       public.ss_user_session 
-                                    where user_id = @user_id
+                                    where user_id iLike @user_id
                                     And token = @token;";
                 try
                 {
@@ -245,7 +301,7 @@ namespace Acc.Api.DataAccess
             }
             return t;
         }
-        public int CountUserLog(string sParam)
+        public int CountUserLog(string IpAddress)
         {
             int result = 0;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -255,9 +311,15 @@ namespace Acc.Api.DataAccess
                 try
                 {
                     conn.Open();
-                    sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
-                    sqlQuery.AppendFormat("select count(*) as cnt from public.ss_user_log WHERE time_input::date = now()::date {0};", sParam);
-                    var res = conn.ExecuteScalar(sqlQuery.ToString());
+                    //sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
+                    //sqlQuery.AppendFormat(@"select count(*) as cnt from public.ss_user_log 
+                    //            WHERE time_input::date = now()::date {0};", sParam);
+
+                    sqlQuery.AppendFormat(@"select count(*) as cnt from public.ss_user_log 
+                                WHERE   time_input::date = @TimeInput 
+                                 AND    ip_address = @IpAddress
+                                 AND    is_fraud = 'true';");
+                    var res = conn.ExecuteScalar(sqlQuery.ToString(), new { IpAddress = IpAddress, TimeInput = DateTime.Now.Date });
                     result = Convert.ToInt32(res);
 
 
@@ -273,7 +335,7 @@ namespace Acc.Api.DataAccess
             }
             return result;
         }
-        public string MaxCaptchaUserLog(string sParam)
+        public string MaxCaptchaUserLog(string IpAddress, string Captcha)
         {
             string result = string.Empty;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -283,12 +345,46 @@ namespace Acc.Api.DataAccess
                 try
                 {
                     conn.Open();
-                    sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
-                    sqlQuery.AppendFormat("select max(captcha) as cnt from public.ss_user_log WHERE time_input::date = now()::date {0};", sParam);
-                    var res = conn.ExecuteScalar(sqlQuery.ToString());
+                    //sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
+                    //sqlQuery.AppendFormat("select max(captcha) as cnt from public.ss_user_log WHERE time_input::date = now()::date {0};", sParam);
+                    //var res = conn.ExecuteScalar(sqlQuery.ToString());
+                    sqlQuery.AppendFormat(@"select max(captcha) as cnt from public.ss_user_log 
+                                WHERE   time_input::date = @TimeInput 
+                                 AND    ip_address = @IpAddress
+                                 AND    is_fraud = 'true'
+                                 AND    captcha = @captcha;");
+                    var res = conn.ExecuteScalar(sqlQuery.ToString(), new { IpAddress = IpAddress, TimeInput = DateTime.Now.Date, captcha = Captcha });
                     result = res == null ? result : res.ToString();
 
 
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return result;
+        }
+
+        public bool UpdateCaptchaLog(string IpAddress)
+        {
+            bool result = false;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = @"Update public.ss_user_log
+                                        SET captcha = ''
+                                    WHERE   time_input::date = @TimeInput 
+                                     AND    ip_address = @IpAddress
+                                     AND    is_fraud = 'true';";
+                try
+                {
+                    conn.Open();
+                    conn.Execute(sqlQuery, new { IpAddress = IpAddress, TimeInput = DateTime.Now.Date });
+                    result = true;
                 }
                 catch (Exception ex)
                 {
@@ -325,18 +421,21 @@ namespace Acc.Api.DataAccess
             return result;
         }
 
-        public bool DeleteUserLog(string sParam)
+        public bool DeleteUserLog(string IpAddress, string Captcha)
         {
             bool result = false;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
+                //sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
                 string sqlQuery = string.Format(@"DELETE from ss_user_log
-                                    WHERE time_input::date = now()::date {0} ;", sParam);
+                                            WHERE   time_input::date = @TimeInput 
+                                             AND    ip_address = @IpAddress
+                                             AND    is_fraud = 'true'
+                                             AND    captcha != @captcha;");
                 try
                 {
                     conn.Open();
-                    conn.Execute(sqlQuery);
+                    conn.Execute(sqlQuery, new { IpAddress = IpAddress, TimeInput = DateTime.Now.Date, captcha = Captcha });
                     result = true;
                 }
                 catch (Exception ex)
@@ -350,18 +449,23 @@ namespace Acc.Api.DataAccess
             }
             return result;
         }
-        public bool UpdateUserLogisFraud(string sParam)
+        public bool UpdateUserLogisFraud(string IpAddress, string Captcha)
         {
             bool result = false;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
-                string sqlQuery = string.Format(@"UPDATE ss_user_log set is_fraud='false', time_edit = now()::timestamp without time zone 
-                                    WHERE time_input::date = now()::date {0} ;", sParam);
+                //sParam = !string.IsNullOrEmpty(sParam) ? " AND " + sParam : string.Empty;
+                string sqlQuery = string.Format(@"UPDATE ss_user_log 
+                                                    set     is_fraud='false', 
+                                                            time_edit = @TimeEdit 
+                                                WHERE   time_input::date = @TimeInput 
+                                             AND    ip_address = @IpAddress
+                                             AND    is_fraud = 'true'
+                                             AND    captcha = @captcha;");
                 try
                 {
                     conn.Open();
-                    conn.Execute(sqlQuery);
+                    conn.Execute(sqlQuery, new { IpAddress = IpAddress, TimeInput = DateTime.Now.Date, captcha = Captcha, TimeEdit = DateTime.Now });
                     result = true;
                 }
                 catch (Exception ex)
@@ -447,6 +551,34 @@ namespace Acc.Api.DataAccess
                 {
                     conn.Open();
                     conn.Execute(sqlQuery, new { ss_user_id = ss_user_id, Passwrod = Pwd });
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return result;
+        }
+        public bool UpdatePortfolio(int PortfolioId, string UserId)
+        {
+            bool result = false;
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = @"UPDATE 
+                                      ss_user
+                                    SET
+                                      portfolio_id = @portfolio_id
+                                    WHERE user_id = @user_id
+                                    ;";
+                try
+                {
+                    conn.Open();
+                    conn.Execute(sqlQuery, new { user_id = UserId, portfolio_id = PortfolioId });
                     result = true;
                 }
                 catch (Exception ex)

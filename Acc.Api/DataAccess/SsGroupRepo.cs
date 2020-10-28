@@ -21,7 +21,7 @@ namespace Acc.Api.DataAccess
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
         }
-        public object GetMenuJson(int? portfolio_id, int? group_id)
+        public object GetMenuJson(int? portfolio_id, int? group_id, string group_access)
         {
             object _result = new object();
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -47,7 +47,7 @@ namespace Acc.Api.DataAccess
                     {
                         Parameters.Add("p_ss_portfolio_id", portfolio_id, dbType: DbType.Int32);
                     }
-
+                    Parameters.Add("p_group_access", group_access);
 
                     var dd = conn.Query<dynamic>("get_menu_json_group", Parameters, commandType: CommandType.StoredProcedure);
                     //var dd = conn.Query<dynamic>("get_menu_json", Parameters, commandType: CommandType.StoredProcedure);
@@ -68,6 +68,58 @@ namespace Acc.Api.DataAccess
         public bool Delete(int key, int timestamp)
         {
             throw new NotImplementedException();
+        }
+        public bool DeleteButtonGroup(int PortfolioId, int GroupID)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_group_id", GroupID, dbType: DbType.Int32);
+                    var dd = conn.Query<dynamic>("fss_group_menu_button_access_d", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool DeleteDashboardGroup(int PortfolioId, int GroupID)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);
+                    Parameters.Add("p_ss_group_id", GroupID, dbType: DbType.Int32);
+                    var dd = conn.Query<dynamic>("fss_group_menu_dashboard_d_group", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
         }
         public bool DeleteDetail(int portfolioId, int group_id)
         {
@@ -114,12 +166,15 @@ namespace Acc.Api.DataAccess
                 ChatID _result = new ChatID();
                 try
                 {
+                    Model.group_access = string.IsNullOrEmpty(Model.group_access) ? Model.user_type : Model.group_access;
                     conn.Open();
                     DynamicParameters Parameters = new DynamicParameters();
                     Parameters.Add("p_ss_portfolio_id", Model.ss_portfolio_id, dbType: DbType.Int32);
                     Parameters.Add("p_descs", Model.descs);
                     Parameters.Add("p_short_descs", Model.short_descs);
                     Parameters.Add("p_user_type", Model.user_type);
+                    Parameters.Add("p_dashboard_url", Model.dashboard_url);
+                    Parameters.Add("p_group_access", Model.group_access);
                     Parameters.Add("p_user_input", Model.user_input);
                     _result = conn.Query<ChatID>("fss_group_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
@@ -170,12 +225,12 @@ namespace Acc.Api.DataAccess
             }
         }
 
-        public object SelectScalar(SQL.Function.Aggregate function, string column,string ParamWhere)
+        public object SelectScalar(SQL.Function.Aggregate function, string column, string ParamWhere)
         {
             object _result = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                ParamWhere = string.IsNullOrEmpty(ParamWhere) ? string.Empty : "WHERE "+ ParamWhere;
+                ParamWhere = string.IsNullOrEmpty(ParamWhere) ? string.Empty : "WHERE " + ParamWhere;
                 StringBuilder sbQuery = new StringBuilder();
                 switch (function)
                 {
@@ -233,6 +288,8 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_descs", domain.descs, dbType: DbType.String);
                     Parameters.Add("p_short_descs", domain.short_descs, dbType: DbType.String);
                     Parameters.Add("p_user_type", domain.user_type, dbType: DbType.String);
+                    Parameters.Add("p_dashboard_url", domain.dashboard_url);
+                    Parameters.Add("p_group_access", domain.group_access);
                     Parameters.Add("p_lastupdatestamp", domain.lastupdatestamp, dbType: DbType.Int32);
                     Parameters.Add("p_user_edit", domain.user_edit);
                     var dd = conn.Query<dynamic>("fss_group_u", Parameters, commandType: CommandType.StoredProcedure).ToList();

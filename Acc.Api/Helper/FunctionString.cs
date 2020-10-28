@@ -1443,6 +1443,40 @@ namespace Acc.Api.Helper
                 }
             }
 
+            if (data.ToLower().Contains("ss_group_id"))
+            {
+                valStrEncrypt = this.getString(data, "ss_group_id='", "'");
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_group_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_group_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "ss_group_id!='", "'") : valStrEncrypt;
+                if (isBase64(valStrEncrypt))
+                {
+                    valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
+                }
+
+                if (!string.IsNullOrEmpty(valStrDecrypt))
+                    data = data.Replace(valStrEncrypt, valStrDecrypt);
+
+                valStrDecrypt = string.Empty;
+            }
+
+            if (data.ToLower().Contains("group_id"))
+            {
+                valStrEncrypt = this.getString(data, "group_id='", "'");
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "group_id='", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "group_id<>'", "'") : valStrEncrypt;
+                valStrEncrypt = string.IsNullOrEmpty(valStrEncrypt) ? this.getString(data, "group_id!='", "'") : valStrEncrypt;
+                if (isBase64(valStrEncrypt))
+                {
+                    valStrDecrypt = EncryptionLibrary.DecryptText(valStrEncrypt);
+                }
+
+                if (!string.IsNullOrEmpty(valStrDecrypt))
+                    data = data.Replace(valStrEncrypt, valStrDecrypt);
+
+                valStrDecrypt = string.Empty;
+            }
+
             if (data.ToLower().Contains("ss_portfolio_id"))
             {
                 valStrEncrypt = this.getString(data, "ss_portfolio_id='", "'");
@@ -1593,9 +1627,9 @@ namespace Acc.Api.Helper
                 DisplayLookup = "concat(";
                 for (int x = 0; x < Displays.Length; x++)
                 {
-                    DisplayLookup += string.Format("{0}::varchar,'|',", Displays[x]);
+                    DisplayLookup += string.Format("{0}::varchar,' | ',", Displays[x]);
                 }
-                DisplayLookup = !string.IsNullOrEmpty(DisplayLookup) ? DisplayLookup.Remove(DisplayLookup.LastIndexOf(",'|',")) : DisplayLookup;
+                DisplayLookup = !string.IsNullOrEmpty(DisplayLookup) ? DisplayLookup.Remove(DisplayLookup.LastIndexOf(",' | ',")) : DisplayLookup;
                 DisplayLookup += ")";
 
                 for (int i = 0; i < FieldLookups.Length; i++)
