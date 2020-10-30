@@ -14,10 +14,12 @@ namespace Acc.Api.Services
     {
         private FunctionString fn;
         private ChatSenderRepo chatRepo;
+        private UserFCMRepo userFcmRepo;
         public ChatSenderService(IConfiguration configuration)
         {
             fn = new FunctionString(Tools.ConnectionString(configuration));
             chatRepo = new ChatSenderRepo(Tools.ConnectionString(configuration));
+            userFcmRepo = new UserFCMRepo(Tools.ConnectionString(configuration));
         }
 
         public Output GetAllChat(ChatSender Model)
@@ -76,6 +78,7 @@ namespace Acc.Api.Services
                     ObjOutput.Add("user_ids", user_ids);
                     ObjOutput.Add("row_id", HeaderId);
                     ObjOutput.Add("chat", dataChat);
+                    ObjOutput.Add("your_id", Model.user_id_to);
                     ObjOutput.Add("is_admin", is_admin);
                     _result.Data = ObjOutput;
                 }
@@ -87,7 +90,7 @@ namespace Acc.Api.Services
             }
             return _result;
         }
-        public Output GetChat(int id, string user_id)
+        public async Task<Output> GetChatAsync(int id, string user_id)
         {
             Output _result = new Output();
             Dictionary<string, object> ObjOutput = new Dictionary<string, object>();
@@ -134,7 +137,15 @@ namespace Acc.Api.Services
                 ObjOutput.Add("row_id", id);
                 ObjOutput.Add("chat", dtList);
                 ObjOutput.Add("is_admin", is_admin);
+                ObjOutput.Add("your_id", user_id);
                 _result.Data = ObjOutput;
+
+                List<string> FCMToken = new List<string>();
+                string[] TOkens = new string[1];
+                TOkens[0] = "dbjfJKXWQw4dFm_cOByI-R:APA91bFlNjxf1N6uvnAwehIDEz276qOPvgU8yWB3CIGwd2LiqqZI17jr_TsHz5NiSlvxfhQNWa5Wx-F8TwNMSTQxc662Za_HhVqe2nGtI3hXAqxP7ODzGHMrw7b5HkgPc10FwfPWRF6N";
+
+                //var dd = await SendingPushNotifications.SendPushNotification(TOkens, "Tes message", "ini adalah body", _result.Data);
+                //var dtd = await SendingPushFCM.SendPushNotification2(TOkens, "Tes message FCM", "ini adalah body FCM", _result.Data);
             }
             catch (Exception ex)
             {
@@ -176,7 +187,7 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        public Output RemoveUser(int ID,string UserRemove)
+        public Output RemoveUser(int ID, string UserRemove)
         {
             Output _result = new Output();
             try
@@ -225,9 +236,9 @@ namespace Acc.Api.Services
                 foreach (string UserID in AddUsers)
                 {
                     string user_id = fn.DecryptString(UserID);
-                    _result.Data  = chatRepo.AddUser(ID, user_id);
+                    _result.Data = chatRepo.AddUser(ID, user_id);
                 }
-                
+
 
                 //_result.Data = chatRepo.RemoveUser(ID, AddUser);
             }
@@ -238,7 +249,7 @@ namespace Acc.Api.Services
             return _result;
         }
 
-        public Output SendChat(ChatDetail Model)
+        public async Task<Output> SendChatAsync(ChatDetail Model)
         {
             Output _result = new Output();
             try
@@ -252,26 +263,31 @@ namespace Acc.Api.Services
                 // check header
                 var dataHedaer = chatRepo.GetDataHeader(Model.ss_chat_h_id);
 
-                var ddd = dataHedaer.user_id_to.Split(",").ToList();
-                ddd.Remove(Model.user_id_from);
-                Model.user_id_to = string.Join(",", ddd);
-                Model.ss_chat_attachment_id = null;
-                var _ret = chatRepo.SendChat(Model);
+                
                 //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
                 //List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
                 List<ChatListUser> Users = chatRepo.GetDataUserList(Model.ss_chat_h_id, Tools.PortfolioId);// dataHedaer.user_id_to.Split(",").ToList();
 
-                if (!Users.Any(a=>a.user_id == Model.user_id_from))
+                if (!Users.Any(a => a.user_id == Model.user_id_from))
                 {
                     throw new Exception("You cant's send message because you're no longer participant.");
                 }
 
+                #region save detail chat
+                var ddd = Users.Where(w => w.user_id != Model.user_id_from).Select(s => s.user_id).ToList();
+                Model.user_id_to = string.Join(",", ddd);
+                Model.ss_chat_attachment_id = null;
+                var _ret = chatRepo.SendChat(Model);
+                #endregion                
+
+
                 string user_ids = string.Empty;
                 Users.ForEach(delegate (ChatListUser dt)
                 {
-                  
+
                     if (Model.user_id_from != dt.user_id)
                     {
+                        
                         ChatDetail dtDetail = new ChatDetail();
                         dtDetail.ss_chat_d_id = _ret.row_id;
                         dtDetail.user_id_from = Model.user_id_from;
@@ -279,10 +295,24 @@ namespace Acc.Api.Services
                         dtDetail.user_input = Model.user_input;
                         chatRepo.SendChatRead(dtDetail);
                     }
-                    
+
                 });
 
-             
+                #region send to fcm
+                var DataUserFCM = userFcmRepo.GetList(Model.ss_chat_h_id, Model.user_id_from);
+
+                if (DataUserFCM.Count > 0)
+                {
+                    //string[] Tokens = new string[DataUserFCM.Count];
+                    var chatNotif = userFcmRepo.GetSumChatNotif(Tools.PortfolioId, Tools.UserId);
+                    var Tokens = DataUserFCM.Select(s => s.fcm_token).ToArray();
+                    var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.chat_text, chatNotif);
+                }
+                #endregion
+
+
+
+
                 _result.Message = "Success.";
             }
             catch (Exception ex)
@@ -300,7 +330,10 @@ namespace Acc.Api.Services
                 var AttachID = chatRepo.SendAttachment(Model);
 
                 ChatDetail SendChat = new ChatDetail();
-                
+
+                // check header
+                var dataHedaer = chatRepo.GetDataHeader(Model.ss_chat_h_id);
+
                 //string User = dataHedaer.user_id_to + "," + dataHedaer.user_id_from;
                 //List<string> Users = dataHedaer.user_id_to.Split(",").ToList();
                 List<ChatListUser> Users = chatRepo.GetDataUserList(Model.ss_chat_h_id, Tools.PortfolioId);// dataHedaer.user_id_to.Split(",").ToList();
@@ -322,7 +355,6 @@ namespace Acc.Api.Services
                     throw new Exception("You cant's send message because you're no longer participant.");
                 }
 
-                string user_ids = string.Empty;
                 Users.ForEach(delegate (ChatListUser dt)
                 {
 
@@ -337,6 +369,19 @@ namespace Acc.Api.Services
                     }
 
                 });
+
+                #region send to fcm
+                var DataUserFCM = userFcmRepo.GetList(Model.ss_chat_h_id, Tools.UserId);
+
+                if (DataUserFCM.Count > 0)
+                {
+                    //string[] Tokens = new string[DataUserFCM.Count];
+                    var chatNotif = userFcmRepo.GetSumChatNotif(Tools.PortfolioId, Tools.UserId);
+                    var Tokens = DataUserFCM.Select(s => s.fcm_token).ToArray();
+                    var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.file_name, chatNotif);
+                }
+                #endregion
+
 
             }
             catch (Exception ex)

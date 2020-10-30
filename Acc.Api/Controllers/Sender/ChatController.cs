@@ -130,12 +130,12 @@ namespace Acc.Api.Controllers.Sender
         [HttpPost]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult Send(ChatDetail Model)
+        public async Task<IActionResult> SendAsync(ChatDetail Model)
         {
             var output = new Output();
             try
             {
-                output = chatService.SendChat(Model);
+                output =await chatService.SendChatAsync(Model);
             }
             catch (Exception ex)
             {
@@ -155,12 +155,12 @@ namespace Acc.Api.Controllers.Sender
         [HttpGet]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetChat(int id, string user_id)
+        public async Task<IActionResult> GetChat(int id, string user_id)
         {
             var output = new Output();
             try
             {
-                output = chatService.GetChat(id, user_id);
+                output = await chatService.GetChatAsync(id, user_id);
             }
             catch (Exception ex)
             {

@@ -14,5 +14,6 @@ namespace Acc.Api.Models
         public string PassLog { get; set; }
         public string Device { get; set; }
         public string Captcha { get; set; }
+        public string TokenFCM { get; set; }
     }
 }

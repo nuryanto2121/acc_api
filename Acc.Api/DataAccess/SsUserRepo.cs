@@ -139,6 +139,7 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
+        
         public bool DeleteButtonUser(int PortfolioId, string UserId)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))

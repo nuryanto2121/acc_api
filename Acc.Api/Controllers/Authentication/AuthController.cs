@@ -14,6 +14,7 @@ using Acc.Api.Models;
 using Acc.Api.Services;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Hosting;
+using Acc.Api.Authorize;
 
 namespace Acc.Api.Controllers
 {
@@ -112,7 +113,8 @@ namespace Acc.Api.Controllers
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
-        [AllowAnonymous]
+        //[AllowAnonymous]
+        [APIAuthorizeAttribute]
         [HttpPost("Auth/Logout")]
         [ProducesResponseType(typeof(Output), 200)]
         public IActionResult Logout(AuthLogin Model)

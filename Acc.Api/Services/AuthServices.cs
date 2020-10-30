@@ -25,6 +25,7 @@ namespace Acc.Api.Services
         IConfiguration config;
         private string _Session_Id;
         private FunctionString fn;
+        private UserFCMRepo userFCMRepo;
         private readonly IEmailService _emailSender;
         private IHostingEnvironment _environment;
         public AuthServices(IConfiguration Configuration, IEmailService EmailSender, IHostingEnvironment environment)
@@ -36,6 +37,7 @@ namespace Acc.Api.Services
             _emailSender = EmailSender;
             config = Configuration;
             _environment = environment;
+            userFCMRepo = new UserFCMRepo(Tools.ConnectionString(Configuration));
         }
 
         public Output ChangePassword(ChangePassword Model)
@@ -171,6 +173,7 @@ namespace Acc.Api.Services
 
                     //dataAuth.pwd = "";
                     //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
+                    userFCMRepo.SaveUserFCM(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()), Model.UserLog, Model.TokenFCM, _Session_Id);
                     var dataSpec = authRepo.GetDataMkSpec(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()));
                     var MenuList = this.menuList(dataAuth);
                     var FavMenu = this.favoriteMenu(dataAuth);
@@ -204,6 +207,7 @@ namespace Acc.Api.Services
                         ObjOutput.Add("Captcha", "");
                     }
                     _result.Data = ObjOutput;// dataAuth;
+                    
                 }
                 else
                 {
@@ -315,6 +319,8 @@ namespace Acc.Api.Services
                 authRepo.DeleteUserSession(UserSession);
 
                 authRepo.UpdateUserLog(Model.UserLog, Tools.GetIpAddress(), Token);
+
+                userFCMRepo.DeleteUserFCM(Token);
 
             }
             catch (Exception ex)

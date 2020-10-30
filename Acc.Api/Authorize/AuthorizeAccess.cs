@@ -121,6 +121,13 @@ namespace Acc.Api.Authorize
                     //if (DateTime.Now > uslog.expire_on)
                     if (DateTime.Now.Date > SessionCreate.Date)
                     {
+                        var UserSession = new UserSession();
+                        UserSession.user_id = Auth.UserLog;
+                        UserSession.token = Token;
+                        UserSession.ip_address = Ip;
+                        _AuthRepor.DeleteUserSession(UserSession);
+
+                        _AuthRepor.UpdateUserLog(Auth.UserLog, Ip, Token);
                         _Message = "Your Session Has Expired";
                         return false;
                     }

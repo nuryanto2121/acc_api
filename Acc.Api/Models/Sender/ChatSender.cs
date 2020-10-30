@@ -99,4 +99,10 @@ namespace Acc.Api.Models
         public string file_type { get; set; }
         public string path_file { get; set; }
     }
+
+    public class ChatNotif
+    {
+        public int v_chat { get; set; }
+        public int v_notif { get; set; }
+    } 
 }
