@@ -306,7 +306,8 @@ namespace Acc.Api.Services
                     //string[] Tokens = new string[DataUserFCM.Count];
                     var chatNotif = userFcmRepo.GetSumChatNotif(Tools.PortfolioId, Tools.UserId);
                     var Tokens = DataUserFCM.Select(s => s.fcm_token).ToArray();
-                    var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.chat_text, chatNotif);
+                    //var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.chat_text, chatNotif);
+                    var dd = await SendingPushFCM.SendPushNotification2(Tokens, dataHedaer.subject, Model.chat_text, chatNotif);
                 }
                 #endregion
 
@@ -378,7 +379,8 @@ namespace Acc.Api.Services
                     //string[] Tokens = new string[DataUserFCM.Count];
                     var chatNotif = userFcmRepo.GetSumChatNotif(Tools.PortfolioId, Tools.UserId);
                     var Tokens = DataUserFCM.Select(s => s.fcm_token).ToArray();
-                    var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.file_name, chatNotif);
+                    //var dd = await SendingPushNotifications.SendPushNotification(Tokens, dataHedaer.subject, Model.file_name, chatNotif);
+                    var dd = await SendingPushFCM.SendPushNotification2(Tokens, dataHedaer.subject, Model.file_name, chatNotif);
                 }
                 #endregion
 

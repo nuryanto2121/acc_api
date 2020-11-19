@@ -216,6 +216,7 @@ namespace Acc.Api.Controllers.Sender
                 }
                 data.Add("path", dbPath);
                 data.Add("name", file.FileName);
+                data.Add("type", fileType);
 
 
                 //}

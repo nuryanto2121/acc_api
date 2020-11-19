@@ -928,6 +928,11 @@ namespace Acc.Api.Services
                     DynamicParameters spParam = new DynamicParameters();
                     var LookUpCd = JModel["LookUpCd"].ToString();
                     var ColumnDB = JModel["ColumnDB"].ToString();
+                    string Sort = string.Empty;
+                    if (JModel["SortField"] != null)
+                    {
+                        Sort = JModel["SortField"].ToString();
+                    }
 
                     var ParamView = JModel["ParamView"] == null ? string.Empty : JModel["ParamView"].ToString();
                     bool isViewFunction = !string.IsNullOrEmpty(ParamView) ? true : false;
@@ -955,7 +960,7 @@ namespace Acc.Api.Services
                     #endregion
 
 
-                    OP.Data = this.QueryList(MvSpName, sWhere, sField: source_field, Limit: "10000");
+                    OP.Data = this.QueryList(MvSpName, sWhere, sField: source_field, Limit: "10000", Sort: Sort);
                 }
                 catch (Exception ex)
                 {
@@ -1082,7 +1087,7 @@ namespace Acc.Api.Services
 
             return op;
         }
-        public List<dynamic> QueryList(string sTable, string sParameter, string sField = "", string Limit = "")
+        public List<dynamic> QueryList(string sTable, string sParameter, string sField = "", string Limit = "",string Sort = "")
         {
             List<dynamic> op = null;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
@@ -1095,6 +1100,10 @@ namespace Acc.Api.Services
                     StringBuilder sQuery = new StringBuilder();
                     sQuery.AppendFormat("SELECT distinct {0} FROM {1} ", sField, sTable);
                     sQuery.AppendFormat(" {0} ", sParameter);
+                    if (!string.IsNullOrEmpty(Sort))
+                    {
+                        sQuery.AppendFormat(" ORDER BY {0} ", Sort);
+                    }
                     if (!string.IsNullOrEmpty(Limit))
                     {
                         sQuery.AppendFormat(" LIMIT {0}; ", Limit);

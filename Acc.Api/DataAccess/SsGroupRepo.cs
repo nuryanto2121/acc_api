@@ -50,9 +50,7 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_group_access", group_access);
 
                     var dd = conn.Query<dynamic>("get_menu_json_group", Parameters, commandType: CommandType.StoredProcedure);
-                    //var dd = conn.Query<dynamic>("get_menu_json", Parameters, commandType: CommandType.StoredProcedure);
                     _result = dd;
-                    //result = conn.Execute(sqlQuery, new { ss_menu_id = key });
                 }
                 catch (Exception ex)
                 {
@@ -159,11 +157,11 @@ namespace Acc.Api.DataAccess
             throw new NotImplementedException();
         }
 
-        public ChatID SaveHeader(SsGroup Model)
+        public RowID SaveHeader(SsGroup Model)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                ChatID _result = new ChatID();
+                RowID _result = new RowID();
                 try
                 {
                     Model.group_access = string.IsNullOrEmpty(Model.group_access) ? Model.user_type : Model.group_access;
@@ -176,7 +174,7 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_dashboard_url", Model.dashboard_url);
                     Parameters.Add("p_group_access", Model.group_access);
                     Parameters.Add("p_user_input", Model.user_input);
-                    _result = conn.Query<ChatID>("fss_group_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    _result = conn.Query<RowID>("fss_group_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
                 }
                 catch (Exception ex)

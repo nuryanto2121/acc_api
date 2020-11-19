@@ -15,39 +15,59 @@ namespace Acc.Api.Services
         //var defaultApp = FirebaseApp.Create(new AppOptions(){Credential = GoogleCredential.FromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "key.json")) });
 
         //Console.WriteLine(defaultApp.Name); // "[DEFAULT]"
-        public static async Task<bool> SendPushNotification2(string[] deviceTokens, string title, string body, object data)
+        public static async Task<bool> SendPushNotification2(string[] deviceTokens, string title, string body, Models.ChatNotif data)
         {
-            var pathFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Key-FCM.json");
-            var defaultApp = FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.FromFile(pathFile),
-            });
-            Console.WriteLine(defaultApp.Name); // "[DEFAULT]"
             bool sent = false;
-            var message = new Message()
+            try
             {
-                Data = new Dictionary<string, string>()
+                var pathFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Key-FCM.json");
+                AppOptions options = new AppOptions();
+                options.Credential = GoogleCredential.FromFile(pathFile);
+                var dd = FirebaseApp.DefaultInstance;
+                if (dd == null)
                 {
-                    ["FirstName"] = "John",
-                    ["LastName"] = "Doe"
-                },
-                //Data = data,
-                Notification = new Notification
-                {
-                    Title = title,
-                    Body = body
-                },
+                    var defaultApp = FirebaseApp.Create(options);
+                    Console.WriteLine(defaultApp.Name); // "[DEFAULT]"
+                }
 
-                //Token = "d3aLewjvTNw:APA91bE94LuGCqCSInwVaPuL1RoqWokeSLtwauyK-r0EmkPNeZmGavSG6ZgYQ4GRjp0NgOI1p-OAKORiNPHZe2IQWz5v1c3mwRE5s5WTv6_Pbhh58rY0yGEMQdDNEtPPZ_kJmqN5CaIc",
-                Topic = "news",
+
+
+                //var defaultApp = FirebaseApp.Create(new AppOptions()
+                //{
+                //    Credential = GoogleCredential.FromFile(pathFile),
+                //});
                 
-                //Token = "dbjfJKXWQw4dFm_cOByI-R:APA91bFlNjxf1N6uvnAwehIDEz276qOPvgU8yWB3CIGwd2LiqqZI17jr_TsHz5NiSlvxfhQNWa5Wx-F8TwNMSTQxc662Za_HhVqe2nGtI3hXAqxP7ODzGHMrw7b5HkgPc10FwfPWRF6N",
-                Token = "AAAAiH5N7BY:APA91bEYAyJ9tMvG56c-XTW90V1sxcBhNxeNCs_z_S9YvSnHzZVPIz9BrhT8EOMRp2wvgec6acLpZlE915i0H0UUQe8vX8MsJxLoAOihzLB4ro5-EJhOsAz0jqXMk9cG27wnWCsPD0x_"
 
-            };
-            var messaging = FirebaseMessaging.DefaultInstance;
-            var result = await messaging.SendAsync(message);
-            Console.WriteLine(result); //projects/myapp/messages/2492588335721724324
+                var message = new MulticastMessage()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        ["v_chat"] = data.v_chat.ToString(),
+                        ["v_notif"] = data.v_notif.ToString()
+                    },
+                    //Data = data,
+                    Notification = new Notification
+                    {
+                        Title = title,
+                        Body = body
+                    },
+
+                    //Token = "d3aLewjvTNw:APA91bE94LuGCqCSInwVaPuL1RoqWokeSLtwauyK-r0EmkPNeZmGavSG6ZgYQ4GRjp0NgOI1p-OAKORiNPHZe2IQWz5v1c3mwRE5s5WTv6_Pbhh58rY0yGEMQdDNEtPPZ_kJmqN5CaIc",
+                    //Topic = "news",
+
+                    Tokens = deviceTokens,//"/RLW7i95EwlV2CkyUNVcanlcBvv228ijPVsG1Nydf/GNhmnWMjGnzsMO8hZ+suQuJVYlGwoVSo5+EyjlcD5+WQ7Z7pszBNf2CiiSHnuWKnkWIMLN4XRqAHtabaLnwXxW43+qISFCz1XcYd3kmC+LmEZY6AEJDORA4uTvIvuBP2qqGn5QLD6QjEDzRyWFa0I29wY925Yf09c7KEgQklXlgw==",
+                                          //Token = "AAAAiH5N7BY:APA91bEdnKW3WPk7IqQa6gxvMLYoA6loRA8VtFHPfGHlXB2agrfrBGYep9UBRBXvRCyshBYmyJe0rVkhokELKTJmo6P5r91w9SS-XqbI6PW10wzCfcdoy28vWMnOEnZeyVO_1yRH58aO"
+
+                };
+                var messaging = FirebaseMessaging.DefaultInstance;
+                var result = await messaging.SendMulticastAsync(message);
+                Console.WriteLine(result); //projects/myapp/messages/2492588335721724324
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
 
             return sent;
         }

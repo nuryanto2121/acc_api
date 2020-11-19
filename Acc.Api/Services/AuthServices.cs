@@ -173,7 +173,11 @@ namespace Acc.Api.Services
 
                     //dataAuth.pwd = "";
                     //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
-                    userFCMRepo.SaveUserFCM(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()), Model.UserLog, Model.TokenFCM, _Session_Id);
+                    if (!string.IsNullOrEmpty(Model.TokenFCM))
+                    {
+                        userFCMRepo.SaveUserFCM(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()), Model.UserLog, Model.TokenFCM, _Session_Id);
+                    }
+                    
                     var dataSpec = authRepo.GetDataMkSpec(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()));
                     var MenuList = this.menuList(dataAuth);
                     var FavMenu = this.favoriteMenu(dataAuth);
@@ -191,7 +195,9 @@ namespace Acc.Api.Services
                     DataUser.Add("portfolio_short_name", dataAuth.Rows[0]["portfolio_short_name"].ToString());
                     DataUser.Add("portfolio_name", dataAuth.Rows[0]["portfolio_name"].ToString());
                     DataUser.Add("phone_country_code", dataSpec.Rows[0]["phone_country_code"].ToString());
-                    
+                    DataUser.Add("gps_token", dataAuth.Rows[0]["gps_token"].ToString());
+                    DataUser.Add("gps_map_token", dataAuth.Rows[0]["gps_map_token"].ToString());
+
                     ObjOutput.Add("data_user", DataUser);
                     ObjOutput.Add("token", _Session_Id);
                     ObjOutput.Add("idle", config.GetValue<int>("appSetting:IdleWeb"));

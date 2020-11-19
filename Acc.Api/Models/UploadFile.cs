@@ -38,6 +38,15 @@ namespace Acc.Api.Models
         public IFormFile file_portin { get; set; }
         //public ICollection<IFormFile> images { get; set; }
     }
+    public class MGenPDF
+    {
+        [Required]
+        public string Subject { get; set; }
+        [Required]
+        public string BodyHTML { get; set; }
+        public string Path { get; set; }
+        public bool IsReplace { get; set; }
+    }
 
     public class ParamPortIn
     {

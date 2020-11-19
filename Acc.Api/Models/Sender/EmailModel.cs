@@ -14,6 +14,8 @@ namespace Acc.Api.Models
         public string to { get; set; }
         public string cc { get; set; }
         public string subject { get; set; }
+        public string attachment_string { get; set; }
+        public string path_attachment { get; set; }
         public string body { get; set; }
         public string doc_type { get; set; }
         public string doc_no { get; set; }

@@ -815,12 +815,14 @@ namespace Acc.Api.Helper
                                 if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                                 {
                                     //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
 
                                 }
                                 else if (data.data_type.ToLower() == "date")
                                 {
-                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                 }
                                 else
                                 {
@@ -841,12 +843,14 @@ namespace Acc.Api.Helper
                                             {
                                                 string[] stF = dfColumn[x].Split("AS");
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {1},", stF[0], stF[1]);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {1},", stF[0], stF[1]);
                                             }
                                             else
                                             {
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                             }
 
                                         }
@@ -855,12 +859,14 @@ namespace Acc.Api.Helper
                                             if (dfColumn[x].Contains("AS"))
                                             {
                                                 string[] stF = dfColumn[x].Split("AS");
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {1},", stF[0], stF[1]);
                                             }
                                             else
                                             {
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                             }
                                         }
                                         else
@@ -894,12 +900,14 @@ namespace Acc.Api.Helper
                             if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                             {
                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
 
                             }
                             else if (data.data_type.ToLower() == "date")
                             {
-                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                             }
                             else
                             {
@@ -1000,12 +1008,14 @@ namespace Acc.Api.Helper
                                 if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                                 {
                                     //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
 
                                 }
                                 else if (data.data_type.ToLower() == "date")
                                 {
-                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                    sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                 }
                                 else
                                 {
@@ -1026,12 +1036,14 @@ namespace Acc.Api.Helper
                                             {
                                                 string[] stF = dfColumn[x].Split("AS");
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {1},", stF[0], stF[1]);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {1},", stF[0], stF[1]);
                                             }
                                             else
                                             {
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                             }
 
                                         }
@@ -1040,12 +1052,14 @@ namespace Acc.Api.Helper
                                             if (dfColumn[x].Contains("AS"))
                                             {
                                                 string[] stF = dfColumn[x].Split("AS");
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {1},", stF[0], stF[1]);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {1},", stF[0], stF[1]);
                                             }
                                             else
                                             {
                                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                                             }
                                         }
                                         else
@@ -1066,12 +1080,14 @@ namespace Acc.Api.Helper
                             if (data.data_type.ToLower().Contains("timestamp") || data.data_type.ToLower() == "datetime")
                             {
                                 //sFieldQuery += string.Format("TO_CHAR({0}, 'DD/MM/YYYY HH24:MI') as {0},", data.column_name);
-                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
 
                             }
                             else if (data.data_type.ToLower() == "date")
                             {
-                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                //sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd/mm/yyyy') as {0},", data.column_name);
+                                sFieldQuery += string.Format("TO_CHAR({0} :: DATE, 'dd Mon yyyy') as {0},", data.column_name);
                             }
                             else
                             {

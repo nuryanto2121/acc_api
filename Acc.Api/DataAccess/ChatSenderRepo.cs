@@ -315,11 +315,11 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
-        public ChatID SendChat(ChatDetail Model)
+        public RowID SendChat(ChatDetail Model)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                ChatID _result = new ChatID();
+                RowID _result = new RowID();
                 try
                 {
                     conn.Open();
@@ -332,7 +332,7 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_is_file", Model.is_file);
                     Parameters.Add("p_ss_chat_attachment_id", Model.ss_chat_attachment_id);                    
                     Parameters.Add("p_user_input", Model.user_input);
-                    _result = conn.Query<ChatID>("fss_chat_d_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    _result = conn.Query<RowID>("fss_chat_d_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
                 }
                 catch (Exception ex)
@@ -347,11 +347,11 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
-        public ChatID SendAttachment(ChatAttachment Model)
+        public RowID SendAttachment(ChatAttachment Model)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
-                ChatID _result = new ChatID();
+                RowID _result = new RowID();
                 try
                 {
                     conn.Open();
@@ -362,7 +362,7 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_file_type", Model.file_type);
                     Parameters.Add("p_path_file", Model.path_file);
                     Parameters.Add("p_user_input", Tools.UserId);
-                    _result =  conn.Query<ChatID>("fss_chat_attachment_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    _result =  conn.Query<RowID>("fss_chat_attachment_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
                 }
                 catch (Exception ex)

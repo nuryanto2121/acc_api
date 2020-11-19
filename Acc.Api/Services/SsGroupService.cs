@@ -81,6 +81,7 @@ namespace Acc.Api.Services
                 SsGroupRepo.DeleteButtonGroup(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
                 SsGroupRepo.DeleteDashboardGroup(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
                 SsGroupRepo.DeleteDetail(Model.DataHeader.ss_portfolio_id, Model.DataHeader.ss_group_id);
+
                 Model.DataDetail.ForEach(delegate (SsMenuGroup dt)
                 {
                     dt.ss_portfolio_id = Model.DataHeader.ss_portfolio_id;

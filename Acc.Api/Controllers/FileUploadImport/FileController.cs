@@ -73,6 +73,7 @@ namespace Acc.Api.Controllers.FileUploadImport
                 }
                 data.Add("path", dbPath);
                 data.Add("name", file.FileName);
+                data.Add("type", fileType);
 
 
                 //}
@@ -291,6 +292,44 @@ namespace Acc.Api.Controllers.FileUploadImport
             }
 
             return File(stream, "application/octet-stream", fileNames); // returns a FileStreamResult
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        [HttpPost("GenPDF")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public async Task<IActionResult> GenPDF([FromBody] MGenPDF Model)
+        {
+            var _result = new Output();
+            try
+            {
+                Dictionary<string, string> data = new Dictionary<string, string>();
+                string AttachPath = string.Empty;
+                if (!string.IsNullOrEmpty(Model.BodyHTML))
+                {
+                    HtmlToPdfOtn._environment = _environment;
+                    HtmlToPdfOtn.HTML = Model.BodyHTML;
+                    HtmlToPdfOtn.Subject = Model.Subject;
+                    HtmlToPdfOtn.PathSave = Model.Path;
+                    AttachPath = HtmlToPdfOtn.PathPDF();
+                }
+                data.Add("DbPath", HtmlToPdfOtn.DBpath);
+                data.Add("FileName", HtmlToPdfOtn.FileName);
+                _result.Data = data;
+                //_result = await _emailSender.SendEmailAsync(Model);
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+            }
+            return StatusCode(StatusCodes.Status200OK, _result);
         }
 
         /// <summary>

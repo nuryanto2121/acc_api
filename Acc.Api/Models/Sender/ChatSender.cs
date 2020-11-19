@@ -73,11 +73,11 @@ namespace Acc.Api.Models
         public string path_file { get; set; }
 
     }
-    public class ChatID
+    public class RowID
     {
         public int row_id { get; set; }
 
-        public static implicit operator int(ChatID v)
+        public static implicit operator int(RowID v)
         {
             throw new NotImplementedException();
         }
