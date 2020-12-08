@@ -133,6 +133,12 @@ namespace Acc.Api.Helper
             HttpContextAccessor dd = new HttpContextAccessor();
             return dd.HttpContext.Connection.RemoteIpAddress.ToString();
         }
+        public static string GetUserAgent()
+        {
+            HttpContextAccessor dd = new HttpContextAccessor();
+            var Headers = dd.HttpContext.Request.Headers;
+            return Headers["User-Agent"].ToString();
+        }
         public static Output Error(Exception ex, int statusCode = 500)
         {
             Output op = new Output();

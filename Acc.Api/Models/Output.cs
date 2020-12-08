@@ -12,6 +12,12 @@ namespace Acc.Api.Models
         public object Data { get; set; }
         public string Message { get; set; }
     }
+    public class OutputVendor : BaseEntity
+    {
+        public int ResponseCode { get; set; } = 1;
+        public object Data { get; set; }
+        public string ResponseMsg {get; set; }
+    }
     public class DTResultListDyn<T> : BaseEntity
     {
         public int Total { get; set; }

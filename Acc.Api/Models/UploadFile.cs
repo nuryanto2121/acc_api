@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,20 @@ namespace Acc.Api.Models
         public string modulecd { get; set; }
         public IFormFile images { get; set; }
         //public ICollection<IFormFile> images { get; set; }
+    }
+
+    public class UploadFileInsurance
+    {
+        [Required]
+        //[JsonProperty("vendor_token")]
+        public string vendor_token {get; set;}
+        //[JsonProperty("order_no")]
+        public string order_no {get; set;}
+        //[JsonProperty("insurance_policy_no")]
+        public string insurance_policy_no {get; set;}
+        //[JsonProperty("file_upload")]
+        public IFormFile file_upload {get; set;}
+
     }
 
     public class Attachement

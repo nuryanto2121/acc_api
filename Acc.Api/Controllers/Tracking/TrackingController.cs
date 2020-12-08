@@ -27,16 +27,25 @@ namespace Acc.Api.Controllers.Tracking
         /// 
         /// </summary>
         /// <param name="order_no"></param>
+        /// <param name="captcha"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult ChangePassword([Required] string order_no)
+        public IActionResult GetTracking([Required] string order_no, [Required] string captcha)
         {
             var _result = new Output();
             try
             {
-                _result = trackingService.GetDataTracking(order_no);
+                _result = trackingService.GetDataTracking(order_no, captcha);
+                if (_result.Error)
+                {
+
+                    var except = Tools.ErrStatusCode(_result.Message);
+                    _result.Status = 500;
+                    _result.Message = except.Message;
+                    return StatusCode(except.StatusCode, _result);
+                }
 
             }
             catch (Exception ex)
@@ -46,5 +55,26 @@ namespace Acc.Api.Controllers.Tracking
             return this.Ok(_result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("genCaptcha")]
+        [ProducesResponseType(typeof(Output), 200)]
+        public IActionResult GetCaptcha()
+        {
+            var _result = new Output();
+            try
+            {
+                _result = trackingService.GenCaptcha();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, Tools.Error(ex));
+            }
+            return this.Ok(_result);
+        }
     }
 }

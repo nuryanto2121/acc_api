@@ -20,7 +20,7 @@ namespace Acc.Api.DataAccess
         {
             connectionString = ConnectionString;
             fn = new FunctionString(ConnectionString);
-        }
+        }        
         public bool Delete(int key)
         {
             int result = 0;
