@@ -193,7 +193,7 @@ namespace Acc.Api.DataAccess
             }
         }
 
-        public bool UpdateDefaultDashboard(int PortfolioId, int SsGroupID,string DashboardUrl,string UserInput)
+        public bool UpdateDefaultDashboard(string UserID, string DashboardUrl, string UserInput)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
@@ -202,11 +202,10 @@ namespace Acc.Api.DataAccess
                 {
                     conn.Open();
                     DynamicParameters Parameters = new DynamicParameters();
-                    Parameters.Add("p_ss_portfolio_id", PortfolioId, dbType: DbType.Int32);
-                    Parameters.Add("p_ss_group_id", SsGroupID, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", UserID);
                     Parameters.Add("p_dashboard_url", DashboardUrl);
                     Parameters.Add("p_user_edit", UserInput);
-                    var dd = conn.Query<dynamic>("fss_group_u_dashboard_url", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    var dd = conn.Query<dynamic>("fss_user_u_dashboard_url", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = true;
                 }
                 catch (Exception ex)
@@ -328,7 +327,86 @@ namespace Acc.Api.DataAccess
             }
             return result;
         }
+        public int SaveNew(SsUser domain)
+        {
+            int result = 0;
+            RowID dd = new RowID();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                string sqlQuery = @"INSERT INTO public.ss_user (
+                                        user_id,                ss_group_id,
+                                        user_name,              password,
+                                        email,                  user_level,
+                                        expired_date,           is_inactive,
+                                        job_title,              hand_phone,
+                                        last_change_password,   default_language,
+                                        user_input,             user_edit,
+                                        portfolio_id,           subportfolio_id,
+                                        time_input,             time_edit,
+                                        file_name,              path_file,
+                                        address,                notes
+                                )
+                                VALUES (
+                                      @user_id,                                      @group_id,
+                                      @user_name,                                      @password,
+                                      @email,                                      @user_level,
+                                      @expired_date,                                      @is_inactive,
+                                      @job_title,                                      @hand_phone,
+                                      @last_change_password,                                      @default_language,
+                                      @user_input,                                      @user_edit,
+                                      @portfolio_id,                                      @subportfolio_id,
+                                      @time_input,                                      @time_edit,
+                                      @file_name,                                      @path_file,
+                                      @address,                                         @notes
+                                );
+                        SELECT currval(pg_get_serial_sequence('ss_user', 'ss_user_id'))::integer as row_id;
+";
+                try
+                {
+                    conn.Open();
+                    //conn.Execute(sqlQuery, domain);
+                    dd = conn.Query<RowID>(sqlQuery, domain).FirstOrDefault();
+                    result = dd.row_id;
 
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return result;
+        }
+        public bool InsertUserPorfolio(string UserID, int SsGroupID, string UserInput)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_group_id", SsGroupID, dbType: DbType.Int32);
+                    Parameters.Add("p_user_id", UserID);
+                    Parameters.Add("p_user_input", UserInput);
+                    var dd = conn.Query<dynamic>("fss_user_portfolio_from_group_i", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
         public object SelectScalar(SQL.Function.Aggregate function, string column, string ParamWhere)
         {
             throw new NotImplementedException();

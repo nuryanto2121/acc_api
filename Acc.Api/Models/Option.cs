@@ -37,6 +37,17 @@ namespace Acc.Api.Models
         public DateTime time_edit { get; set; }        
     }
 
+    public class TablePortinFunction
+    {
+        public int ss_table_portin_function_id { get; set;}
+        public string filename { get; set;}
+        public string function_name { get; set;}
+        public string user_input {get; set;}
+        public string user_edit {get; set;}
+        public DateTime time_input { get; set;}
+        public DateTime time_edit { get; set;}
+    }
+
     public class OptionFunction
     {
         public int ss_option_function_id { get; set; }

@@ -22,10 +22,12 @@ namespace Acc.Api.Controllers
     {
         private IDynamicService DynService;
         private readonly HttpContext Context;
+        FunctionString fn;
         public DynamicAPIController(IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             DynService = new DynamicService(configuration);
             Context = contextAccessor.HttpContext;
+            fn = new FunctionString(Tools.ConnectionString(configuration));
         }
 
         /// <summary>
@@ -65,12 +67,14 @@ namespace Acc.Api.Controllers
         [HttpGet]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetById([Required]string option_url, [Required]int line_no, [Required]int id, [Required]int lastupdatestamp)
+        public IActionResult GetById([Required]string option_url, [Required]int line_no, [Required]int id, [Required]string lastupdatestamp)
         {
             var output = new Output();
             try
             {
-                output = DynService.execute(id, lastupdatestamp, line_no, option_url);
+                var ls = fn.DecryptString(lastupdatestamp);
+                
+                output = DynService.execute(id, Convert.ToInt32(ls), line_no, option_url);
             }
             catch (Exception ex)
             {

@@ -92,6 +92,29 @@ namespace Acc.Api.DataAccess
             }
             return op;
         }
+        public TablePortinFunction GetdataTableFunction(string FileName)
+        {
+            TablePortinFunction op = new TablePortinFunction();
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    op = conn.Query<TablePortinFunction>(@"SELECT * FROM public.ss_table_portin_function 
+                                                where  @FileName iLike '%'||filename||'%'", new { FileName = FileName }).FirstOrDefault();
+                    // hati2 ada nama file yg sama dengan filename akan dapat 2 data
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
+            return op;
+        }
         public List<OptionDB> GetList(string OptionUrl)
         {
             List<OptionDB> op = new List<OptionDB>();

@@ -132,12 +132,6 @@ namespace Acc.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            //app.UseSwaggerUI(option =>
-            //{
-            //    option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
-            //});
-
-            // set culture agar format datetime dd/MM/yyyy
             var supportedCultures = new[]
                 {
                    new CultureInfo("en-GB"),

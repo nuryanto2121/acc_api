@@ -7,6 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 using Dapper;
 using Acc.Api.Models;
 using NpgsqlTypes;
@@ -171,6 +172,16 @@ namespace Acc.Api.Helper
                 }
 
                 JObj["portfolio_id"] = ss_portfolio_id;
+            }
+            if (JObj["ss_group_login"] != null)
+            {
+                var ss_group_login = JObj["ss_group_login"].ToString();
+                if (isBase64(JObj["ss_group_login"].ToString()))
+                {
+                    ss_group_login = EncryptionLibrary.DecryptText(JObj["ss_group_login"].ToString());
+                }
+
+                JObj["ss_group_login"] = ss_group_login;
             }
             if (JObj["ss_portfolio_id"] != null)
             {
@@ -473,15 +484,16 @@ namespace Acc.Api.Helper
                                 //return;
                             }
                             else
-                            {
+                            {                                
                                 valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
-                                if (valData.ToString().Contains("."))
+                                var intValue = valData.ToString().Replace(",", "");
+                                if (intValue.Contains("."))
                                 {
-                                    sp.Add("@" + validName, Convert.ToInt32(Convert.ToDecimal(valData.ToString())), dbType: DbType.Int32);
+                                    sp.Add("@" + validName, Convert.ToInt32(Convert.ToDecimal(intValue)), dbType: DbType.Int32);
                                 }
                                 else
                                 {
-                                    sp.Add("@" + validName, Convert.ToInt32(valData.ToString()), dbType: DbType.Int32);
+                                    sp.Add("@" + validName, Convert.ToInt32(intValue), dbType: DbType.Int32);
                                 }
 
                             }
@@ -492,13 +504,14 @@ namespace Acc.Api.Helper
                     {
                         if (valData.ToString().ToLower() == "null")
                         {
-                            sp.Add("@" + validName, null, dbType: DbType.Int32);
+                            sp.Add("@" + validName, null, dbType: DbType.Decimal);
                             //return;
                         }
                         else
-                        {
+                        {                            
                             valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
-                            sp.Add("@" + validName, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
+                            var intValue = valData.ToString().Replace(",", "");
+                            sp.Add("@" + validName, Convert.ToDecimal(intValue), dbType: DbType.Decimal);
                         }
 
                     }
@@ -510,9 +523,10 @@ namespace Acc.Api.Helper
                             //return;
                         }
                         else
-                        {
+                        {                            
                             valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
-                            sp.Add("@" + validName, Convert.ToDecimal(valData.ToString()), dbType: DbType.Int32);
+                            var intValue = valData.ToString().Replace(",", "");
+                            sp.Add("@" + validName, Convert.ToDecimal(intValue), dbType: DbType.Decimal);
                         }
 
                     }
@@ -526,7 +540,8 @@ namespace Acc.Api.Helper
                         else
                         {
                             valData = string.IsNullOrEmpty(valData.ToString()) ? 0 : valData;
-                            sp.Add("@" + validName, Convert.ToInt64(valData.ToString()), dbType: DbType.Int64);
+                            var intValue = valData.ToString().Replace(",", "");
+                            sp.Add("@" + validName, Convert.ToInt64(intValue), dbType: DbType.Int64);
                         }
 
                     }
@@ -773,6 +788,21 @@ namespace Acc.Api.Helper
                 throw ex;
             }
             return sp;
+        }
+        public string sha256_hash(string value)
+        {
+            StringBuilder Sb = new StringBuilder();
+
+            using (SHA256 hash = SHA256Managed.Create())
+            {
+                Encoding enc = Encoding.UTF8;
+                Byte[] result = hash.ComputeHash(enc.GetBytes(value));
+
+                foreach (Byte b in result)
+                    Sb.Append(b.ToString("x2"));
+            }
+
+            return Sb.ToString();
         }
         public string DecryptString(string data)
         {

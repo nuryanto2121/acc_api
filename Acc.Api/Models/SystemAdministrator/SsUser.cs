@@ -41,8 +41,7 @@ namespace Acc.Api.Models
         public int subportfolio_id { get; set; }
         public string file_name { get; set; }
         public string path_file { get; set; }
-
-
+        public string user_type { get; set; }
 
     }
 

@@ -38,7 +38,7 @@ namespace Acc.Api.Services
                 //var message = new MailMessage();
                 MailMessage message = new MailMessage()
                 {
-                    From = new MailAddress(_emailSettings.UsernameEmail, "Beri Hati")
+                    From = new MailAddress(_emailSettings.UsernameEmail, "")
                 };
                 message.To.Add(new MailAddress(mail.to));
 

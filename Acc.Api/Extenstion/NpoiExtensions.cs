@@ -28,11 +28,16 @@ namespace Acc.Api.Extenstion
                                 ICellStyle style = cell.CellStyle;
                                 // Excel uses lowercase m for month whereas .Net uses uppercase
                                 string format = style.GetDataFormatString().Replace('m', 'M');
+                                if (format== "M/d/yy")
+                                {
+                                    format = "dd/MM/yyyy HH:mm:ss";
+                                }
                                 return date.ToString(format);
                             }
                             catch (NullReferenceException)
                             {
-                                return DateTime.FromOADate(cell.NumericCellValue).ToString();
+                                var dt = DateTime.FromOADate(cell.NumericCellValue).ToString("dd/MM/yyyy HH:mm:ss");
+                                return dt;
                             }
                         }
                         else

@@ -94,7 +94,7 @@ namespace Acc.Api.Services
                 UserRepo.DeleteDashboardUser(Convert.ToInt32(Model.portfolio_id), Model.user_id);
                 UserRepo.DeleteButtonUser(Convert.ToInt32(Model.portfolio_id), Model.user_id);
                 UserRepo.DeleteDetailMenu(Convert.ToInt32(Model.portfolio_id), Model.user_id);
-                UserRepo.UpdateDefaultDashboard(Convert.ToInt32(Model.portfolio_id), Convert.ToInt32(Model.group_id), Model.dashboard_url, Model.user_input);
+                UserRepo.UpdateDefaultDashboard(Model.user_id, Model.dashboard_url, Model.user_input);
                 Model.DataDetail.ForEach(delegate (SsMenuUser dt)
                 {
                     dt.ss_portfolio_id = Convert.ToInt32(fn.DecryptString(dt.portfolio_id));
@@ -217,7 +217,13 @@ namespace Acc.Api.Services
                 Model.time_edit = DateTime.Now;
                 Model.user_input = fn.DecryptString(Model.user_input);
                 Model.user_edit = Model.user_input;
-                UserRepo.Save(Model);
+                //UserRepo.Save(Model);
+                Model.ss_user_id = UserRepo.SaveNew(Model);
+
+                if (Model.user_type == "I")
+                {
+                    UserRepo.InsertUserPorfolio(Model.user_id, Convert.ToInt32(Model.ss_group_id), Model.user_input);
+                }
 
                 dataOut.Add("row_id", Model.ss_user_id);
                 _result.Data = dataOut;
@@ -361,6 +367,15 @@ namespace Acc.Api.Services
                 var dataAuth = authRepo.GetDataUser(Model.UserId);
                 if (dataAuth.Rows.Count > 0)
                 {
+                    dataAuth.Rows[0]["portfolio_id"] = Model.SsPortfolioId;
+                    //dataAuth.pwd = "";
+                    //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
+                    var MenuList = authService.menuList(dataAuth);
+                    var FavMenu = authService.favoriteMenu(dataAuth);
+                    if (MenuList.Rows.Count == 0)
+                    {
+                        throw new Exception("Please complete the menu assignment to user");
+                    }
                     var expireDate = DateTime.Now.AddMinutes(config.GetValue<int>("appSetting:TokenExpire"));
                     _Session_Id = Token.GenerateToken(dataAuth, expireDate, Log, Tools.GetIpAddress());
 
@@ -392,11 +407,7 @@ namespace Acc.Api.Services
                     authRepo.SaveUserLog(SsUserLog);
 
 
-                    dataAuth.Rows[0]["portfolio_id"] = Model.SsPortfolioId;
-                    //dataAuth.pwd = "";
-                    //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
-                    var MenuList = authService.menuList(dataAuth);
-                    var FavMenu = authService.favoriteMenu(dataAuth);
+                    
                     dataAuth = fn.DataClearEncrypt(dataAuth);
 
                     DataUser.Add("user_id", dataAuth.Rows[0]["user_id"].ToString());

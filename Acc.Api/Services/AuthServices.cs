@@ -78,6 +78,7 @@ namespace Acc.Api.Services
             Dictionary<string, object> DataUser = new Dictionary<string, object>();
             JObject Captcha = new JObject();
             var dtCaptcha = string.Empty;
+            string UserID = string.Empty;
             _Session_Id = string.Empty;
             try
             {
@@ -101,9 +102,19 @@ namespace Acc.Api.Services
                 var dataAuth = authRepo.GetDataAuth(Model);
                 if (dataAuth.Rows.Count > 0)
                 {
+                    UserID = dataAuth.Rows[0]["user_id"].ToString();
+                }
+                
+                if (dataAuth.Rows.Count == 1)
+                {
                     var expireDate = DateTime.Now.AddMinutes(config.GetValue<int>("appSetting:TokenExpire"));
                     _Session_Id = Token.GenerateToken(dataAuth, expireDate, Model, Tools.GetIpAddress());
-
+                    var MenuList = this.menuList(dataAuth);
+                    var FavMenu = this.favoriteMenu(dataAuth);
+                    if (MenuList.Rows.Count == 0)
+                    {
+                        throw new Exception("Please complete the menu assignment to user");
+                    }
                     if (!string.IsNullOrEmpty(Model.Captcha))
                     {
                         Model.Captcha = EncryptionLibrary.EncryptText(Model.Captcha);
@@ -120,14 +131,14 @@ namespace Acc.Api.Services
                         else
                         {
                             authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
-                            SsUserLog.user_id = Model.UserLog;
+                            SsUserLog.user_id = UserID;
                             SsUserLog.ip_address = Tools.GetIpAddress();
                             SsUserLog.login_date = DateTime.Now;
                             SsUserLog.token = _Session_Id;
                             SsUserLog.is_fraud = true;
                             SsUserLog.captcha = EncryptionLibrary.EncryptText(dtCaptcha);
-                            SsUserLog.user_input = Model.UserLog;
-                            SsUserLog.user_edit = Model.UserLog;
+                            SsUserLog.user_input = UserID;
+                            SsUserLog.user_edit = UserID;
                             SsUserLog.time_input = DateTime.Now;
                             SsUserLog.time_edit = DateTime.Now;
                             authRepo.SaveUserLog(SsUserLog);
@@ -144,13 +155,13 @@ namespace Acc.Api.Services
 
                     // insert user session for authentication
 
-                    UserSession.user_id = Model.UserLog;
+                    UserSession.user_id = UserID;
                     UserSession.expire_on = expireDate;
                     UserSession.token = _Session_Id;
                     UserSession.last_login = DateTime.Now;
                     UserSession.ip_address = Tools.GetIpAddress();
-                    UserSession.user_input = Model.UserLog;
-                    UserSession.user_edit = Model.UserLog;
+                    UserSession.user_input = UserID;
+                    UserSession.user_edit = UserID;
                     UserSession.time_input = DateTime.Now;
                     UserSession.time_edit = DateTime.Now;
                     authRepo.SaveUserSession(UserSession);
@@ -158,13 +169,13 @@ namespace Acc.Api.Services
                     // Insert User Log
                     authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
 
-                    SsUserLog.user_id = Model.UserLog;
+                    SsUserLog.user_id = UserID;
                     SsUserLog.ip_address = Tools.GetIpAddress();
                     SsUserLog.login_date = DateTime.Now;
                     SsUserLog.token = _Session_Id;
                     SsUserLog.is_fraud = false;
-                    SsUserLog.user_input = Model.UserLog;
-                    SsUserLog.user_edit = Model.UserLog;
+                    SsUserLog.user_input = UserID;
+                    SsUserLog.user_edit = UserID;
                     SsUserLog.time_input = DateTime.Now;
                     SsUserLog.time_edit = DateTime.Now;
                     authRepo.SaveUserLog(SsUserLog);
@@ -175,12 +186,11 @@ namespace Acc.Api.Services
                     //dataAuth.user_id = Tools.EncryptString(dataAuth.user_id
                     if (!string.IsNullOrEmpty(Model.TokenFCM))
                     {
-                        userFCMRepo.SaveUserFCM(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()), Model.UserLog, Model.TokenFCM, _Session_Id);
+                        userFCMRepo.SaveUserFCM(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()), UserID, Model.TokenFCM, _Session_Id);
                     }
                     
-                    var dataSpec = authRepo.GetDataMkSpec(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()));
-                    var MenuList = this.menuList(dataAuth);
-                    var FavMenu = this.favoriteMenu(dataAuth);
+                    //var dataSpec = authRepo.GetDataMkSpec(Convert.ToInt32(dataAuth.Rows[0]["portfolio_id"].ToString()));
+                   
                     dataAuth = fn.DataClearEncrypt(dataAuth);
 
                     DataUser.Add("user_id", dataAuth.Rows[0]["user_id"].ToString());
@@ -194,7 +204,7 @@ namespace Acc.Api.Services
                     DataUser.Add("portfolio_id", dataAuth.Rows[0]["portfolio_id"].ToString());
                     DataUser.Add("portfolio_short_name", dataAuth.Rows[0]["portfolio_short_name"].ToString());
                     DataUser.Add("portfolio_name", dataAuth.Rows[0]["portfolio_name"].ToString());
-                    DataUser.Add("phone_country_code", dataSpec.Rows[0]["phone_country_code"].ToString());
+                    DataUser.Add("phone_country_code", dataAuth.Rows[0]["phone_country_code"].ToString()); //disable utk hoonian
                     DataUser.Add("gps_token", dataAuth.Rows[0]["gps_token"].ToString());
                     DataUser.Add("gps_map_token", dataAuth.Rows[0]["gps_map_token"].ToString());
 
@@ -225,14 +235,14 @@ namespace Acc.Api.Services
 
                         if (captcha_db != Model.Captcha)
                         {
-                            SsUserLog.user_id = Model.UserLog;
+                            SsUserLog.user_id = UserID;
                             SsUserLog.ip_address = Tools.GetIpAddress();
                             SsUserLog.login_date = DateTime.Now;
                             SsUserLog.token = _Session_Id;
                             SsUserLog.is_fraud = true;
                             SsUserLog.captcha = EncryptionLibrary.EncryptText(dtCaptcha);
-                            SsUserLog.user_input = Model.UserLog;
-                            SsUserLog.user_edit = Model.UserLog;
+                            SsUserLog.user_input = UserID;
+                            SsUserLog.user_edit = UserID;
                             SsUserLog.time_input = DateTime.Now;
                             SsUserLog.time_edit = DateTime.Now;
                             authRepo.SaveUserLog(SsUserLog);
@@ -245,19 +255,26 @@ namespace Acc.Api.Services
                         }
                     }
                     authRepo.UpdateCaptchaLog(Tools.GetIpAddress());
-                    SsUserLog.user_id = Model.UserLog;
+                    SsUserLog.user_id = UserID;
                     SsUserLog.ip_address = Tools.GetIpAddress();
                     SsUserLog.login_date = DateTime.Now;
                     SsUserLog.token = _Session_Id;
                     SsUserLog.is_fraud = true;
                     SsUserLog.captcha = !string.IsNullOrEmpty(dtCaptcha) ? EncryptionLibrary.EncryptText(dtCaptcha) : "";
-                    SsUserLog.user_input = Model.UserLog;
-                    SsUserLog.user_edit = Model.UserLog;
+                    SsUserLog.user_input = UserID;
+                    SsUserLog.user_edit = UserID;
                     SsUserLog.time_input = DateTime.Now;
                     SsUserLog.time_edit = DateTime.Now;
                     authRepo.SaveUserLog(SsUserLog);
-
-                    _result.Message = "The user name or password is incorrect.^" + StatusCodes.Status401Unauthorized;
+                    if (dataAuth.Rows.Count > 1)
+                    {
+                        _result.Message = "Duplicate Account Please Contact Your Administrator.^" + StatusCodes.Status401Unauthorized;
+                    }
+                    else
+                    {
+                        _result.Message = "The user name or password is incorrect.^" + StatusCodes.Status401Unauthorized;
+                    }
+                    
                     _result.Error = true;
                     _result.Data = Captcha;
                     return _result;

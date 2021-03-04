@@ -55,5 +55,25 @@ namespace Acc.Api.Controllers.FileUploadImport
             return _result;
 
         }
+
+        [HttpPost("New")]
+        [APIAuthorizeAttribute]
+        [ProducesResponseType(typeof(Output), 200)]
+        public async Task<Output> UploadFileNew([FromForm] PortInFile portinFile)
+        //public async Task<IActionResult> UploadFile([FromBody] PortInFile portinFile)
+        {
+            var _result = new Output();
+            try
+            {
+                _result = await PortService.ReadDataExcelToDBNewWithSetting(portinFile);
+            }
+            catch (Exception ex)
+            {
+                //return StatusCode(StatusCodes.Status500InternalServerError, Tools.Error(ex.Message));
+                _result = Tools.Error(ex);
+            }
+            return _result;
+
+        }
     }
 }

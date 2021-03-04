@@ -84,7 +84,7 @@ namespace Acc.Api.Services
                         stream = new MemoryStream(bytes);
 
                         List<JObject> ListOutPut = new List<JObject>();
-                        
+
                         #region Read Extention Driver
                         if (sFileExtension == ".xls")
                         {
@@ -94,7 +94,7 @@ namespace Acc.Api.Services
                             eval = new HSSFFormulaEvaluator(hssfwb);
                         }
                         else
-                        {                            
+                        {
                             XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
                             Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
                             ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
@@ -209,74 +209,74 @@ namespace Acc.Api.Services
             //using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             //using (IDbConnection conn = Tools.DBConnection(connectionString))
             //{
-                #region set variable
-                Output _result = new Output();
-                ss_portfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_portfolio_id));
-                ss_subportfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_subportfolio_id));
-                user_input = fn.DecryptString(portinFile.user_input);
-                IFormFile file = portinFile.file_portin;
-                //string SpName = string.Empty;
-                StringCollection ColumnsHeader = new StringCollection();
-                var stream = new MemoryStream();
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
-                ISheet Settingsheet, ImportSheet;
-                #endregion
-                if (file.Length > 0)
+            #region set variable
+            Output _result = new Output();
+            ss_portfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_portfolio_id));
+            ss_subportfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_subportfolio_id));
+            user_input = fn.DecryptString(portinFile.user_input);
+            IFormFile file = portinFile.file_portin;
+            //string SpName = string.Empty;
+            StringCollection ColumnsHeader = new StringCollection();
+            var stream = new MemoryStream();
+            var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+            string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+            ISheet Settingsheet, ImportSheet;
+            #endregion
+            if (file.Length > 0)
+            {
+
+                using (var ms = new MemoryStream())
                 {
+                    //file.CopyTo(ms);
 
-                    using (var ms = new MemoryStream())
+                    await file.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    string s = Convert.ToBase64String(fileBytes);
+                    byte[] bytes = Convert.FromBase64String(s);
+                    stream = new MemoryStream(bytes);
+
+                    List<JObject> ListOutPut = new List<JObject>();
+
+                    #region Read Extention Driver
+                    if (sFileExtension == ".xls")
                     {
-                        //file.CopyTo(ms);
+                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                        Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
+                        ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
+                        eval = new HSSFFormulaEvaluator(hssfwb);
+                    }
+                    else
+                    {
+                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                        Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
+                        ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
+                        eval = new XSSFFormulaEvaluator(hssfwb);
 
-                        await file.CopyToAsync(ms);
-                        var fileBytes = ms.ToArray();
-                        string s = Convert.ToBase64String(fileBytes);
-                        byte[] bytes = Convert.FromBase64String(s);
-                        stream = new MemoryStream(bytes);
-
-                        List<JObject> ListOutPut = new List<JObject>();
-
-                        #region Read Extention Driver
-                        if (sFileExtension == ".xls")
-                        {
-                            HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                            Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
-                            ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
-                            eval = new HSSFFormulaEvaluator(hssfwb);
-                        }
-                        else
-                        {
-                            XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                            Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
-                            ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
-                            eval = new XSSFFormulaEvaluator(hssfwb);
-
-                        }
-                        #endregion
-
-                        #region Read Storeprocedure
-                        //Get SP Name in Setting Sheet
-                        var cr = new CellReference("B1");
-                        var rows = Settingsheet.GetRow(cr.Row);
-                        var cells = rows.GetCell(cr.Col);
-                        SpName = cells.StringCellValue;
-                        #endregion
-
-                        #region Set Header 
-                        IRow headerRow = ImportSheet.GetRow(0); //Get Header Row
-                                                                //IRow headerRow = ImportSheet.G; //Get Header Row
-                        int cellCount = headerRow.LastCellNum;
-                        //sb.Append("<table class='table table-bordered'><tr>");
-                        for (int j = 0; j < cellCount; j++)
-                        {
-                            NPOI.SS.UserModel.ICell cell = headerRow.GetCell(j);
-                            if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-                            //sb.Append("<th>" + cell.ToString() + "</th>");
-                            ColumnsHeader.Add(cell.ToString());
-                        }
+                    }
                     #endregion
-                    if (SpName=="USER")
+
+                    #region Read Storeprocedure
+                    //Get SP Name in Setting Sheet
+                    var cr = new CellReference("B1");
+                    var rows = Settingsheet.GetRow(cr.Row);
+                    var cells = rows.GetCell(cr.Col);
+                    SpName = cells.StringCellValue;
+                    #endregion
+
+                    #region Set Header 
+                    IRow headerRow = ImportSheet.GetRow(0); //Get Header Row
+                                                            //IRow headerRow = ImportSheet.G; //Get Header Row
+                    int cellCount = headerRow.LastCellNum;
+                    //sb.Append("<table class='table table-bordered'><tr>");
+                    for (int j = 0; j < cellCount; j++)
+                    {
+                        NPOI.SS.UserModel.ICell cell = headerRow.GetCell(j);
+                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                        //sb.Append("<th>" + cell.ToString() + "</th>");
+                        ColumnsHeader.Add(cell.ToString());
+                    }
+                    #endregion
+                    if (SpName == "USER")
                     {
                         ListOutPut = await OutputPortinUser(ImportSheet, ColumnsHeader);
                     }
@@ -284,21 +284,116 @@ namespace Acc.Api.Services
                     {
                         ListOutPut = await OutputPortin(ImportSheet, ColumnsHeader);
                     }
-                    
 
-                        _result.Data = ListOutPut;
-                    }
+
+                    _result.Data = ListOutPut;
                 }
+            }
             if (isError == true)
             {
                 _result.Error = isError;
                 _result.Status = 500;
             }
-                return _result;
+            return _result;
             //}
         }
 
-        private async Task<List<JObject>> OutputPortin( ISheet ImportSheet,StringCollection ColumnsHeader)
+        public async Task<Output> ReadDataExcelToDBNewWithSetting(PortInFile portinFile)
+        {
+            //using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            //using (IDbConnection conn = Tools.DBConnection(connectionString))
+            //{
+            #region set variable
+            Output _result = new Output();
+            ss_portfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_portfolio_id));
+            ss_subportfolio_id = Convert.ToInt32(fn.DecryptString(portinFile.ss_subportfolio_id));
+            user_input = fn.DecryptString(portinFile.user_input);
+            IFormFile file = portinFile.file_portin;
+            //string SpName = string.Empty;
+            StringCollection ColumnsHeader = new StringCollection();
+            var stream = new MemoryStream();
+            var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+            string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+            ISheet Settingsheet, ImportSheet;
+            #endregion
+            if (file.Length > 0)
+            {
+
+                using (var ms = new MemoryStream())
+                {
+                    //file.CopyTo(ms);
+
+                    await file.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    string s = Convert.ToBase64String(fileBytes);
+                    byte[] bytes = Convert.FromBase64String(s);
+                    stream = new MemoryStream(bytes);
+
+                    List<JObject> ListOutPut = new List<JObject>();
+
+                    #region Read Extention Driver
+                    if (sFileExtension == ".xls")
+                    {
+                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                        //Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
+                        ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
+                        eval = new HSSFFormulaEvaluator(hssfwb);
+                    }
+                    else
+                    {
+                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                        //Settingsheet = hssfwb.GetSheet("Setting"); //get Setting sheet from workbook  
+                        ImportSheet = hssfwb.GetSheet("Import"); //get Import sheet from workbook  
+                        eval = new XSSFFormulaEvaluator(hssfwb);
+
+                    }
+                    #endregion
+
+                    #region Read Storeprocedure
+                    string fileN = fileName.Replace(sFileExtension, "");
+                    TablePortinFunction dt = OptionRepo.GetdataTableFunction(fileN);
+                    if (dt == null)
+                    {
+                        throw new Exception("Table Setting Function null.");
+                    }
+                    SpName = dt.function_name;
+                    #endregion
+
+                    #region Set Header 
+                    IRow headerRow = ImportSheet.GetRow(0); //Get Header Row
+                                                            //IRow headerRow = ImportSheet.G; //Get Header Row
+                    int cellCount = headerRow.LastCellNum;
+                    //sb.Append("<table class='table table-bordered'><tr>");
+                    for (int j = 0; j < cellCount; j++)
+                    {
+                        NPOI.SS.UserModel.ICell cell = headerRow.GetCell(j);
+                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                        //sb.Append("<th>" + cell.ToString() + "</th>");
+                        ColumnsHeader.Add(cell.ToString());
+                    }
+                    #endregion
+                    if (SpName == "USER")
+                    {
+                        ListOutPut = await OutputPortinUser(ImportSheet, ColumnsHeader);
+                    }
+                    else
+                    {
+                        ListOutPut = await OutputPortin(ImportSheet, ColumnsHeader);
+                    }
+
+
+                    _result.Data = ListOutPut;
+                }
+            }
+            if (isError == true)
+            {
+                _result.Error = isError;
+                _result.Status = 500;
+            }
+            return _result;
+            //}
+        }
+        private async Task<List<JObject>> OutputPortin(ISheet ImportSheet, StringCollection ColumnsHeader)
         {
             using (IDbConnection conn = Tools.DBConnection(connectionString))
             {
@@ -370,7 +465,7 @@ namespace Acc.Api.Services
                 return ListOutPut;
             }
 
-            
+
         }
 
         private async Task<List<JObject>> OutputPortinUser(ISheet ImportSheet, StringCollection ColumnsHeader)
@@ -514,7 +609,7 @@ namespace Acc.Api.Services
 
                         }
                         #endregion
-                 
+
                         #region Set Header 
                         IRow headerRow = ImportSheet.GetRow(0); //Get Header Row
                                                                 //IRow headerRow = ImportSheet.G; //Get Header Row
@@ -573,7 +668,8 @@ namespace Acc.Api.Services
                                 string GroupCd = ParamExcel["group_cd"].ToString();
                                 string ParamWHere = string.Format("short_descs = '{0}' AND ss_portfolio_id = {1}", GroupCd, ss_portfolio_id);
                                 int GroupID = Convert.ToInt32(GroupRepo.SelectScalar(Enum.SQL.Function.Aggregate.Min, "ss_group_id", ParamWHere));
-                                if (GroupID == 0){
+                                if (GroupID == 0)
+                                {
                                     throw new Exception("User Group Not Found.");
                                 }
                                 dataUser.portfolio_id = ss_portfolio_id;
@@ -585,7 +681,7 @@ namespace Acc.Api.Services
                                 dataUser.email = ParamExcel["email"].ToString();
                                 dataUser.hand_phone = ParamExcel["handphone"].ToString();
                                 dataUser.address = ParamExcel["address"].ToString();
-                                dataUser.user_level = "S";dataUser.is_inactive = "B";
+                                dataUser.user_level = "S"; dataUser.is_inactive = "B";
                                 dataUser.password = EncryptionLibrary.EncryptText("1");
                                 dataUser.group_id = GroupID;
 
@@ -628,7 +724,7 @@ namespace Acc.Api.Services
             }
         }
 
-        void SaveUser(IDbConnection Conn,IDbTransaction Trans, SsUser domain)
+        void SaveUser(IDbConnection Conn, IDbTransaction Trans, SsUser domain)
         {
             try
             {
@@ -659,9 +755,9 @@ namespace Acc.Api.Services
                                       @address,                                         @notes
                                 );";
 
-                Conn.Execute(sqlQuery, domain,transaction: Trans);
+                Conn.Execute(sqlQuery, domain, transaction: Trans);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

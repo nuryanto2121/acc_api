@@ -63,7 +63,7 @@ namespace Acc.Api.Controllers.SystemAdministrator
         [HttpGet("{id}")]
         [APIAuthorizeAttribute]
         [ProducesResponseType(typeof(Output), 200)]
-        public IActionResult GetById([Required] int id, [Required] int lastupdatestamp)
+        public IActionResult GetById([Required] int id, int lastupdatestamp)
         {
             var output = new Output();
             try

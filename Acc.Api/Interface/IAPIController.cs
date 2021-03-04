@@ -10,7 +10,7 @@ namespace Acc.Api.Interface
 {
     public interface IAPIController<T>
     {        
-        IActionResult GetById([Required]string option_url, [Required]int line_no, [Required]int id, [Required]int lastupdatestamp);
+        IActionResult GetById([Required]string option_url, [Required]int line_no, [Required]int id, [Required]string lastupdatestamp);
         IActionResult GetList([FromBody]ParamList ModelList);
         IActionResult Insert([FromBody]T Model);
         IActionResult Update([FromBody]T Model);

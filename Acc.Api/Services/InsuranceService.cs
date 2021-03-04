@@ -30,10 +30,19 @@ namespace Acc.Api.Services
             try
             {
                 DataUpload.vendor_token = fn.DecryptString(DataUpload.vendor_token);
-                var DataInsurance = repoInsurance.GetVendor(DataUpload.vendor_token);
+                var DataInsurance = repoInsurance.GetVendorInsurance(DataUpload.vendor_token);
                 if (DataInsurance == null)
                 {
                     throw new Exception("Vendor Token Not Valid.");
+                }
+
+                if (string.IsNullOrEmpty(DataUpload.insurance_policy_no))
+                {
+                    throw new Exception("Insurance Policy No could not be empty.");
+                }
+                if (string.IsNullOrEmpty(DataUpload.order_no))
+                {
+                    throw new Exception("Order No could not be empty.");
                 }
 
                 string parameter = string.Format("order_no = '{0}'",DataUpload.order_no);
@@ -62,5 +71,20 @@ namespace Acc.Api.Services
             }
             return result;
         }
+
+        public bool InsertLog(VendorInsuranceLog param)
+        {
+            bool result = false;
+            try
+            {
+                result = repoInsurance.InsertLog(param);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return result;
+        }
+
     }
 }

@@ -112,10 +112,10 @@ namespace Acc.Api.Models
         public long Radius { get; set; }
 
         [JsonProperty("lon")]
-        public string Lon { get; set; } = "106.914125";
+        public string Lon { get; set; } 
 
         [JsonProperty("lat")]
-        public string Lat { get; set; } = "-6.182101";
+        public string Lat { get; set; } 
 
         [JsonProperty("plan_time")]
         public string PlanTime { get; set; }
@@ -136,10 +136,10 @@ namespace Acc.Api.Models
         public long Radius { get; set; }
 
         [JsonProperty("lon")]
-        public string Lon { get; set; } = "112.750270";
+        public string Lon { get; set; } 
 
         [JsonProperty("lat")]
-        public string Lat { get; set; } = "-7.252438";
+        public string Lat { get; set; } 
 
         [JsonProperty("plan_time")]
         public string PlanTime { get; set; }

@@ -29,15 +29,10 @@ namespace Acc.Api.Services
                     var defaultApp = FirebaseApp.Create(options);
                     Console.WriteLine(defaultApp.Name); // "[DEFAULT]"
                 }
-
-
-
                 //var defaultApp = FirebaseApp.Create(new AppOptions()
                 //{
                 //    Credential = GoogleCredential.FromFile(pathFile),
                 //});
-                
-
                 var message = new MulticastMessage()
                 {
                     Data = new Dictionary<string, string>()
