@@ -179,5 +179,75 @@ namespace Acc.Api.DataAccess
                 return _result;
             }
         }
+        public RowID SaveWoUser(MMWorkshopUser Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                RowID _result = new RowID();
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", Convert.ToInt32(Model.SsPortfolioId), dbType: DbType.Int32);
+                    Parameters.Add("p_mm_workshop_id", Model.MmWorkshopId, dbType: DbType.Int32);
+                    Parameters.Add("p_user_name", Model.UserName);
+                    Parameters.Add("p_password", Model.Password);
+                    Parameters.Add("p_phone_no", Model.PhoneNo);
+                    Parameters.Add("p_descs", Model.Descs);
+                    Parameters.Add("p_user_status", Model.UserStatus);
+                    Parameters.Add("p_file_name", Model.FileName);
+                    Parameters.Add("p_path_file", Model.PathFile);
+                    Parameters.Add("p_user_input", Model.UserStatus);                   
+                    _result = conn.Query<RowID>("fmm_workshop_user_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    //_result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
+        public bool UpdateWoUser(MMWorkshopUser Model)
+        {
+            using (IDbConnection conn = Tools.DBConnection(connectionString))
+            {
+                var _result = false;
+                try
+                {
+                    conn.Open();
+                    DynamicParameters Parameters = new DynamicParameters();
+                    Parameters.Add("p_ss_portfolio_id", Convert.ToInt32(Model.SsPortfolioId), dbType: DbType.Int32);
+                    Parameters.Add("p_mm_workshop_id", Model.MmWorkshopId, dbType: DbType.Int32);
+                    Parameters.Add("p_mm_workshop_user_id", Model.MmWorkshopUserId, dbType: DbType.Int32);
+                    Parameters.Add("p_user_name", Model.UserName);
+                    Parameters.Add("p_password", Model.Password);
+                    Parameters.Add("p_phone_no", Model.PhoneNo);
+                    Parameters.Add("p_descs", Model.Descs);
+                    Parameters.Add("p_user_status", Model.UserStatus);
+                    Parameters.Add("p_file_name", Model.FileName);
+                    Parameters.Add("p_path_file", Model.PathFile);
+                    Parameters.Add("p_user_edit", Model.UserStatus);
+                    Parameters.Add("p_lastupdatestamp", 0);
+                    var dd = conn.Query<dynamic>("ffm_driver_u", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    _result = true;
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+
+                return _result;
+            }
+        }
     }
 }

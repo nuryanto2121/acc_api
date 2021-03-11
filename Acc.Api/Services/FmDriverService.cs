@@ -79,5 +79,52 @@ namespace Acc.Api.Services
             }
             return _result;
         }
+        public Output SaveWoUser(MMWorkshopUser Model)
+        {
+            Output _result = new Output();
+            try
+            {
+                Model.SsPortfolioId = fn.DecryptString(Model.SsPortfolioId);
+                Model.UserInput = fn.DecryptString(Model.UserInput);
+
+                Model.Password = EncryptionLibrary.EncryptText(Model.Password);
+                var dtRow = FmDriverRepo.SaveWoUser(Model);
+               
+
+                _result.Data = dtRow;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+        public Output UpdateWoUser(MMWorkshopUser Model)
+        {
+            Output _result = new Output();
+            try
+            {
+                Model.SsPortfolioId = fn.DecryptString(Model.SsPortfolioId);
+                Model.UserInput = fn.DecryptString(Model.UserInput);
+
+                if (!string.IsNullOrEmpty(Model.Password))
+                {
+                    Model.Password = EncryptionLibrary.EncryptText(Model.Password);
+                }
+
+                var dtRow = FmDriverRepo.UpdateWoUser(Model);
+               
+
+                _result.Data = dtRow;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return _result;
+        }
+
     }
 }
