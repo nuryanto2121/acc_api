@@ -107,6 +107,7 @@ namespace Acc.Api.Services
             {
                 Model.SsPortfolioId = fn.DecryptString(Model.SsPortfolioId);
                 Model.UserInput = fn.DecryptString(Model.UserInput);
+                Model.UserEdit = fn.DecryptString(Model.UserEdit);
 
                 if (!string.IsNullOrEmpty(Model.Password))
                 {

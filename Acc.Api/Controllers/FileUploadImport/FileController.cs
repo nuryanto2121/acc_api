@@ -25,6 +25,7 @@ namespace Acc.Api.Controllers.FileUploadImport
         private IHostingEnvironment _environment;
         private FunctionString fn;
         private FileService FileService;
+        private GenXML genXML;
         private ProsessGenerateFunction ProsesGenerateFunction;
         public FileController(IConfiguration configuration, IHostingEnvironment environment)
         {
@@ -32,6 +33,7 @@ namespace Acc.Api.Controllers.FileUploadImport
             fn = new FunctionString(Tools.ConnectionString(configuration));
             FileService = new FileService(configuration, environment);
             ProsesGenerateFunction = new ProsessGenerateFunction(Tools.ConnectionString(configuration));
+            genXML = new GenXML(configuration, environment);
 
         }
 
@@ -428,6 +430,51 @@ namespace Acc.Api.Controllers.FileUploadImport
 
             return File(stream, "application/octet-stream", fileNames);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        [HttpPost("XMLCoa")]
+        [APIAuthorizeAttribute]
+        public async Task<IActionResult> GenXMLCoa(ParamCoaXml Model)
+        {
+            var stream = new MemoryStream();
+            string fileNames = string.Empty;//string.Format("CRUD_{0}.sql", TableName);
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                {
+                    _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
+
+                string pathToSave = Path.Combine(_environment.WebRootPath, "FolderXML");
+
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+
+                Model.SsPortfolioId = Tools.DecryptString(Model.SsPortfolioId);
+                Model.UserInput = Tools.DecryptString(Model.UserInput);
+
+                fileNames = genXML.GenCOA(Model, pathToSave, _environment.WebRootPath);//ProsesGenerateFunction.CreateFileFunction(TableName, pathToSave, _environment.WebRootPath);
+
+                string PathFile = Path.Combine(pathToSave, fileNames);
+                var workbookBytes = new byte[0];
+                System.IO.FileStream fs = new System.IO.FileStream(PathFile, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                fs.CopyTo(stream);
+                stream.Position = 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return File(stream, "application/octet-stream", fileNames);
+        }
+
 
     }
 }

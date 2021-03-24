@@ -232,9 +232,9 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_user_status", Model.UserStatus);
                     Parameters.Add("p_file_name", Model.FileName);
                     Parameters.Add("p_path_file", Model.PathFile);
-                    Parameters.Add("p_user_edit", Model.UserStatus);
+                    Parameters.Add("p_user_edit", Model.UserEdit);
                     Parameters.Add("p_lastupdatestamp", 0);
-                    var dd = conn.Query<dynamic>("ffm_driver_u", Parameters, commandType: CommandType.StoredProcedure).ToList();
+                    var dd = conn.Query<dynamic>("fmm_workshop_user_u", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = true;
                 }
                 catch (Exception ex)

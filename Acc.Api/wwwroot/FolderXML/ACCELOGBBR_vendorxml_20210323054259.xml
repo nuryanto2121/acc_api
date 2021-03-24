@@ -1,0 +1,60 @@
+<Root>
+  <NMEXML EximID="3" BranchCode="841463763" ACCOUNTANTCOPYID="">
+    <TRANSACTIONS OnError="continue">
+      <OTHERPAYMENT operation="Add" REQUESTID="1">
+        <TRANSACTIONID>1</TRANSACTIONID>
+        <ACCOUNTLINE operation="Add">
+          <KeyID>1</KeyID>
+          <GLACCOUNT>5100-001</GLACCOUNT>
+          <GLAMOUNT>725000</GLAMOUNT>
+          <RATE>1</RATE>
+          <PRIMEAMOUNT>725000</PRIMEAMOUNT>
+        </ACCOUNTLINE>
+        <JVNUMBER>CA-2101771</JVNUMBER>
+        <TRANSDATE>2021-03-01</TRANSDATE>
+        <SOURCE>GL</SOURCE>
+        <TRANSTYPE>other payment</TRANSTYPE>
+        <TRANSDESCRIPTION>B 9442 TEH
+TAMRIN</TRANSDESCRIPTION>
+        <JVAMOUNT>725000</JVAMOUNT>
+        <PAYEE>PT. Bintang Baru Raya</PAYEE>
+        <GLACCOUNT>1112-001</GLACCOUNT>
+        <RATE>1</RATE>
+      </OTHERPAYMENT>
+      <OTHERPAYMENT operation="Add" REQUESTID="1">
+        <TRANSACTIONID>1</TRANSACTIONID>
+        <ACCOUNTLINE operation="Add">
+          <KeyID>1</KeyID>
+          <GLACCOUNT>5100-001</GLACCOUNT>
+          <GLAMOUNT>545000</GLAMOUNT>
+          <RATE>1</RATE>
+          <PRIMEAMOUNT>545000</PRIMEAMOUNT>
+        </ACCOUNTLINE>
+        <ACCOUNTLINE operation="Add">
+          <KeyID>2</KeyID>
+          <GLACCOUNT>5100-001</GLACCOUNT>
+          <GLAMOUNT>100000</GLAMOUNT>
+          <RATE>1</RATE>
+          <PRIMEAMOUNT>100000</PRIMEAMOUNT>
+        </ACCOUNTLINE>
+        <ACCOUNTLINE operation="Add">
+          <KeyID>3</KeyID>
+          <GLACCOUNT>5100-001</GLACCOUNT>
+          <GLAMOUNT>200000</GLAMOUNT>
+          <RATE>1</RATE>
+          <PRIMEAMOUNT>200000</PRIMEAMOUNT>
+        </ACCOUNTLINE>
+        <JVNUMBER>CA-2101907</JVNUMBER>
+        <TRANSDATE>2021-03-01</TRANSDATE>
+        <SOURCE>GL</SOURCE>
+        <TRANSTYPE>other payment</TRANSTYPE>
+        <TRANSDESCRIPTION>B 9005 TEU
+JAMADI</TRANSDESCRIPTION>
+        <JVAMOUNT>845000</JVAMOUNT>
+        <PAYEE>PT. Bintang Baru Raya</PAYEE>
+        <GLACCOUNT>1112-001</GLACCOUNT>
+        <RATE>1</RATE>
+      </OTHERPAYMENT>
+    </TRANSACTIONS>
+  </NMEXML>
+</Root>

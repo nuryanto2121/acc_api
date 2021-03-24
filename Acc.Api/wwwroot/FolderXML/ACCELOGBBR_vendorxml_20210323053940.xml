@@ -1,0 +1,97 @@
+
+        {
+               'NMEXML': {
+                  '@EximID': '3',
+                  '@BranchCode': '841463763',
+                  '@ACCOUNTANTCOPYID': '',
+                  'TRANSACTIONS': {
+                     '@OnError': 'continue',
+                     'OTHERPAYMENT': [
+                        {
+                           '@operation': 'Add',
+                           '@REQUESTID': '1',
+                           'TRANSACTIONID': '1',
+                           'ACCOUNTLINE': {
+                              '@operation': 'Add',
+                              'KeyID': '1',
+                              'GLACCOUNT': '5100-001',
+                              'GLAMOUNT': '725000',
+                              'DESCRIPTION': [],
+                              'RATE': '1',
+                              'PRIMEAMOUNT': '725000',
+                              'TXDATE': [],
+                              'POSTED': [],
+                              'CURRENCYNAME': []
+                           },
+                           'JVNUMBER': 'CA-2101771',
+                           'TRANSDATE': '2021-03-01',
+                           'SOURCE': 'GL',
+                           'TRANSTYPE': 'other payment',
+                           'TRANSDESCRIPTION': 'B 9442 TEH\nTAMRIN',
+                           'JVAMOUNT': '725000',
+                           'CHEQUENO': [],
+                           'PAYEE': 'PT. Bintang Baru Raya',
+                           'VOIDCHEQUE': [],
+                           'GLACCOUNT': '1112-001',
+                           'RATE': '1'
+                        },
+                        {
+                           '@operation': 'Add',
+                           '@REQUESTID': '1',
+                           'TRANSACTIONID': '1',
+                           'ACCOUNTLINE': [
+                              {
+                                 '@operation': 'Add',
+                                 'KeyID': '1',
+                                 'GLACCOUNT': '5100-001',
+                                 'GLAMOUNT': '545000',
+                                 'DESCRIPTION': [],
+                                 'RATE': '1',
+                                 'PRIMEAMOUNT': '545000',
+                                 'TXDATE': [],
+                                 'POSTED': [],
+                                 'CURRENCYNAME': []
+                              },
+                              {
+                                 '@operation': 'Add',
+                                 'KeyID': '2',
+                                 'GLACCOUNT': '5100-001',
+                                 'GLAMOUNT': '100000',
+                                 'DESCRIPTION': [],
+                                 'RATE': '1',
+                                 'PRIMEAMOUNT': '100000',
+                                 'TXDATE': [],
+                                 'POSTED': [],
+                                 'CURRENCYNAME': []
+                              },
+                              {
+                                 '@operation': 'Add',
+                                 'KeyID': '3',
+                                 'GLACCOUNT': '5100-001',
+                                 'GLAMOUNT': '200000',
+                                 'DESCRIPTION': [],
+                                 'RATE': '1',
+                                 'PRIMEAMOUNT': '200000',
+                                 'TXDATE': [],
+                                 'POSTED': [],
+                                 'CURRENCYNAME': []
+                              }
+                           ],
+                           'JVNUMBER': 'CA-2101907',
+                           'TRANSDATE': '2021-03-01',
+                           'SOURCE': 'GL',
+                           'TRANSTYPE': 'other payment',
+                           'TRANSDESCRIPTION': 'B 9005 TEU\nJAMADI',
+                           'JVAMOUNT': '845000',
+                           'CHEQUENO': [],
+                           'PAYEE': 'PT. Bintang Baru Raya',
+                           'VOIDCHEQUE': [],
+                           'GLACCOUNT': '1112-001',
+                           'RATE': '1'
+                        }
+                     ]
+                  }
+               }
+            }
+
+        
