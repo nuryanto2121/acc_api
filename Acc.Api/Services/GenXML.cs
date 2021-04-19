@@ -21,7 +21,7 @@ namespace Acc.Api.Services
         private string PathCOA;
         private IHostingEnvironment _environment;
         string SpCoa = "f_st_export_oca_s";
-        string SpInvoice = "";
+        string SpInvoice = "f_st_export_invoice_s";
         private string connectionString;
         public GenXML(IConfiguration Configuration, IHostingEnvironment environment)
         {
@@ -31,112 +31,12 @@ namespace Acc.Api.Services
             connectionString = Tools.ConnectionString(Configuration);
         }
 
-        private string xmlCoa()
-        {
-            return @"
-        {
-               'NMEXML': {
-                  '@EximID': '3',
-                  '@BranchCode': '841463763',
-                  '@ACCOUNTANTCOPYID': '',
-                  'TRANSACTIONS': {
-                     '@OnError': 'continue',
-                     'OTHERPAYMENT': [
-                        {
-                           '@operation': 'Add',
-                           '@REQUESTID': '1',
-                           'TRANSACTIONID': '1',
-                           'ACCOUNTLINE': {
-                              '@operation': 'Add',
-                              'KeyID': '1',
-                              'GLACCOUNT': '5100-001',
-                              'GLAMOUNT': '725000',
-                              'DESCRIPTION': [],
-                              'RATE': '1',
-                              'PRIMEAMOUNT': '725000',
-                              'TXDATE': [],
-                              'POSTED': [],
-                              'CURRENCYNAME': []
-                           },
-                           'JVNUMBER': 'CA-2101771',
-                           'TRANSDATE': '2021-03-01',
-                           'SOURCE': 'GL',
-                           'TRANSTYPE': 'other payment',
-                           'TRANSDESCRIPTION': 'B 9442 TEH\nTAMRIN',
-                           'JVAMOUNT': '725000',
-                           'CHEQUENO': [],
-                           'PAYEE': 'PT. Bintang Baru Raya',
-                           'VOIDCHEQUE': [],
-                           'GLACCOUNT': '1112-001',
-                           'RATE': '1'
-                        },
-                        {
-                           '@operation': 'Add',
-                           '@REQUESTID': '1',
-                           'TRANSACTIONID': '1',
-                           'ACCOUNTLINE': [
-                              {
-                                 '@operation': 'Add',
-                                 'KeyID': '1',
-                                 'GLACCOUNT': '5100-001',
-                                 'GLAMOUNT': '545000',
-                                 'DESCRIPTION': [],
-                                 'RATE': '1',
-                                 'PRIMEAMOUNT': '545000',
-                                 'TXDATE': [],
-                                 'POSTED': [],
-                                 'CURRENCYNAME': []
-                              },
-                              {
-                                 '@operation': 'Add',
-                                 'KeyID': '2',
-                                 'GLACCOUNT': '5100-001',
-                                 'GLAMOUNT': '100000',
-                                 'DESCRIPTION': [],
-                                 'RATE': '1',
-                                 'PRIMEAMOUNT': '100000',
-                                 'TXDATE': [],
-                                 'POSTED': [],
-                                 'CURRENCYNAME': []
-                              },
-                              {
-                                 '@operation': 'Add',
-                                 'KeyID': '3',
-                                 'GLACCOUNT': '5100-001',
-                                 'GLAMOUNT': '200000',
-                                 'DESCRIPTION': [],
-                                 'RATE': '1',
-                                 'PRIMEAMOUNT': '200000',
-                                 'TXDATE': [],
-                                 'POSTED': [],
-                                 'CURRENCYNAME': []
-                              }
-                           ],
-                           'JVNUMBER': 'CA-2101907',
-                           'TRANSDATE': '2021-03-01',
-                           'SOURCE': 'GL',
-                           'TRANSTYPE': 'other payment',
-                           'TRANSDESCRIPTION': 'B 9005 TEU\nJAMADI',
-                           'JVAMOUNT': '845000',
-                           'CHEQUENO': [],
-                           'PAYEE': 'PT. Bintang Baru Raya',
-                           'VOIDCHEQUE': [],
-                           'GLACCOUNT': '1112-001',
-                           'RATE': '1'
-                        }
-                     ]
-                  }
-               }
-            }
 
-        ";
-        }
-
-        public string GenCOA(ParamCoaXml Model,string FolderPath, string PathRoot)
+        public string GenCOA(ParamCoaXml Model, string FolderPath, string PathRoot)
         {
             try
             {
-                string XMLCoa = this.xmlCoa(Convert.ToInt32(Model.SsPortfolioId), Model.UserInput);
+                string XMLCoa = this.xmlData(Convert.ToInt32(Model.SsPortfolioId), Model.UserInput);
                 XNode node = JsonConvert.DeserializeXNode(XMLCoa, "NMEXML");
                 string XMLString = node.ToString();
                 PathCOA = string.Format("ACCELOGBBR_vendorxml_{0}.xml", DateTime.Now.ToString("yyyyMMddhhmmss"));
@@ -147,7 +47,30 @@ namespace Acc.Api.Services
                                    StringSplitOptions.None
                                );
                 Tools.writeFile(XMLdata, PathComponent);
-                
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return PathCOA;
+        }
+        public string GenInvoice(ParamCoaXml Model, string FolderPath, string PathRoot)
+        {
+            try
+            {
+                string XMLCoa = this.xmlData(Convert.ToInt32(Model.SsPortfolioId), Model.UserInput, false);
+                XNode node = JsonConvert.DeserializeXNode(XMLCoa, "NMEXML");
+                string XMLString = node.ToString();
+                PathCOA = string.Format("ACCELOGBBR_salesinv_xml_{0}.xml", DateTime.Now.ToString("yyyyMMddhhmmss"));
+                var PathComponent = Path.Combine(FolderPath, PathCOA);
+
+                string[] XMLdata = XMLString.Split(
+                                   new[] { Environment.NewLine },
+                                   StringSplitOptions.None
+                               );
+                Tools.writeFile(XMLdata, PathComponent);
+
             }
             catch (Exception ex)
             {
@@ -156,17 +79,18 @@ namespace Acc.Api.Services
             return PathCOA;
         }
 
-        private string xmlCoa(int SsPortfolioId,string UserInput)
+        private string xmlData(int SsPortfolioId, string UserInput, bool isCoa = true)
         {
             string resultXml = string.Empty;
             using (IDbConnection conn = Tools.DBConnection(connectionString))
-            {                
+            {
                 try
                 {
+                    string SPName = isCoa ? SpCoa : SpInvoice;
                     DynamicParameters spParam = new DynamicParameters();
                     spParam.Add("p_ss_portfolio_id", SsPortfolioId, dbType: DbType.Int32);
                     spParam.Add("p_user_input", UserInput);
-                    var datas = conn.Query(SpCoa, spParam, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    var datas = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     var res = JObject.FromObject(datas);
                     if (res["result"] != null)
                     {
@@ -178,8 +102,6 @@ namespace Acc.Api.Services
                         {
                             resultXml = res[SpCoa].ToString();
                         }
-                       
-
                     }
                 }
                 catch (Exception ex)
@@ -187,8 +109,9 @@ namespace Acc.Api.Services
                     throw ex;
                 }
             }
-            
+
             return resultXml;
         }
+
     }
 }

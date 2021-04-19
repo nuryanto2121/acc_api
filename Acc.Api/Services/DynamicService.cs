@@ -1028,7 +1028,7 @@ namespace Acc.Api.Services
 
                     JModel = fn.DecryptData(JModel);
                     spParam = fn.SpParameters(JModel, OptionRepo.getListParamType(MvSpName));
-                    var datas = conn.Query(MvSpName, spParam, commandType: CommandType.StoredProcedure);
+                    var datas = conn.Query(MvSpName, spParam, commandTimeout: 30000, commandType: CommandType.StoredProcedure);
                     OutputList.Data = datas;
 
                 }
@@ -1072,7 +1072,7 @@ namespace Acc.Api.Services
                     sQuery.AppendFormat(" LIMIT {0} ", iPageSize);
                     sQuery.AppendFormat(" OFFSET {0} ;", iOffset);
                     conn.Open();
-                    op = conn.Query<dynamic>(sQuery.ToString()).ToList();
+                    op = conn.Query<dynamic>(sQuery.ToString(),commandTimeout:30000).ToList();
                 }
                 catch (Exception ex)
                 {

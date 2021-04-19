@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -431,19 +432,17 @@ namespace Acc.Api.Controllers.FileUploadImport
             return File(stream, "application/octet-stream", fileNames);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Model"></param>
+        
         /// <returns></returns>
-        [HttpPost("XMLCoa")]
-        [APIAuthorizeAttribute]
-        public async Task<IActionResult> GenXMLCoa(ParamCoaXml Model)
+        [HttpGet("XMLCoa")]
+        public async Task<IActionResult> GenXMLCoa([Required] string ss_portfolio_id, [Required] string user_input)
         {
             var stream = new MemoryStream();
             string fileNames = string.Empty;//string.Format("CRUD_{0}.sql", TableName);
             try
             {
+                user_input = user_input.Replace(" ", "+");
+                ss_portfolio_id = ss_portfolio_id.Replace(" ", "+");
                 if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
                 {
                     _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -455,9 +454,9 @@ namespace Acc.Api.Controllers.FileUploadImport
                 {
                     Directory.CreateDirectory(pathToSave);
                 }
-
-                Model.SsPortfolioId = Tools.DecryptString(Model.SsPortfolioId);
-                Model.UserInput = Tools.DecryptString(Model.UserInput);
+                ParamCoaXml Model = new ParamCoaXml();
+                Model.SsPortfolioId = Tools.DecryptString(ss_portfolio_id);
+                Model.UserInput = Tools.DecryptString(user_input);
 
                 fileNames = genXML.GenCOA(Model, pathToSave, _environment.WebRootPath);//ProsesGenerateFunction.CreateFileFunction(TableName, pathToSave, _environment.WebRootPath);
 
@@ -469,7 +468,50 @@ namespace Acc.Api.Controllers.FileUploadImport
             }
             catch (Exception ex)
             {
-                throw ex;
+                //throw ex;
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return File(stream, "application/octet-stream", fileNames);
+        }
+
+        [HttpGet("XMLInvoice")]
+        public async Task<IActionResult> GenXMLInvoice([Required] string ss_portfolio_id, [Required] string user_input)
+        {
+            var stream = new MemoryStream();
+            string fileNames = string.Empty;//string.Format("CRUD_{0}.sql", TableName);
+            try
+            {
+                user_input = user_input.Replace(" ", "+");
+                ss_portfolio_id = ss_portfolio_id.Replace(" ", "+");
+                if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                {
+                    _environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
+
+                string pathToSave = Path.Combine(_environment.WebRootPath, "FolderXML");
+
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+                ParamCoaXml Model = new ParamCoaXml();
+                Model.SsPortfolioId = Tools.DecryptString(ss_portfolio_id);
+                Model.UserInput = Tools.DecryptString(user_input);
+
+                fileNames = genXML.GenInvoice(Model, pathToSave, _environment.WebRootPath);//ProsesGenerateFunction.CreateFileFunction(TableName, pathToSave, _environment.WebRootPath);
+
+                string PathFile = Path.Combine(pathToSave, fileNames);
+                var workbookBytes = new byte[0];
+                System.IO.FileStream fs = new System.IO.FileStream(PathFile, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                fs.CopyTo(stream);
+                stream.Position = 0;
+            }
+            catch (Exception ex)
+            {
+                //throw ex;
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                ///return //File(stream, "application/json", fileNames);
             }
 
             return File(stream, "application/octet-stream", fileNames);
