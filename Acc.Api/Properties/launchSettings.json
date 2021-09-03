@@ -14,7 +14,9 @@
       "launchUrl": "swagger/index.html",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "nativeDebugging": false,
+      "jsWebView2Debugging": false
     },
     "Acc.Api": {
       "commandName": "Project",

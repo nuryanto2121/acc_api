@@ -37,7 +37,12 @@ namespace Acc.Api.Services
 
                     if (Param.Token != fn.sha256_hash(Token))
                     {
-                        throw new Exception("Invalid Token.");
+                        //throw new Exception("Invalid Token.");
+                        result.Data = null;
+                        result.Message = "Invalid Token.";
+                        result.Error = true;
+                        result.Status = 404;
+                        return result;
                     }
                     conn.Open();
                     DynamicParameters spParam = new DynamicParameters();
@@ -53,8 +58,11 @@ namespace Acc.Api.Services
                     }
                     else
                     {
-                        result.Data = datas;
-                        //OutputList.Message = "Data Not Found.";
+                        result.Data = null;
+                        result.Message = "Data Not Found.";
+                        result.Error = true;
+                        result.Status = 404;
+                        //throw new Exception("Data Not Found.");
                     }
                 }
                 catch (Exception ex)

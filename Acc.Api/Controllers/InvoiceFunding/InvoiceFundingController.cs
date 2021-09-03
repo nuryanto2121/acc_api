@@ -35,7 +35,7 @@ namespace Acc.Api.Controllers.InvoiceFunding
                 _result = await InvService.GetInvoice(Model);
                 if (_result.Error)
                 {
-                    return StatusCode(501, _result);
+                    return StatusCode(_result.Status, _result);
                 }
             }
             catch (Exception ex)

@@ -206,6 +206,13 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
+                //check user_id exit
+                string sParam = string.Format("user_id ilike '{0}'", Model.user_id);
+                int userCNt = Convert.ToInt32(UserRepo.SelectScalar(Enum.SQL.Function.Aggregate.Count, "*", sParam));
+                if (userCNt > 0)
+                {
+                    throw new Exception("Duplicate User ID.");
+                }
                 JObject dataOut = new JObject();
                 //Model.is_inactive = "N";
                 Model.expired_date = DateTime.Now.AddYears(1);

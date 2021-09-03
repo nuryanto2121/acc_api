@@ -53,7 +53,11 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_join_date", Model.FMDriver.JoinDate, dbType: DbType.DateTime);
                     Parameters.Add("p_contract_end_date", Model.FMDriver.ContractEndDate, dbType: DbType.DateTime);
                     Parameters.Add("p_terminate_date", Model.FMDriver.TerminateDate, dbType: DbType.DateTime);
-                    Parameters.Add("p_password", Model.FMDriver.Password);                    
+                    Parameters.Add("p_password", Model.FMDriver.Password);
+                    Parameters.Add("p_date_of_birth", Model.FMDriver.DateOfBirth, dbType: DbType.DateTime);
+                    Parameters.Add("p_expected_income_month_amt", Convert.ToDecimal(Model.FMDriver.ExpectedIncomeMonthAmt), dbType: DbType.Decimal);
+                    Parameters.Add("p_expected_order_month", Convert.ToDecimal(Model.FMDriver.ExpectedOrderMonth), dbType: DbType.Decimal);
+                    Parameters.Add("p_expected_mileage_month_amt", Convert.ToDecimal(Model.FMDriver.ExpectedMileageMonthAmt), dbType: DbType.Decimal);
                     _result = conn.Query<RowID>("ffm_driver_i", Parameters, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     //_result = true;
                 }
@@ -107,6 +111,10 @@ namespace Acc.Api.DataAccess
                     Parameters.Add("p_password", Model.FMDriver.Password);
                     Parameters.Add("p_user_edit", Model.UserInput);
                     Parameters.Add("p_lastupdatestamp", 0);
+                    Parameters.Add("p_date_of_birth", Model.FMDriver.DateOfBirth, dbType: DbType.DateTime);
+                    Parameters.Add("p_expected_income_month_amt", Convert.ToDecimal(Model.FMDriver.ExpectedIncomeMonthAmt), dbType: DbType.Decimal);
+                    Parameters.Add("p_expected_order_month", Convert.ToDecimal(Model.FMDriver.ExpectedOrderMonth), dbType: DbType.Decimal);
+                    Parameters.Add("p_expected_mileage_month_amt", Convert.ToDecimal(Model.FMDriver.ExpectedMileageMonthAmt), dbType: DbType.Decimal);
                     var dd = conn.Query<dynamic>("ffm_driver_u", Parameters, commandType: CommandType.StoredProcedure).ToList();
                     _result = true;
                 }

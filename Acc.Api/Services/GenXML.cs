@@ -90,7 +90,7 @@ namespace Acc.Api.Services
                     DynamicParameters spParam = new DynamicParameters();
                     spParam.Add("p_ss_portfolio_id", SsPortfolioId, dbType: DbType.Int32);
                     spParam.Add("p_user_input", UserInput);
-                    var datas = conn.Query(SPName, spParam, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                    var datas = conn.Query(SPName, spParam, commandTimeout: 30000, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     var res = JObject.FromObject(datas);
                     if (res["result"] != null)
                     {

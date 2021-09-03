@@ -31,6 +31,7 @@ namespace Acc.Api.Models
         {
             get; set;
         }
+        
     }
 
     public partial class FMDriver
@@ -146,7 +147,21 @@ namespace Acc.Api.Models
         {
             get; set;
         }
-
+        [JsonProperty("expected_mileage_month_amt")]
+        public string ExpectedMileageMonthAmt
+        {
+            get; set;
+        }
+        [JsonProperty("expected_order_month")]
+        public string ExpectedOrderMonth
+        {
+            get; set;
+        }
+        [JsonProperty("expected_income_month_amt")]
+        public string ExpectedIncomeMonthAmt
+        {
+            get; set;
+        }
         [JsonProperty("bank_acct_no")]
         public string BankAcctNo
         {
@@ -161,6 +176,12 @@ namespace Acc.Api.Models
 
         [JsonProperty("join_date")]
         public DateTime? JoinDate
+        {
+            get; set;
+        }
+
+        [JsonProperty("date_of_birth")]
+        public DateTime? DateOfBirth
         {
             get; set;
         }

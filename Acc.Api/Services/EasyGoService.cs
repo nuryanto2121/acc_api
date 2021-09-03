@@ -188,18 +188,20 @@ namespace Acc.Api.Services
                 using (var client = new HttpClient(handler))
                 {
                     var url = "https://vtsapi.easygo-gps.co.id/api/report/lastposition";
+                    Uri MyUri = new Uri(url,UriKind.Absolute);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
                     client.DefaultRequestHeaders.Add("Token", Tokens.gps_token);
                     StringContent content = new StringContent(JsonConvert.SerializeObject(ParamEasyGo), Encoding.UTF8, "application/json");
-                    using (var response = await client.PostAsync(url, content))
+                    //var dd = await client.PostAsync(MyUri,content)
+                    using (var response = await client.PostAsync(MyUri, content))
                     {
 
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         Resp = JsonConvert.DeserializeObject<ResponsePosition>(apiResponse);
                         _result.Data = Resp;
-                    }
+                    } 
                 }
             }
             catch (Exception ex)
