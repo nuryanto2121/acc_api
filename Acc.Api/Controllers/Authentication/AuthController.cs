@@ -79,7 +79,7 @@ namespace Acc.Api.Controllers
         }
 
         /// <summary>
-        /// ini adalah login
+        /// ini adalah login new
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>

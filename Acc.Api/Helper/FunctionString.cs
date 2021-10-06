@@ -1598,14 +1598,16 @@ namespace Acc.Api.Helper
             string _result = string.Empty;
             try
             {
+                string[] filter = { "no", "row_id", "time_edit", "time_input" };
                 string[] fields = sField.Split(',');
                 for (int x = 0; x < fields.Count(); x++)
                 {
                     string[] sFIeld = fields[x].Split(':');
-                    if (sFIeld[0].ToString().ToLower() == "no")
+                    if (filter.Contains( sFIeld[0].ToString().ToLower()))
                     {
                         continue;
                     }
+
 
                     sFIeld[0] = string.Format("{0}", sFIeld[0]);
                     if (sFIeld.Count() > 1)

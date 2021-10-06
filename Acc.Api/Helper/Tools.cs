@@ -169,7 +169,7 @@ namespace Acc.Api.Helper
         {
             ErrorStatusCode _result = new ErrorStatusCode();
             _result.StatusCode = StatusCodes.Status500InternalServerError;
-            _result.Message = ex.Message;
+            _result.Message = ex.Message+"\n"+ex.StackTrace;
             if (ex.Message.IndexOf("^") != -1)
             {
                 string []msg = ex.Message.Split("^");
