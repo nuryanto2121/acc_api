@@ -213,6 +213,22 @@ namespace Acc.Api.Services
                 {
                     throw new Exception("Duplicate User ID.");
                 }
+                //hand_phone
+                sParam = string.Format("hand_phone ilike '{0}' AND is_inactive = 'N'", Model.hand_phone);
+                var ss_portfolio = UserRepo.SelectScalar(Enum.SQL.Function.Aggregate.Max, "portfolio_id", sParam);
+                if (ss_portfolio != null)
+                {
+                    if (Convert.ToInt32(ss_portfolio) != Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id)))
+                    {
+                        throw new Exception("Duplicate Handphone in Another Portfolio.");
+                    }
+                    else
+                    {
+                        throw new Exception("Duplicate Handphone.");
+                    }
+                }
+
+
                 JObject dataOut = new JObject();
                 //Model.is_inactive = "N";
                 Model.expired_date = DateTime.Now.AddYears(1);

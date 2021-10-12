@@ -32,7 +32,7 @@ namespace Acc.Api.Controllers
         }
 
         /// <summary>
-        /// change password
+        /// change password adalah utk rubah password
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
@@ -79,7 +79,7 @@ namespace Acc.Api.Controllers
         }
 
         /// <summary>
-        /// ini adalah login new
+        /// ini adalah login marketing
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
