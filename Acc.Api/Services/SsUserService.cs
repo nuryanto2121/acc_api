@@ -263,6 +263,20 @@ namespace Acc.Api.Services
             Output _result = new Output();
             try
             {
+                string sParam = string.Format("hand_phone ilike '{0}' AND is_inactive = 'N' and ss_user_id <> {1}", Model.hand_phone,Model.ss_user_id);
+                var ss_portfolio = UserRepo.SelectScalar(Enum.SQL.Function.Aggregate.Max, "portfolio_id", sParam);
+                if (ss_portfolio != null)
+                {
+                    if (Convert.ToInt32(ss_portfolio) != Convert.ToInt32(fn.DecryptString(Model.ss_portfolio_id)))
+                    {
+                        throw new Exception("Duplicate Handphone in Another Portfolio.");
+                    }
+                    else
+                    {
+                        throw new Exception("Duplicate Handphone.");
+                    }
+                }
+
                 JObject dataOut = new JObject();
                 if (string.IsNullOrEmpty(Model.password))
                 {
